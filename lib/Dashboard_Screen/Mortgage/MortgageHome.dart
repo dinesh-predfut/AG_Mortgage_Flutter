@@ -152,8 +152,8 @@ class _MortgagePageState extends State<MortgagePage> {
     const Landing_Mortgage(),
     MortgageFormPage(),
     CalendarPage(),
-    const MortgageStep4(),
-    const MortgageStep5(),
+     CardDetailsPage(),
+     PaymentMethodPage(),
   ];
 
   void _goToNextStep() {
@@ -559,27 +559,227 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             const SizedBox(height: 16),
             // Show Selected Date
-          
+          Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MortgagePage(
+                                startIndex: 4), // Start with MortgageHome
+                          ),
+                        );
+                      },
+                      //  onPressed: _goToPreviousStep,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        minimumSize: const Size(200, 50),
+                      ),
+                      child: const Text(
+                        "Proceed",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 }
-class MortgageStep4 extends StatelessWidget {
-  const MortgageStep4({super.key});
 
+
+class CardDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Mortgage Step 4'));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Card"),
+        centerTitle: true,
+      ),
+      body: 
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Card(
+              color: Colors.red,
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "iPay",
+                      style: TextStyle(color: Colors.white, fontSize: 28),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "0000 0000 0000 0000",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "CVV: 000",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "EXP: 00/00",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const TextField(
+              decoration: InputDecoration(labelText: "Card Name"),
+            ),
+            const SizedBox(height: 16),
+            const TextField(
+              decoration: InputDecoration(labelText: "Card Number"),
+            ),
+            const SizedBox(height: 16),
+            const Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(labelText: "Exp. Date"),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(labelText: "CVV"),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Checkbox(value: false, onChanged: (value) {}),
+                const Text("Save Card"),
+              ],
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MortgagePage(
+                                startIndex: 4), // Start with MortgageHome
+                          ),
+                        );
+                      },
+                      //  
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
+              child: const Text("Save Card"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class MortgageStep5 extends StatelessWidget {
-  const MortgageStep5({super.key});
+
+
+
+class PaymentMethodPage extends StatefulWidget {
+  @override
+  _PaymentMethodPageState createState() => _PaymentMethodPageState();
+}
+
+class _PaymentMethodPageState extends State<PaymentMethodPage> {
+  String selectedPaymentMethod = "Card";
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Mortgage Step 5'));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Payment"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "How would you like to make your first deposit?",
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.credit_card),
+              title: const Text("Card"),
+              trailing: Radio<String>(
+                value: "Card",
+                groupValue: selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: const Text("Bank Transfer"),
+              trailing: Radio<String>(
+                value: "Bank Transfer",
+                groupValue: selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
+              ),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MortgagePage(
+                                startIndex: 3), // Start with MortgageHome
+                          ),
+                        );
+                      },
+                      //  
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
+              child: const Text("Make Payment"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
+
