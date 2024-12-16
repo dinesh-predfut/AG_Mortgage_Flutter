@@ -1,217 +1,152 @@
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/Landing/landing.dart';
+
+import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
+import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
-import 'package:ag_mortgage/const/colors.dart';
-import 'package:ag_mortgage/const/colors.dart';
-import 'package:ag_mortgage/onboarding_pages/second_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+// ignore: depend_on_referenced_packages
+import 'package:table_calendar/table_calendar.dart';
 
-void main() {
-  runApp(const Dashboard_Screen());
-}
 
-// ignore: camel_case_types
-class Dashboard_Screen extends StatelessWidget {
-  const Dashboard_Screen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Dashboard with Bottom Nav Bar',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const DashboardPage(),
-    );
-  }
-}
-
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _DashboardPageState createState() => _DashboardPageState();
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'AG Mortgage',
+      home: HomePage(),
+    );
+  }
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const Landing_Mortgage(),
-    const MarketplaceScreen(),
-    const NotificationsScreen(),
-    const AccountScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AG Mortgage Bank Plc'),
-        centerTitle: true,
+        title: const Text('AG Mortgage'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items:  [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-             backgroundColor:baseColor,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.shopping_cart),
-            label: 'Marketplace',
-            backgroundColor:baseColor,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.notifications),
-            label: 'Notifications',
-            backgroundColor:baseColor,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: 'Account',
-            backgroundColor:baseColor,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Welcome to Home Screen'),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MortgageScreen(),
-                ),
-              );
-            },
-            child: const Text('Mortgage'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MortgageScreen extends StatelessWidget {
-  const MortgageScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mortgage Options'),
-      ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Mortgage Page 1'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MortgagePage2(),
+            const Text(
+              'Hello, Pelumi 👋',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'What brings you to AG Mortgage Bank Plc today?',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                children: [
+                  MenuButton(
+                    title: 'Mortgage',
+                    icon: Icons.home,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MortgageHome(),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-              child: const Text('Next Page'),
+                  MenuButton(
+                    title: 'Rent to Own',
+                    icon: Icons.key,
+                    onTap: () {Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Rent_To_Own(),
+                        )
+                  );
+                  },
+                  ),
+                  MenuButton(
+                    title: 'Construction Finance',
+                    icon: Icons.construction,
+                     onTap: () {Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ConstructionPage(),
+                        )
+                  );
+                     }
+                  ),
+                  MenuButton(
+                    title: 'Investment',
+                    icon: Icons.trending_up,
+                    onTap: () {},
+                  ),
+                  MenuButton(
+                    title: 'Marketplace',
+                    icon: Icons.shopping_cart,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MortgageHome(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: 0, // Use this to sync across all pages if needed.
-      //   onTap: (index) {},
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Home',
-      //       backgroundColor: Colors.blue
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.shopping_cart),
-      //       label: 'Marketplace',
-      //        backgroundColor: Colors.blue
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.notifications),
-      //       label: 'Notifications',
-      //        backgroundColor: Colors.blue
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person),
-      //       label: 'Account',
-      //        backgroundColor: Colors.blue
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
 
-class MortgagePage2 extends StatelessWidget {
-  const MortgagePage2({super.key});
+class MenuButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const MenuButton({
+    Key? key,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mortgage Options - Page 2'),
-      ),
-      body: const Center(
-        child: Text('Mortgage Page 2'),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
       ),
     );
-  }
-}
-
-// Placeholder Screens
-class MarketplaceScreen extends StatelessWidget {
-  const MarketplaceScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Marketplace Screen'));
-  }
-}
-
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Notifications Screen'));
-  }
-}
-
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Account Screen'));
   }
 }

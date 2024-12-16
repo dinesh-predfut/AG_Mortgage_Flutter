@@ -7,4 +7,6 @@ class Images {
   static const String Iconstext = "assets/Frame.png";
   static const String house1 = "assets/registerpagehome.png";
    static const String mortgage = "assets/Imagemor.png";
+   static const String success = "assets/success.png";
+   static const String constraction_Landing = "assets/Construction.png";
 }

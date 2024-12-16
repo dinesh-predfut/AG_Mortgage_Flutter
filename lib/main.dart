@@ -1,8 +1,10 @@
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/Apply_From/form.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/main.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/NotificationScreen/notification.dart';
+import 'package:ag_mortgage/Profile/profile.dart';
+
+
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/onboarding_pages/first_page.dart';
@@ -23,9 +25,9 @@ class MyApp extends StatelessWidget {
      initialRoute: '/login',
       routes: {
         '/login': (context) => const LandingPage(),
-        '/second': (context) =>  MortgageHome (),
+        // '/second': (context) =>  MortgageHome (),
         '/landing': (context) => const Logo_Screen(),
-        '/main_page':(context) =>  MortgageHome(),
+        // '/main_page':(context) => const MortgageHome(),
         
       },
     );
@@ -51,11 +53,11 @@ class _LandingPageState extends State<LandingPage> {
   // List of pages to show based on the index
   final List<Widget> _pages = [
     const Logo_Screen(),
-       MortgageHome(),
+    const DashboardPage(),
     const NotificationsScreen(),
-    const AccountScreen(),
-    const Form_mortgage(),
-  ];
+    const ProfilePage(),
+    
+  ];  
 
   void _onItemTapped(int index) {
     setState(() {

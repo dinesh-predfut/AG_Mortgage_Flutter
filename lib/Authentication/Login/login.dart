@@ -1,6 +1,5 @@
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:ag_mortgage/Authentication/Reset_Password/reset_password.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/Landing/landing.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/main.dart';
