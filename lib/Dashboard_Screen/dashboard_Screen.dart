@@ -1,5 +1,8 @@
 
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Investment/investment.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/marketing.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/const/Image.dart';
@@ -89,7 +92,14 @@ class HomePage extends StatelessWidget {
                   MenuButton(
                     title: 'Investment',
                     icon: Icons.trending_up,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Investment(),
+                        ),
+                      );
+                    },
                   ),
                   MenuButton(
                     title: 'Marketplace',
@@ -98,7 +108,7 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const MortgageHome(),
+                          builder: (_) => const Market_place_connection(),
                         ),
                       );
                     },

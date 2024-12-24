@@ -1,0 +1,98 @@
+ [
+      {
+        "date": "Today",
+        "data": [
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          }, 
+          {
+            "iconUrl": "assets/6.jpg",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          }
+        ]
+      },
+      {
+        "date": "Yesterday",
+        "data": [
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          },
+          {
+            "iconUrl": "assets/notificationIcon.png",
+            "title": "Lorem Ipsum",
+            "description": "Sample description",
+            "timestamp": "25 minutes ago",
+            "id": 1
+          }
+        ]
+      }
+    ]
+  
+  

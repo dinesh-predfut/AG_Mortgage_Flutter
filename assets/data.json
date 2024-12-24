@@ -1,0 +1,255 @@
+[
+  {
+    "title": "Sponsored",
+    "homes": [
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/6.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/2.jpg",
+        "status": "Sponsored",
+        "sq": "1,890 SqFt"
+      },
+      {
+        "price": "NGN 81,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/5.jpg",
+        "status": "Sponsored",
+        "sq": "2,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/6.jpg",
+        "status": "Sponsored",
+        "sq": "890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "2 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/7.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/3.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+        
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/8.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      }
+    ]
+  },
+  {
+    "title": "Most Viewed",
+    "homes": [
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/2.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/2.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/3.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/2.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/9.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      }
+    ]
+  },
+  {
+    "title": "Today's Deal",
+    "homes": [
+      {
+        "price": "NGN 92,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/3.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/2.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/9.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      }
+    ]
+  },
+   {
+    "title": "New House",
+    
+    "homes": [
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/10.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/9.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/8.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/7.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/6.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/5.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 86,000,000",
+        "type": "3 Bedroom Semi-Detached Apartment",
+        "location": "Lagos",
+        "image": "assets/4.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      },
+      {
+        "price": "NGN 40,000,000",
+        "type": "Studio",
+        "location": "Lagos",
+        "image": "assets/3.jpg",
+        "status": "Sponsored",
+        "sq": "3,890 SqFt"
+      }
+    ]
+  }
+
+]

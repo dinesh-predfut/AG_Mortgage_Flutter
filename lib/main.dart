@@ -1,4 +1,5 @@
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/NotificationScreen/notification.dart';
@@ -54,7 +55,8 @@ class _LandingPageState extends State<LandingPage> {
   final List<Widget> _pages = [
     const Logo_Screen(),
     const DashboardPage(),
-    const NotificationsScreen(),
+     const MarketMain(),
+    const NotificationsPage(),
     const ProfilePage(),
     
   ];  
@@ -74,7 +76,7 @@ class _LandingPageState extends State<LandingPage> {
           ? BottomNavBar(
               currentIndex: _currentIndex - 1,
               onTap: (index) =>
-                  _onItemTapped(index + 1), // Adjust for LandingPage
+                  _onItemTapped(index + 1), items: const [], // Adjust for LandingPage
             )
           : null,
     );

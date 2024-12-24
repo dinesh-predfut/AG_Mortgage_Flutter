@@ -1,198 +1,104 @@
-
+import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-// ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
 
-void main() {
-  runApp(const MortgageHome());
-}
-
-class MortgageHome extends StatelessWidget {
-  const MortgageHome({super.key});
+class Investment extends StatefulWidget {
+  final int startIndex;
+  const Investment({super.key, this.startIndex = 0});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AG Mortgage',
-      home: MortgagePage(),
-    );
-  }
+  State<Investment> createState() => __InvestmenStateState();
 }
 
-  class MortgagePage extends StatefulWidget {
-    final int startIndex;
-    const MortgagePage({super.key, this.startIndex = 0});
-    @override
-    // ignore: library_private_types_in_public_api
-    _MortgagePageState createState() => _MortgagePageState();
+class __InvestmenStateState extends State<Investment> {
+  int _currentStepIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    _currentStepIndex = widget.startIndex;
   }
 
-  class _MortgagePageState extends State<MortgagePage> {
-    int _currentStepIndex = 0;
-    @override
-    void initState() {
-      super.initState();
-      _currentStepIndex = widget.startIndex; // Initialize with provided index
-    }
-
-    final List<Widget> _steps = [
-      const Landing_Mortgage(),
-      const MortgageFormPage(),
-      const CalendarPage(),
+  final List<Widget> _steps = [
+    const InvestmentFormPage(),
+     const PaymentMethodPage(),
       const CardDetailsPage(),
-      const PaymentMethodPage(),
-      const AllCardsDetails(),
-      const PaymentPage(),
-      const Success(),
-      const TermSheetPage(),
-      const BankTransferPage()
-    ];
-
-    void _goToNextStep() {
-      setState(() {
-        if (_currentStepIndex < _steps.length - 1) {
-          _currentStepIndex++;
-        }
-      });
-    }
-
-    void _goTomMortgageFormPage() {
-      setState(() {
-        if (_currentStepIndex > 0) {
-          _currentStepIndex--;
-        }
-      });
-    }
-
-    void _goToPreviousStep() {
-      setState(() {
-        if (_currentStepIndex > 0) {
-          _currentStepIndex--;
-        }
-      });
-    }
-
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-              child: _steps[_currentStepIndex],
-            ),
-          ],
-        ),
-      
-      );
-    }
-  }
-
-// Chain of Components for Mortgage
-// ignore: camel_case_types
-class Landing_Mortgage extends StatelessWidget {
-  const Landing_Mortgage({super.key});
-
+    const AllCardsDetails(),
+    const PaymentPage(),
+    const Success(),
+    const CalendarPage(),
+   
+    const TermSheetPage(),
+    const BankTransferPage()
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(children: [
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(Images.mortgage),
-              const SizedBox(height: 10),
-              const Text(
-                'Mortgage',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Save Smart, Own Your Home!",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
-              const Text(
-                "Build your down payment with interest and prove you’re mortgage ready. Start Saving today and move closer to owning your dream apartment in any Nigerian city. Your Journey to homeownership starts here.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MortgagePage(
-                                startIndex: 1), // Start with MortgageHome
-                          ),
-                        );
-                      },
-                      //  onPressed: _goToPreviousStep,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        minimumSize: const Size(200, 50),
-                      ),
-                      child: const Text(
-                        "Proceed",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      body: Column(
+        children: [
+          Expanded(
+            child: _steps[_currentStepIndex],
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
 
-class MortgageFormPage extends StatefulWidget {
-  const MortgageFormPage({super.key});
+class InvestmentFormPage extends StatefulWidget {
+  const InvestmentFormPage({super.key});
 
   @override
-  _MortgageFormPageState createState() => _MortgageFormPageState();
+  InvestmentFormPageState createState() => InvestmentFormPageState();
 }
 
-class _MortgageFormPageState extends State<MortgageFormPage> {
+class InvestmentFormPageState extends State<InvestmentFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _propertyValueController = TextEditingController();
-  final TextEditingController _initialDepositController = TextEditingController();
-  final TextEditingController _monthlyRepaymentController = TextEditingController();
+  // ignore: non_constant_identifier_names
+  final TextEditingController _interest = TextEditingController();
+  final TextEditingController _maturityDate = TextEditingController();
+  final TextEditingController _yield = TextEditingController();
+
+  final TextEditingController _amount = TextEditingController();
 
   String? _selectedApartmentType;
-  String? _selectedCity;
-  String? _selectedArea;
-  double _sliderValue = 10; // Default value for slider
+
+  DateTime? _selectedStartDate; // Holds the selected start date
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedStartDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null && pickedDate != _selectedStartDate) {
+      setState(() {
+        _selectedStartDate = pickedDate;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mortgage'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Construction Finance',
+          style:
+              TextStyle(color: Color(0xFF633095), fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -209,14 +115,23 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Apartment Type Dropdown
-              const Text('Apartment Type'),
+              const Text('Amount (<NGN 500,000)'),
+              TextFormField(
+                controller: _amount,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text('Duration'),
               DropdownButtonFormField<String>(
                 value: _selectedApartmentType,
                 items: const [
-                  DropdownMenuItem(value: 'Apartment', child: Text('Apartment')),
-                  DropdownMenuItem(value: 'House', child: Text('House')),
+                  DropdownMenuItem(value: '1 BHK', child: Text('1 BHK')),
+                  DropdownMenuItem(value: '2 BHK', child: Text('2 BHK')),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -229,161 +144,92 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-
-              // City Dropdown
-              const Text('City'),
-              DropdownButtonFormField<String>(
-                value: _selectedCity,
-                items: const [
-                  DropdownMenuItem(value: 'City 1', child: Text('City 1')),
-                  DropdownMenuItem(value: 'City 2', child: Text('City 2')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCity = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
               const SizedBox(height: 10),
-
-              // Area Dropdown
-              const Text('Area'),
-              DropdownButtonFormField<String>(
-                value: _selectedArea,
-                items: const [
-                  DropdownMenuItem(value: 'Area 1', child: Text('Area 1')),
-                  DropdownMenuItem(value: 'Area 2', child: Text('Area 2')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedArea = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Estimated Property Value
-              const Text('Estimated Property Value'),
-              TextFormField(
-                controller: _propertyValueController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Initial Deposit
-              const Text('Initial Deposit (Optional)'),
-              TextFormField(
-                controller: _initialDepositController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Loan Repayment Period Slider
-              const Text('Select Loan Repayment Period'),
-              Slider(
-                value: _sliderValue,
-                min: 1,
-                max: 20,
-                divisions: 19,
-                label: '${_sliderValue.toInt()} Years',
-                onChanged: (value) {
-                  setState(() {
-                    _sliderValue = value; // Update slider value
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
-
-              // Repayment Period
-              const Text(
-                'Repayment Period',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                width: double.infinity,
+              const Text('Start Date'),
+              GestureDetector(
+                onTap: () => _selectDate(context),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  width: 360,
+                  height: 60,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(252, 251, 255, 1),
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
                   child: Text(
-                    '${_sliderValue.toInt()} Years', // Dynamically update the text
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18),
+                    _selectedStartDate == null
+                        ? ''
+                        : '${_selectedStartDate!.toLocal()}'.split(' ')[0],
+                    style: TextStyle(color: Colors.black54),
                   ),
                 ),
               ),
+
               const SizedBox(height: 10),
-
-              // Monthly Repayment
-              const Text('Monthly Repayment'),
-              TextFormField(
-                controller: _monthlyRepaymentController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
+              if (_selectedStartDate != null) ...[
+                const Text('Interest (%)'),
+                TextFormField(
+                  controller: _interest,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 10),
+                const Text('Maturity Date'),
+                TextFormField(
+                  controller: _maturityDate,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text('Yield'),
+                TextFormField(
+                  controller: _yield,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+              ],
+              // Add other form fields here
               const SizedBox(height: 30),
-
-              // Proceed Button
-              SizedBox(
-                width: double.infinity,
+              Center(
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Perform form submission
                       Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MortgagePage(
-                              startIndex: 4), // Start with MortgageHome
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Investment(
+                                startIndex: 1), // Start with MortgageHome
+                          ),
+                        );
+                      // Perform form submission
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Form Submitted!')));
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
                   ),
                   child: const Text(
                     'Proceed',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -391,7 +237,6 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
     );
   }
 }
-
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -473,14 +318,14 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const MortgagePage(startIndex: 8),
+                        builder: (context) => const Investment(startIndex: 7),
                       ),
                     );
                   },
@@ -504,7 +349,6 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 }
-
 
 class CardDetailsPage extends StatelessWidget {
   const CardDetailsPage({super.key});
@@ -601,7 +445,7 @@ class CardDetailsPage extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MortgagePage(
+                    builder: (context) => const Investment(
                         startIndex: 5), // Start with MortgageHome
                   ),
                 );
@@ -682,8 +526,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MortgagePage(
-                          startIndex: 9), // Example for Bank Transfer
+                      builder: (context) => const Investment(
+                          startIndex: 8), // Example for Bank Transfer
                     ),
                   );
                 } else if (selectedPaymentMethod == "Card") {
@@ -691,7 +535,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MortgagePage(
+                      builder: (context) => const Investment(
                           startIndex: 3), // Example for Card payment
                     ),
                   );
@@ -701,7 +545,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const MortgagePage(startIndex: 9), // Default case
+                          const Investment(startIndex: 9), // Default case
                     ),
                   );
                 }
@@ -745,8 +589,8 @@ class AllCardsDetails extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MortgagePage(
-                        startIndex: 6), // Start with MortgageHome
+                    builder: (context) => const Investment(
+                        startIndex: 4), // Start with MortgageHome
                   ),
                 );
               },
@@ -796,8 +640,8 @@ class AllCardsDetails extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MortgagePage(
-                        startIndex: 3), // Start with MortgageHome
+                    builder: (context) => const Investment(
+                        startIndex: 2), // Start with MortgageHome
                   ),
                 );
               },
@@ -986,8 +830,8 @@ class _PaymentPageState extends State<PaymentPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MortgagePage(
-                        startIndex: 7), // Start with MortgageHome
+                    builder: (context) => const Investment(
+                        startIndex: 5), // Start with MortgageHome
                   ),
                 );
               },
@@ -1042,8 +886,8 @@ class Success extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MortgagePage(
-                            startIndex: 2), // Start with MortgageHome
+                        builder: (context) => const Investment(
+                            startIndex: 6), // Start with MortgageHome
                       ),
                     );
                   },
@@ -1171,7 +1015,15 @@ class TermSheetPage extends StatelessWidget {
             const SizedBox(height: 24.0),
             Center(
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const DashboardPage(), // Start with MortgageHome
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: baseColor,
                   padding: const EdgeInsets.symmetric(
@@ -1313,7 +1165,7 @@ class BankTransferPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MortgagePage(
+                      builder: (context) => const Investment(
                           startIndex: 7), // Start with MortgageHome
                     ),
                   );
