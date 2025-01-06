@@ -236,7 +236,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
         ),
       ),
     );
-  }
+  } 
 }
 
 class CalendarPage extends StatefulWidget {
