@@ -92,7 +92,7 @@ class AccountPage extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 216, 167, 77),
+                    iconColor: Color.fromARGB(255, 216, 167, 77),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
