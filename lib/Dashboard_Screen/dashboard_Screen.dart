@@ -1,17 +1,12 @@
 
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Investment/investment.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/marketing.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
-import 'package:ag_mortgage/const/Image.dart';
-import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
-import 'package:table_calendar/table_calendar.dart';
 
 
 
@@ -28,6 +23,19 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
+class Main_Access_Dashboard extends StatefulWidget {
+  const Main_Access_Dashboard({super.key});
+
+  @override
+  State<Main_Access_Dashboard> createState() => _Main_Access_DashboardState();
+}
+
+class _Main_Access_DashboardState extends State<Main_Access_Dashboard> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -109,6 +117,30 @@ class HomePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const Market_place_connection(),
+                        ),
+                      );
+                    },
+                  ),
+                   MenuButton(
+                    title: 'Rent-to-own DashBoard',
+                    icon: Icons.shopping_cart,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DashboardPageS("Rent-To-Own"),
+                        ),
+                      );
+                    },
+                  ),
+                  MenuButton(
+                    title: 'Mortgage DashBoard',
+                    icon: Icons.shopping_cart,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DashboardPageS("Mortgage"),
                         ),
                       );
                     },

@@ -1,6 +1,7 @@
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:flutter/material.dart';
 
+// ignore: camel_case_types
 class Market_PlaceRedirectPage extends StatefulWidget {
   const Market_PlaceRedirectPage({Key? key}) : super(key: key);
 

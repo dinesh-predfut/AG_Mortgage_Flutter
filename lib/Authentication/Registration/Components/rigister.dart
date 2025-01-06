@@ -127,7 +127,7 @@ class RegisterScreen extends StatelessWidget {
                            Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const Login(),
+                            builder: (context) => const Login(navigation: true),
                           ));
                         },
                         child: const Text(

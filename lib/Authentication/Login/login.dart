@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
 
 void main() {
-  runApp(const Login());
+  runApp(const Login(navigation: true));
 }
 
 class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({Key? key, required bool navigation}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -98,11 +98,10 @@ class RegisterScreen extends StatelessWidget {
                   // Register Button
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const LandingPage(
-                              startIndex: 1), // Start with MortgageHome
+                          builder: (_) => const LandingPage(startIndex: 1),
                         ),
                       );
                     },

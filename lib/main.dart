@@ -1,3 +1,4 @@
+import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 
@@ -23,15 +24,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-     initialRoute: '/login',
+     initialRoute: '/landing',
       routes: {
-        '/login': (context) => const LandingPage(),
+        '/landing': (context) => const LandingPage(),
         // '/second': (context) =>  MortgageHome (),
-        '/landing': (context) => const Logo_Screen(),
+        '/login': (context) => const Login(navigation: true,),
         // '/main_page':(context) => const MortgageHome(),
         
       },
-    );
+    );  
   }
 }
 
@@ -60,7 +61,6 @@ class _LandingPageState extends State<LandingPage> {
     const ProfilePage(),
     
   ];  
-
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -71,6 +71,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final bool showBottomNavBar = _currentIndex != 0; // H
     return Scaffold(
+      
       body: _pages[_currentIndex],
       bottomNavigationBar: showBottomNavBar
           ? BottomNavBar(

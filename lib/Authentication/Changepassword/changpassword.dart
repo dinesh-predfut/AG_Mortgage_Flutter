@@ -165,7 +165,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                           Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const Login(),
+                            builder: (context) => const Login(navigation: true),
                           ));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

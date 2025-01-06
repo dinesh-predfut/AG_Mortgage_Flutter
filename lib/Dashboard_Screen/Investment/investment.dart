@@ -4,6 +4,7 @@ import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+// ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
 
 class Investment extends StatefulWidget {
@@ -130,8 +131,8 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               DropdownButtonFormField<String>(
                 value: _selectedApartmentType,
                 items: const [
-                  DropdownMenuItem(value: '1 BHK', child: Text('1 BHK')),
-                  DropdownMenuItem(value: '2 BHK', child: Text('2 BHK')),
+                  DropdownMenuItem(value: 'BANK-1', child: Text('BANK-1')),
+                  DropdownMenuItem(value: 'BANK-2', child: Text('BANK-2')),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -917,10 +918,10 @@ class TermSheetPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Term Sheet'),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

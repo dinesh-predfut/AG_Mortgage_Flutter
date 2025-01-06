@@ -45,7 +45,8 @@ class _Market_place_connectionState extends State<Market_place_connection> {
     const New_house(),
      PropertyDetailsPage(),
      const FilterHousePage(),
-     const FavoritesPage()
+     const FavoritesPage(),
+     
     ];
   @override
   Widget build(BuildContext context) {

@@ -1054,7 +1054,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         backgroundColor: Colors.white,
                         child: Icon(Icons.circle, color: Colors.green),
                       ),
-                      const Spacer(),
+                      const Spacer(), 
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -1591,11 +1591,11 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
             }),
             _buildSwitchTile(
                 'Do you have approved electrical and mechanical drawing?',
-                hasElectricalDrawing, (value) {
-              setState(() {
-                hasElectricalDrawing = value;
-              });
-            }),
+                  hasElectricalDrawing, (value) {
+                setState(() {
+                  hasElectricalDrawing = value;
+                });
+              }),
             _buildSwitchTile(
                 'Do you have current bill of quantities and material by certified quantity surveyor?',
                 hasBillOfQuantities, (value) {

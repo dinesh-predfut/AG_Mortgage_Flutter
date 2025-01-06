@@ -29,11 +29,7 @@ class _MostViewedPageState extends State<MostViewedPage>
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
+ 
 
   final List<String> _tabs = [
     "All",
@@ -59,7 +55,8 @@ class _MostViewedPageState extends State<MostViewedPage>
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconButton(onPressed: () {
+          IconButton(
+              onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -67,7 +64,8 @@ class _MostViewedPageState extends State<MostViewedPage>
                         const Market_place_connection(startIndex: 6),
                   ),
                 );
-              }, icon: const Icon(Icons.favorite_border)),
+              },
+              icon: const Icon(Icons.favorite_border)),
           IconButton(
               onPressed: () {
                 Navigator.pushReplacement(
@@ -108,32 +106,23 @@ class _MostViewedPageState extends State<MostViewedPage>
                   alignment: Alignment.centerLeft,
                   child: TabBar(
                     controller: _tabController,
-                    isScrollable: true, // Makes the tabs scrollable
-                    labelColor: Colors.white, // Active tab text color
-                    // unselectedLabelColor:
-                    //     Colors.orange, // Inactive tab text color
-                    // indicator: BoxDecoration(
-                    //   borderRadius: BorderRadius.circular(
-                    //       40), // Rounded corners for active tab
-                    //   color: Colors.orange// Active tab background color
-                    // ),
+                    isScrollable: true,
                     indicator: const BoxDecoration(),
-                    splashFactory:
-                        NoSplash.splashFactory, // Removes ripple effect
+                    splashFactory: NoSplash.splashFactory,
                     overlayColor: MaterialStateProperty.all(Colors.transparent),
                     tabs: _tabs.asMap().entries.map((entry) {
                       int index = entry.key;
                       String tab = entry.value;
-
-                      bool isActive = _tabController.index ==
-                          index; // Check if the tab is active
+                      bool isActive = _tabController.index == index;
+                      ; // Check if the tab is active
 
                       return Tab(
                         child: Column(
                           children: [
                             Container(
                               width: 60,
-                              padding: const EdgeInsets.symmetric(horizontal: 3),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 3),
                               height: isActive
                                   ? 40
                                   : 40, // Increased height for active tab
