@@ -1,7 +1,10 @@
 import 'package:ag_mortgage/Authentication/Login/login.dart';
+import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:flutter/material.dart';
-import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
+import 'package:ag_mortgage/const/Image.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart'; // Update this with the correct path to your image.dart file.
 
 void main() {
   runApp(const Register());
@@ -19,11 +22,31 @@ class Register extends StatelessWidget {
     );
   }
 }
-
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+    ProfileController signupController = Get.find<ProfileController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -72,6 +95,33 @@ class RegisterScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   // Phone Number Field
                   TextField(
+                    controller: signupController.firstNameController,
+                    decoration: InputDecoration(
+                      labelText: "First Name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Phone Number Field
+                  TextField(
+                     controller:signupController.lasttNameController,
+                    decoration: InputDecoration(
+                      labelText: "Last Name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Phone Number Field
+                  TextField(
+                    controller: signupController.numberController,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
@@ -83,6 +133,7 @@ class RegisterScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   // Promo Code Field
                   TextField(
+                     controller: signupController.promoCode,
                     decoration: InputDecoration(
                       labelText: "Promo Code (Optional)",
                       border: OutlineInputBorder(
@@ -95,10 +146,12 @@ class RegisterScreen extends StatelessWidget {
                   // Register Button
                   ElevatedButton(
                     onPressed: () {
+                        signupController.sendOTP();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const Authentication(),
+                           
                           ));
                     },
                     style: ElevatedButton.styleFrom(
@@ -124,11 +177,12 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Login(navigation: true),
-                          ));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const Login(navigation: true),
+                              ));
                         },
                         child: const Text(
                           "Login",

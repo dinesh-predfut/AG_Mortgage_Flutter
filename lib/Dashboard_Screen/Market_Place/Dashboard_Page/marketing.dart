@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/New_House/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
+import 'package:ag_mortgage/const/constant.dart';
+import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class MarketplacePage extends StatefulWidget {
   const MarketplacePage({super.key});
@@ -14,7 +19,10 @@ class MarketplacePage extends StatefulWidget {
 
 class _MarketplacePageState extends State<MarketplacePage>
     with SingleTickerProviderStateMixin {
-  late Future<List<Section>> _sections;
+  final controller = Get.put(Market_Place_controller());
+
+  late Future<ApiResponsemostview> fetchMostViewedHouses;
+  late Future<ApiResponse> futureHouses;
   bool isFavorite = false;
   late TabController _tabController;
   final _selectedColor = const Color(0xff1a73e8);
@@ -22,8 +30,10 @@ class _MarketplacePageState extends State<MarketplacePage>
   @override
   void initState() {
     super.initState();
-    _sections = loadSections();
+    futureHouses = controller.fetchHouses();
+      fetchMostViewedHouses = controller.fetchMostViewedHouses();
     _tabController = TabController(length: 12, vsync: this);
+    
   }
 
   @override
@@ -42,11 +52,8 @@ class _MarketplacePageState extends State<MarketplacePage>
     "Kaduna",
     "Kano"
   ];
-  Future<List<Section>> loadSections() async {
-    String jsonString = await rootBundle.loadString('assets/data.json');
-    final jsonData = json.decode(jsonString) as List;
-    return jsonData.map((section) => Section.fromJson(section)).toList();
-  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -56,157 +63,180 @@ class _MarketplacePageState extends State<MarketplacePage>
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconButton(onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const Market_place_connection(startIndex: 6),
-                  ),
-                );
-              }, icon: const Icon(Icons.favorite_border)),
           IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const Market_place_connection(startIndex: 5),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.tune)),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const Market_place_connection(startIndex: 6),
+                ),
+              );
+            },
+            icon: const Icon(Icons.favorite_border),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const Market_place_connection(startIndex: 5),
+                ),
+              );
+            },
+            icon: const Icon(Icons.tune),
+          ),
         ],
       ),
-      body: FutureBuilder<List<Section>>(
-        future: _sections,
-        builder: (context, snapshot) {
-          print('_someMethod: Foo Error ${snapshot} Error:{e.toString()}');
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading data'));
-          } else {
-            final sections = snapshot.data ?? [];
+    body: ListView(
+  children: [
+    const SizedBox(height: 12),
 
-            // Filter sections to only show the "Sponsored" section
-            final sponsoredSection = sections.firstWhere(
-              (section) => section.title == "Sponsored",
-              orElse: () => Section(
-                  title: "Sponsored",
-                  homes: []), // Default in case no section matches
-            );
-            final mostView = sections.firstWhere(
-              (section) => section.title == "Most Viewed",
-              orElse: () => Section(
-                  title: "Most Viewed",
-                  homes: []), // Default in case no section matches
-            );
-            final TodayDeals = sections.firstWhere(
-              (section) => section.title == "Today's Deal",
-              orElse: () => Section(
-                  title: "Today's Deal",
-                  homes: []), // Default in case no section matches
-            );
-            final newHouse = sections.firstWhere(
-              (section) => section.title == "New House",
-              orElse: () => Section(
-                  title: "New House",
-                  homes: []), // Default in case no section matches
-            );
+    // Sponsored Section
+    FutureBuilder<ApiResponse>(
+      future: futureHouses, // Replace with the API call for sponsored houses
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error loading sponsored data'));
+        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+          return buildSection(snapshot.data!.items); // Pass the sponsored items
+        } else {
+          return const SizedBox(); // Show nothing if no data
+        }
+      },
+    ),
 
-            return ListView(
-              children: [
-                buildSection(sponsoredSection),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TabBar(
-                    controller: _tabController,
-                    isScrollable: true, // Makes the tabs scrollable
-                    labelColor: Colors.white,
-                    // Active tab text color
-                    unselectedLabelColor:
-                        Colors.orange, // Inactive tab text color
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                          40), // Rounded corners for active tab
-                      color: Colors.orange,
+    const SizedBox(height: 12),
 
-                      // Active tab background color
-                    ),
-
-                    tabs: _tabs.map((tab) {
-                      return Tab(
-                        child: Container(
-                          width: 100,
-                          height: 50,
-                          padding: const EdgeInsets.only(left: 5, right: 5),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.orange, // Inactive tab border color
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(40), // Rounded corners
-                            // Inactive tab background color
-                          ),
-                          child: Center(
-                            child: Text(
-                              tab, // Tab text
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                buildSectionmostview(mostView),
-                todayDeals(TodayDeals),
-                newHouses(context, newHouse)
-              ],
-            );
-          }
-        },
+    // TabBar for Most Viewed, Today's Deal, and New House
+    Align(
+      alignment: Alignment.centerLeft,
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.orange,
+        indicator: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          color: Colors.orange,
+        ),
+        tabs: _tabs.map((tab) {
+          return Tab(
+            child: Container(
+              width: 60,
+              height: 30,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.orange),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(tab, style: const TextStyle(fontSize: 14)),
+              ),
+            ),
+          );
+        }).toList(),
       ),
+    ),
+
+    const SizedBox(height: 12),
+
+    // Most Viewed Section
+    FutureBuilder<ApiResponsemostview>(
+      future: fetchMostViewedHouses, // Replace with the API call for most viewed houses
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error loading most viewed data'));
+        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty ) {
+          return buildSectionmostview(snapshot.data!.items); // Pass the most viewed items
+        } else {
+          return const SizedBox(); // Show nothing if no data
+        }
+      },
+    ),
+
+    // const SizedBox(height: 12),
+
+    // // Today's Deal Section
+    // FutureBuilder<ApiResponse>(
+    //   future: fetchTodayDeals(), // Replace with the API call for today's deal houses
+    //   builder: (context, snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.waiting) {
+    //       return const Center(child: CircularProgressIndicator());
+    //     } else if (snapshot.hasError) {
+    //       return const Center(child: Text('Error loading today\'s deals'));
+    //     } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+    //       return todayDeals(snapshot.data!.items); // Pass today's deal items
+    //     } else {
+    //       return const SizedBox(); // Show nothing if no data
+    //     }
+    //   },
+    // ),
+
+    // const SizedBox(height: 12),
+
+    // // New Houses Section
+    // FutureBuilder<ApiResponse>(
+    //   future: fetchNewHouses(), // Replace with the API call for new houses
+    //   builder: (context, snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.waiting) {
+    //       return const Center(child: CircularProgressIndicator());
+    //     } else if (snapshot.hasError) {
+    //       return const Center(child: Text('Error loading new houses'));
+    //     } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+    //       return newHouses(context, snapshot.data!.items); // Pass new house items
+    //     } else {
+    //       return const SizedBox(); // Show nothing if no data
+    //     }
+    //   },
+    // ),
+  ],
+),
+
     );
   }
 
-  Widget buildSection(Section section) {
+  Widget buildSection(List<dynamic> section) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Text(
-            section.title, // Displaying the section name dynamically
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            "Sponsoreds", // Displaying section name statically or dynamically if available
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         SizedBox(
           height: 300,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: section.homes.length,
+            itemCount: section.length,
             itemBuilder: (context, index) {
-              final home = section.homes[index];
-              return Container(
+              final home = section[index]; // Each house in the section
+              final imageUrl = home.housePictures.isNotEmpty
+                  ? home.housePictures[
+                      0] // Assuming we take the first image for now
+                  : ''; // Default image URL if not available
+
+                return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: 340,
-                // Adjust as needed for the card width
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   image: DecorationImage(
-                    image: AssetImage(home.image),
-
+                    image: NetworkImage(
+                        imageUrl), // Use NetworkImage for network URLs
                     colorFilter: const ColorFilter.mode(
-                      Color.fromARGB(101, 0, 0,
-                          0), // Applies a semi-transparent overlay color
+                      Color.fromARGB(101, 0, 0, 0),
                       BlendMode.darken,
-                    ), // Replace with AssetImage if local
-                    fit: BoxFit
-                        .cover, // Ensures the image covers the entire container
+                    ),
+                    fit: BoxFit.cover,
                   ),
                 ),
                 child: Stack(
@@ -225,7 +255,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                         ),
                       ),
                     ),
-                    // Text Content
+                    // Text Content (Sponsored Badge)
                     Positioned(
                       top: 10,
                       right: 10,
@@ -246,8 +276,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                         ),
                       ),
                     ),
-
-                    // Favorite button (Top-left)
+                    // Favorite Button (Top-left)
                     Positioned(
                       top: 10,
                       left: 10,
@@ -264,47 +293,60 @@ class _MarketplacePageState extends State<MarketplacePage>
                         ),
                       ),
                     ),
+                    // Information Content (Price, Type, Location, etc.)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(home.price,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              )),
+                          Text(
+                            home.price.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text(home.type,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70,
-                              )),
+                          Text(
+                            home.houseType ??
+                                "Unknown Type", // House type dynamically
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Row(
                             children: [
                               const Icon(Icons.location_on,
-                                  size: 14, color: Colors.white70),
+                                  size: 10, color: Colors.white70),
                               const SizedBox(width: 6),
-                              Text(home.location,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.white70)),
-                              const SizedBox(width: 16),
+                              Text(
+                                home.street ?? "Unknown City", // Dynamic city
+                                style: const TextStyle(
+                                    fontSize: 8, color: Colors.white70),
+                              ),
+                              const SizedBox(width: 10),
                               const Icon(Icons.bed,
-                                  size: 14, color: Colors.white70),
+                                  size: 10, color: Colors.white70),
                               const SizedBox(width: 3),
-                              Text(home.type.substring(0, 10),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.white70)),
-                              const SizedBox(width: 16),
+                              Text(
+                                home.rooms?.toString() ??
+                                    "0", // Rooms dynamically
+                                style: const TextStyle(
+                                    fontSize: 8, color: Colors.white70),
+                              ),
+                              const SizedBox(width: 10),
                               const Icon(Icons.square_foot,
-                                  size: 14, color: Colors.white70),
+                                  size: 10, color: Colors.white70),
                               const SizedBox(width: 3),
-                              const Text("2900 Sqft",
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.white70))
+                              Text(
+                                "${home.street ?? '0'} Sqft", // Area dynamically
+                                style: const TextStyle(
+                                    fontSize: 8, color: Colors.white70),
+                              ),
                             ],
                           ),
                         ],
@@ -320,16 +362,16 @@ class _MarketplacePageState extends State<MarketplacePage>
     );
   }
 
-  Widget buildSectionmostview(Section section) {
+  Widget buildSectionmostview( List<dynamic> section) {
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              section.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Text(
+              "",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {
@@ -368,9 +410,13 @@ class _MarketplacePageState extends State<MarketplacePage>
             height: 250,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: section.homes.length,
+              itemCount: section.length,
               itemBuilder: (context, index) {
-                final home = section.homes[index];
+                final home = section[index];
+               final imageUrl = home.housePictures.isNotEmpty
+                  ? home.housePictures[
+                      0] // Assuming we take the first image for now
+                  : ''; 
                 return Container(
                   width: 300,
                   decoration: BoxDecoration(
@@ -394,8 +440,8 @@ class _MarketplacePageState extends State<MarketplacePage>
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(10)),
-                            child: Image.asset(home.image,
-                                fit: BoxFit.cover, width: double.infinity),
+                            child:Image(image: NetworkImage(imageUrl),
+                                fit: BoxFit.cover, width: double.infinity,) 
                           ),
                         ),
                         Container(
@@ -407,38 +453,38 @@ class _MarketplacePageState extends State<MarketplacePage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(home.price,
+                                  Text( home.price.toString() ,
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold)),
                                   const SizedBox(height: 4),
-                                  Text(home.type,
+                                  Text(home.houseType,
                                       style: const TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
+                                          fontSize: 12, color: Colors.grey)),
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
                                       const Icon(Icons.location_on,
-                                          size: 14, color: Colors.grey),
+                                          size: 12, color: Colors.grey),
                                       const SizedBox(width: 4),
-                                      Text(home.location,
+                                      Text(home.street as String,
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 10,
                                               color: Colors.grey)),
-                                      const SizedBox(width: 16),
+                                      const SizedBox(width: 12),
                                       const Icon(Icons.bed,
-                                          size: 14, color: Colors.grey),
+                                          size: 12, color: Colors.grey),
                                       const SizedBox(width: 3),
                                       Text(
-                                          home.type.length > 10
-                                              ? home.type.substring(0, 10)
-                                              : home.type,
+                                          home.houseType.length > 10
+                                              ? home.houseType.substring(0, 10)
+                                              : home.houseType,
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 10,
                                               color: Colors.grey)),
-                                      const SizedBox(width: 16),
+                                      const SizedBox(width: 12),
                                       const Icon(Icons.square_foot,
-                                          size: 14, color: Colors.grey),
+                                          size: 12, color: Colors.grey),
                                       const SizedBox(width: 3),
                                       const Text("2900 Sqft",
                                           style: TextStyle(
@@ -493,7 +539,7 @@ class _MarketplacePageState extends State<MarketplacePage>
     ]);
   }
 
-  Widget todayDeals(Section section) {
+  Widget todayDeals(section) {
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -501,7 +547,7 @@ class _MarketplacePageState extends State<MarketplacePage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              section.title,
+              section.houseType,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
@@ -652,21 +698,21 @@ class _MarketplacePageState extends State<MarketplacePage>
                             const SizedBox(height: 4),
                             Text(home.type,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   color: Colors.white70,
                                 )),
                             const SizedBox(height: 4),
                             Row(
                               children: [
                                 const Icon(Icons.location_on,
-                                    size: 14, color: Colors.white70),
+                                    size: 12, color: Colors.white70),
                                 const SizedBox(width: 6),
                                 Text(home.location,
                                     style: const TextStyle(
                                         fontSize: 12, color: Colors.white70)),
                                 const SizedBox(width: 16),
                                 const Icon(Icons.bed,
-                                    size: 14, color: Colors.white70),
+                                    size: 12, color: Colors.white70),
                                 const SizedBox(width: 3),
                                 Text(
                                     home.type.length > 10
@@ -676,7 +722,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                                         fontSize: 12, color: Colors.white70)),
                                 const SizedBox(width: 16),
                                 const Icon(Icons.square_foot,
-                                    size: 14, color: Colors.white70),
+                                    size: 12, color: Colors.white70),
                                 const SizedBox(width: 3),
                                 const Text("2900 Sqft",
                                     style: TextStyle(
@@ -698,16 +744,16 @@ class _MarketplacePageState extends State<MarketplacePage>
   }
 }
 
-Widget newHouses(BuildContext context, Section section) {
+Widget newHouses(BuildContext context, List<dynamic> section) {
   return Column(children: [
     Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            section.title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          const Text(
+            "New House",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           TextButton(
             onPressed: () {
@@ -746,9 +792,13 @@ Widget newHouses(BuildContext context, Section section) {
           height: 250,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: section.homes.length,
+            itemCount: section.length,
             itemBuilder: (context, index) {
-              final home = section.homes[index];
+              final home = section[index];
+              final imageUrl = home.housePictures.isNotEmpty
+                  ? home.housePictures[
+                      0] // Assuming we take the first image for now
+                  : '';
               return Container(
                 width: 300,
                 decoration: BoxDecoration(
@@ -769,11 +819,31 @@ Widget newHouses(BuildContext context, Section section) {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(10)),
-                          child: Image.asset(home.image,
-                              fit: BoxFit.cover, width: double.infinity),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                          width: 340,
+                          // Adjust as needed for the card width
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: NetworkImage(imageUrl),
+
+                              colorFilter: const ColorFilter.mode(
+                                Color.fromARGB(101, 0, 0,
+                                    0), // Applies a semi-transparent overlay color
+                                BlendMode.darken,
+                              ), // Replace with AssetImage if local
+                              fit: BoxFit
+                                  .cover, // Ensures the image covers the entire container
+                            ),
+                          ),
                         ),
                       ),
                       Container(
@@ -785,40 +855,40 @@ Widget newHouses(BuildContext context, Section section) {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(home.price,
+                                Text(home.price.toString(),
                                     style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 4),
-                                Text(home.type,
+                                Text(home.houseType ?? "Unknown Type",
                                     style: const TextStyle(
-                                        fontSize: 14, color: Colors.grey)),
+                                        fontSize: 12, color: Colors.grey)),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     const Icon(Icons.location_on,
-                                        size: 14, color: Colors.grey),
+                                        size: 12, color: Colors.grey),
                                     const SizedBox(width: 4),
-                                    Text(home.location,
+                                    Text(home.street ?? "Unknown City",
                                         style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                    const SizedBox(width: 16),
+                                            fontSize: 10, color: Colors.grey)),
+                                    const SizedBox(width: 12),
                                     const Icon(Icons.bed,
-                                        size: 14, color: Colors.grey),
+                                        size: 12, color: Colors.grey),
                                     const SizedBox(width: 3),
                                     Text(
-                                        home.type.length > 10
-                                            ? home.type.substring(0, 10)
-                                            : home.type,
+                                        home.houseType.length > 10
+                                            ? home.houseType.substring(0, 10)
+                                            : home.houseType,
                                         style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                    const SizedBox(width: 16),
+                                            fontSize: 10, color: Colors.grey)),
+                                    const SizedBox(width: 12),
                                     const Icon(Icons.square_foot,
-                                        size: 14, color: Colors.grey),
+                                        size: 12, color: Colors.grey),
                                     const SizedBox(width: 3),
-                                    const Text("2900 Sqft",
-                                        style: TextStyle(
-                                            fontSize: 12, color: Colors.grey))
+                                    Text(home.totalArea ?? "Unknown City",
+                                        style: const TextStyle(
+                                            fontSize: 10, color: Colors.grey))
                                   ],
                                 ),
                                 Align(

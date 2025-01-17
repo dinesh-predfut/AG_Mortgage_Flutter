@@ -37,7 +37,7 @@ class Card_Success extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AccountPage(), // Start with MortgageHome
+                        builder: (context) => const AccountPage(), // Start with MortgagePage
                       ),
                     );
                   },

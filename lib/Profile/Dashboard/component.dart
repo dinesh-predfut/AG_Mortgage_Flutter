@@ -42,7 +42,7 @@ class AccountPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    const AccountPage(), // Start with MortgageHome
+                    const AccountPage(), // Start with MortgagePage
               ),
             ),
           },
@@ -92,7 +92,7 @@ class AccountPage extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    iconColor: Color.fromARGB(255, 216, 167, 77),
+                    backgroundColor: const Color.fromARGB(255, 216, 167, 77),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -127,7 +127,7 @@ class AccountPage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  const MyCardsPage(), // Start with MortgageHome
+                                  const MyCardsPage(), // Start with MortgagePage
                             ),
                           );
                         },

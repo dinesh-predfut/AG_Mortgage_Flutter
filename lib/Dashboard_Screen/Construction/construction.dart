@@ -1,3 +1,4 @@
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
@@ -46,7 +47,7 @@ class _ConstuctionState extends State<Constuction> {
     const ConstructionFinancePage(),
     const PaymentMethodPage(),
     const CardDetailsPage(),
-    const AllCardsDetails(),
+    const ALL_Card(),
     const PaymentPage(),
     const Success(),
      const Construction_CalendarPage(),
@@ -108,7 +109,7 @@ class Construction_Landing extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      const DashboardPage()), // Start with MortgageHome
+                      const DashboardPage()), // Start with MortgagePage
             );
           },
         ),
@@ -255,7 +256,7 @@ class Construction_Landing extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Constuction(
-                          startIndex: 1), // Start with MortgageHome
+                          startIndex: 1), // Start with MortgagePage
                     ),
                   );
                 },
@@ -518,7 +519,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Constuction(
-                          startIndex: 2), // Start with MortgageHome
+                          startIndex: 2), // Start with MortgagePage
                     ),
                   );
                     }
@@ -625,6 +626,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -860,103 +862,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               ),
               child: const Text("Make Payment",
                   style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AllCardsDetails extends StatelessWidget {
-  const AllCardsDetails({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Card"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-                child: Text(
-              'Enter Card Details',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            )),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Constuction(
-                        startIndex: 6), // Start with ConstructionPage
-                  ),
-                );
-              },
-              child: Card(
-                color: const Color.fromARGB(255, 64, 214, 69),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "iPay",
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 28, height: 3),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "0000 0000 0000 0000",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "CVV: 000",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "EXP: 00/00",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Constuction(
-                        startIndex: 4), // Start with ConstructionPage
-                  ),
-                );
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text(
-                " +  Add New Cards",
-                style: TextStyle(color: Colors.white, letterSpacing: 2),
-              ),
             ),
           ],
         ),
@@ -1633,7 +1538,7 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Constuction(
-                          startIndex: 3), // Start with MortgageHome
+                          startIndex: 3), // Start with MortgagePage
                     ),
                   );
                 },

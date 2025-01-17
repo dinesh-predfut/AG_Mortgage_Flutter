@@ -1,4 +1,5 @@
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +193,7 @@ class RentToOwnLanding extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Rent_To_Own(
-                          startIndex: 1), // Start with MortgageHome
+                          startIndex: 1), // Start with MortgagePage
                     ),
                   );
                 },
@@ -599,7 +600,7 @@ class BankTransferPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Rent_To_Own(
-                          startIndex: 4), // Start with MortgageHome
+                          startIndex: 4), // Start with MortgagePage
                     ),
                   );
                 },
@@ -665,7 +666,7 @@ class Success extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MortgageHome(), // Start with MortgageHome
+                        builder: (context) => const MortgagePage(), // Start with MortgagePage
                       ),
                     );
                   },

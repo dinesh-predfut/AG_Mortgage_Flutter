@@ -163,7 +163,7 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    const AccountPage(), // Start with MortgageHome
+                    const AccountPage(), // Start with MortgagePage
               ),
             ),
           },

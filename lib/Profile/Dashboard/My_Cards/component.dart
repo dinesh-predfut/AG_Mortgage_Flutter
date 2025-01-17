@@ -116,7 +116,7 @@ class _MyCardsPageState extends State<MyCardsPage>
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    const AccountPage(), // Start with MortgageHome
+                    const AccountPage(), // Start with MortgagePage
               ),
             ),
           },
@@ -177,7 +177,7 @@ class _MyCardsPageState extends State<MyCardsPage>
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const AddCardDetailsPage(), // Start with MortgageHome
+                            const AddCardDetailsPage(), // Start with MortgagePage
                       ),
                     );
                   },

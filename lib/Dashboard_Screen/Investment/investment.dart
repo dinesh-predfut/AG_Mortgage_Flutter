@@ -1,3 +1,4 @@
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
@@ -6,6 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../All_Cards/Add_New_Cards/add_cards.dart';
+import '../../All_Cards/Select_Amount/select_Amount.dart';
 
 class Investment extends StatefulWidget {
   final int startIndex;
@@ -25,13 +29,12 @@ class __InvestmenStateState extends State<Investment> {
 
   final List<Widget> _steps = [
     const InvestmentFormPage(),
-     const PaymentMethodPage(),
-      const CardDetailsPage(),
-    const AllCardsDetails(),
-    const PaymentPage(),
+     const CardPaymentPage(),
+   const ADD_CardDetailsPage(),
+     const ALL_Card(),
+    const CardPaymentPage(),
     const Success(),
     const CalendarPage(),
-   
     const TermSheetPage(),
     const BankTransferPage()
   ];
@@ -212,7 +215,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const Investment(
-                                startIndex: 1), // Start with MortgageHome
+                                startIndex: 1), // Start with MortgagePage
                           ),
                         );
                       // Perform form submission
@@ -351,317 +354,6 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 }
 
-class CardDetailsPage extends StatelessWidget {
-  const CardDetailsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Card"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-                child: Text(
-              'Enter Card Details',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            )),
-            Card(
-              color: Colors.red,
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "iPay",
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 28, height: 3),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      "0000 0000 0000 0000",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "CVV: 000",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          "EXP: 00/00",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const TextField(
-              decoration: InputDecoration(labelText: "Card Name"),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(labelText: "Card Number"),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(labelText: "Exp. Date"),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(labelText: "CVV"),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Checkbox(value: false, onChanged: (value) {}),
-                const Text("Save Card"),
-              ],
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Investment(
-                        startIndex: 5), // Start with MortgageHome
-                  ),
-                );
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
-              ),
-              child: const Text("Save Card",
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PaymentMethodPage extends StatefulWidget {
-  const PaymentMethodPage({super.key});
-
-  @override
-  _PaymentMethodPageState createState() => _PaymentMethodPageState();
-}
-
-class _PaymentMethodPageState extends State<PaymentMethodPage> {
-  String selectedPaymentMethod = "Card";
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Payment"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "How would you like to make your first deposit?",
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.credit_card),
-              title: const Text("Card"),
-              trailing: Radio<String>(
-                value: "Card",
-                groupValue: selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance),
-              title: const Text("Bank Transfer"),
-              trailing: Radio<String>(
-                value: "Bank Transfer",
-                groupValue: selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                if (selectedPaymentMethod == "Bank Transfer") {
-                  // Navigate to a page for Bank Transfer
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Investment(
-                          startIndex: 8), // Example for Bank Transfer
-                    ),
-                  );
-                } else if (selectedPaymentMethod == "Card") {
-                  // Navigate to a page for Card payment
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Investment(
-                          startIndex: 3), // Example for Card payment
-                    ),
-                  );
-                } else {
-                  // Default case: navigate to MortgageHome with startIndex as 3 (fallback case)
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const Investment(startIndex: 9), // Default case
-                    ),
-                  );
-                }
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
-              ),
-              child: const Text("Make Payment",
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AllCardsDetails extends StatelessWidget {
-  const AllCardsDetails({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Card"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-                child: Text(
-              'Enter Card Details',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            )),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Investment(
-                        startIndex: 4), // Start with MortgageHome
-                  ),
-                );
-              },
-              child: Card(
-                color: const Color.fromARGB(255, 64, 214, 69),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "iPay",
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 28, height: 3),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "0000 0000 0000 0000",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "CVV: 000",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "EXP: 00/00",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Investment(
-                        startIndex: 2), // Start with MortgageHome
-                  ),
-                );
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text(
-                " +  Add New Cards",
-                style: TextStyle(color: Colors.white, letterSpacing: 2),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -832,7 +524,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Investment(
-                        startIndex: 5), // Start with MortgageHome
+                        startIndex: 5), // Start with MortgagePage
                   ),
                 );
               },
@@ -853,61 +545,7 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 }
 
-class Success extends StatelessWidget {
-  const Success({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(""),
-        centerTitle: true,
-      ),
-      body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  Images.success, width: 150, // Adjust size as needed
-                  height: 150,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Deposite Successful",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                const Text(
-                    "Congratulations Pelumi! You have made your first deposit",
-                    style: TextStyle(fontSize: 10)),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Investment(
-                            startIndex: 6), // Start with MortgageHome
-                      ),
-                    );
-                  },
-                  //
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: baseColor,
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: const Text(
-                    "Processd",
-                    style: TextStyle(color: Colors.white, letterSpacing: 2),
-                  ),
-                ),
-              ],
-            ),
-          )),
-    );
-  }
-}
 
 class TermSheetPage extends StatelessWidget {
   const TermSheetPage({super.key});
@@ -1021,7 +659,7 @@ class TermSheetPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const DashboardPage(), // Start with MortgageHome
+                          const DashboardPage(), // Start with MortgagePage
                     ),
                   );
                 },
@@ -1167,7 +805,7 @@ class BankTransferPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Investment(
-                          startIndex: 7), // Start with MortgageHome
+                          startIndex: 7), // Start with MortgagePage
                     ),
                   );
                 },

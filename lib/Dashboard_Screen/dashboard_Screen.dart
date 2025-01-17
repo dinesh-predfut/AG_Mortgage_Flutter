@@ -3,6 +3,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Investment/investment.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const MortgageHome(),
+                          builder: (_) => const MortgagePage(),
                         ),
                       );
                     },
@@ -141,6 +142,18 @@ class HomePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const DashboardPageS("Mortgage"),
+                        ),
+                      );
+                    },
+                  ),
+                     MenuButton(
+                    title: 'Construction DashBoard',
+                    icon: Icons.shopping_cart,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DashboardPageS("Construction Finance"),
                         ),
                       );
                     },

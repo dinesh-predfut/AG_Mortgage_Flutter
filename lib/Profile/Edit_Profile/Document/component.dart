@@ -126,6 +126,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
       appBar: AppBar(
         title: const Text("Documents"),
         centerTitle: true,
+         leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+      ),
       ),
       body: SingleChildScrollView(
         child: Column(

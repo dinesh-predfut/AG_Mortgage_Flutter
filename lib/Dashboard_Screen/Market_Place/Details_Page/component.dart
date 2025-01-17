@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';

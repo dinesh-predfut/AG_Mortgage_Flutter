@@ -40,14 +40,14 @@ class _Market_place_connectionState extends State<Market_place_connection> {
 
   final List<Widget> _steps = [
     const MarketplacePage(),
-     const MostViewedPage(),
-     const TodayDeals(),
-    const New_house(),
+    //  const MostViewedPage(),
+    //  const TodayDeals(),
+    // const New_house(),
      PropertyDetailsPage(),
      const FilterHousePage(),
      const FavoritesPage(),
      
-    ];
+    ];           
   @override
   Widget build(BuildContext context) {
     return Scaffold(

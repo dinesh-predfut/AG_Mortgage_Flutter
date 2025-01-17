@@ -1,7 +1,11 @@
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Statement_Page/controller.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class StatementOfAccount extends StatefulWidget {
   const StatementOfAccount({Key? key}) : super(key: key);
@@ -11,6 +15,12 @@ class StatementOfAccount extends StatefulWidget {
 }
 
 class _StatementOfAccountState extends State<StatementOfAccount> {
+   final Controllers = Get.put(StatementPage());
+  @override
+  void initState() {
+    super.initState();
+   Controllers.getAllTransactions(context);
+  }
   final List<Map<String, dynamic>> transactions = [
     {
       "date": "Today",
@@ -79,7 +89,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Container(
+                  Container(  
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -157,7 +167,15 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                 ],
                               ),
                               ElevatedButton(
-                                onPressed: () => showDepositBottomSheet(context),
+                                onPressed: () => {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const Get_All_Cards(),
+                                    ),
+                                  ),
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.deepPurple,
                                   shape: RoundedRectangleBorder(
@@ -269,59 +287,18 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
+      builder: (context) => const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               "Deposit",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () => openSecondPopup(context, "Bank Transfer"),
-              child: Card(
-                color: const Color.fromARGB(255, 64, 214, 69),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "iPay",
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 28, height: 3),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "0000 0000 0000 0000",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "CVV: 000",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "EXP: 00/00",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            SizedBox(height: 16),
+            ALL_Card()
           ],
         ),
       ),
@@ -329,147 +306,151 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
   }
 
   void openSecondPopup(BuildContext context, String method) {
-     showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       isScrollControlled: true,
       builder: (context) => FractionallySizedBox(
-      heightFactor: 0.8,
-      child:Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 30),
-            const Align(
-              alignment: Alignment.centerLeft,
-                child: Text(
-              "Deposit",
-              
-              style: TextStyle(fontSize: 20, color: Colors.black,fontWeight: FontWeight.w900),
-            )),
-            const SizedBox(height: 10),
-            // Card Section
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 51, 170, 55),
-                    Color.fromARGB(209, 45, 245, 51)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        heightFactor: 0.8,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Deposit",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900),
+                  )),
+              const SizedBox(height: 10),
+              // Card Section
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 51, 170, 55),
+                      Color.fromARGB(209, 45, 245, 51)
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                borderRadius: BorderRadius.circular(12),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.circle, color: Colors.green),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () {},
+                          icon:
+                              const Icon(Icons.more_vert, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      "Adeyemi Pelumi",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "3098 9576 1876 6521",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "CVV: 010",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "EXP: 12/29",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _amountController,
+                decoration: InputDecoration(
+                  prefixText: "NGN ",
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.deepPurple),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.deepPurple, width: 2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
                 children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.circle, color: Colors.green),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Adeyemi Pelumi",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "3098 9576 1876 6521",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "CVV: 010",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "EXP: 12/29",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
+                  _amountButton(context, "#100,000", 100000),
+                  _amountButton(context, "#200,000", 200000),
+                  _amountButton(context, "#300,000", 300000),
+                  _amountButton(context, "#400,000", 400000),
+                  _amountButton(context, "#500,000", 500000),
+                  _amountButton(context, "#600,000", 600000),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _amountController,
-              decoration: InputDecoration(
-                prefixText: "NGN ",
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.deepPurple),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  showSuccessPopup(context);
+                },
+                //
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: baseColor,
+                  minimumSize: const Size.fromHeight(50),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
+                child: const Text(
+                  "Processd",
+                  style: TextStyle(color: Colors.white, letterSpacing: 2),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _amountButton(context, "#100,000", 100000),
-                _amountButton(context, "#200,000", 200000),
-                _amountButton(context, "#300,000", 300000),
-                _amountButton(context, "#400,000", 400000),
-                _amountButton(context, "#500,000", 500000),
-                _amountButton(context, "#600,000", 600000),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-               showSuccessPopup(context);
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text(
-                "Processd",
-                style: TextStyle(color: Colors.white, letterSpacing: 2),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-     );
+    );
   }
- Widget _amountButton(BuildContext context, String displayText, int amount) {
+
+  Widget _amountButton(BuildContext context, String displayText, int amount) {
     // ignore: unrelated_type_equality_checks
 
     return ElevatedButton(
@@ -497,58 +478,61 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
       ),
     );
   }
+
   void showSuccessPopup(BuildContext context) {
-     showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      isScrollControlled: true,
-      builder: (context) => FractionallySizedBox(
-      heightFactor: 0.5,
-      child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  Images.success, width: 150, // Adjust size as needed
-                  height: 150,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Deposite Successful",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                const Text(
-                    "Congratulations Pelumi! You have made your first deposit",
-                    style: TextStyle(fontSize: 10)),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Main_Dashboard(), // Start with MortgageHome
-                      ),
-                    );
-                  },
-                  //
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: baseColor,
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: const Text(
-                    "Processd",
-                    style: TextStyle(color: Colors.white, letterSpacing: 2),
-                  ),
-                ),
-              ],
-            ),
-          )),
-    )
-     );
+    showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        isScrollControlled: true,
+        builder: (context) => FractionallySizedBox(
+              heightFactor: 0.5,
+              child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          Images.success, width: 150, // Adjust size as needed
+                          height: 150,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "Deposite Successful",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        const Text(
+                            "Congratulations Pelumi! You have made your first deposit",
+                            style: TextStyle(fontSize: 10)),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const Main_Dashboard(), // Start with MortgagePage
+                              ),
+                            );
+                          },
+                          //
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: baseColor,
+                            minimumSize: const Size.fromHeight(50),
+                          ),
+                          child: const Text(
+                            "Processd",
+                            style: TextStyle(
+                                color: Colors.white, letterSpacing: 2),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ));
   }
 }
 

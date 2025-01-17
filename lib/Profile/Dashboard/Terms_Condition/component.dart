@@ -28,7 +28,7 @@ class Terms_andcondition extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  const AccountPage(), // Start with MortgageHome
+                                  const AccountPage(), // Start with MortgagePage
                             ),
                           );
       

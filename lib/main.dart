@@ -2,7 +2,7 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/NotificationScreen/notification.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
 
@@ -11,9 +11,14 @@ import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/onboarding_pages/first_page.dart';
 import 'package:ag_mortgage/onboarding_pages/second_page.dart';
+import 'package:get/get.dart';
+
+
+import 'Authentication/Login_Controller/controller.dart';
 // Import the BottomNavBar
 
 void main() {
+    Get.lazyPut(() => ProfileController());
   runApp(const MyApp());
 }
 
@@ -27,9 +32,9 @@ class MyApp extends StatelessWidget {
      initialRoute: '/landing',
       routes: {
         '/landing': (context) => const LandingPage(),
-        // '/second': (context) =>  MortgageHome (),
+        // '/second': (context) =>  MortgagePage (),
         '/login': (context) => const Login(navigation: true,),
-        // '/main_page':(context) => const MortgageHome(),
+        // '/main_page':(context) => const MortgagePage(),
         
       },
     );  

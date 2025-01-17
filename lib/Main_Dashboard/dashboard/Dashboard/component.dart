@@ -1,4 +1,6 @@
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
+import 'package:ag_mortgage/Main_Dashboard/Construction/component.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Investment/compontent.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Refer_Page/Bonus/component.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Statement_Page/component.dart';
@@ -6,6 +8,7 @@ import 'package:ag_mortgage/Main_Dashboard/dashboard/Term_Sheet/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 void main() {
@@ -34,12 +37,9 @@ class DashboardPageS extends StatefulWidget {
 }
 
 class _DashboardPageSState extends State<DashboardPageS> {
-  final TextEditingController _amount = TextEditingController();
-  final TextEditingController _repaymentDate = TextEditingController();
-  final TextEditingController _bvn = TextEditingController();
-  final TextEditingController _accountNumber = TextEditingController();
+  final controller = Get.put(Main_Dashboard_controller());
+
   late final String plans;
-  String? _selectedApartmentType;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,11 +245,22 @@ class _DashboardPageSState extends State<DashboardPageS> {
                       icon: Icons.description,
                       label: "Statement of Account",
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StatementOfAccount(),
-                            ));
+                        if (widget.plans != "Construction Finance") {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const StatementOfAccount(),
+                              ));
+                        }
+                        if (widget.plans == "Construction Finance") {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const Constuction_StatementPage(),
+                              ));
+                        }
                       },
                     ),
                     FeatureCard(
@@ -287,7 +298,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const Investment_Forms(), // Start with MortgageHome
+                            const Investment_Forms(), // Start with MortgagePage
                       ),
                     );
                   },
@@ -347,6 +358,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
   }
 
   void showSuccessPopup(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+
     showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
@@ -359,119 +372,180 @@ class _DashboardPageSState extends State<DashboardPageS> {
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text(
-                          'Withdraw',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Text('Account Number'),
-                        TextFormField(
-                          controller: _accountNumber,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text('BVN'),
-                        TextFormField(
-                          controller: _bvn,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
+                          const Text(
+                            'Withdraw',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text('Bank'),
-                        DropdownButtonFormField<String>(
-                          value: _selectedApartmentType,
-                          items: const [
-                            DropdownMenuItem(
-                                value: '1 BHK', child: Text('1 BHK')),
-                            DropdownMenuItem(
-                                value: '2 BHK', child: Text('2 BHK')),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedApartmentType = value;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text('Amount'),
-                        TextFormField(
-                          controller: _amount,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
+                          const Text('Account Number'),
+                          TextFormField(
+                            controller: controller.accountNumber,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text('Repayment Date'),
-                        TextFormField(
-                          controller: _repaymentDate,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () {
-                               Navigator.pop(context); 
-                              showWithdrawDetailsPopup(context);
-
-                              // Perform form submission
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Form Submitted!')));
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter account number';
+                              }
+                              return null;
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 150),
-                            ),
-                            child: const Text(
-                              'Proceed',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
-                            ),
                           ),
-                        )
-                      ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text('BVN'),
+                          TextFormField(
+                            controller: controller.bvn,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter BVN';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text('Bank'),
+                          TextFormField(
+                            controller: controller.bankName,
+                            // keyboardType: TextInputType.datetime,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a Bank Name';
+                              }
+                              // Add further date validation logic if needed
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text('Amount'),
+                          TextFormField(
+                            controller: controller.amount,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an amount';
+                              }
+                              if (double.tryParse(value) == null) {
+                                return 'Please enter a valid number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text('Repayment Date'),
+                          TextFormField(
+                            controller: controller.repaymentDate,
+                            readOnly: true, // Prevent manual text input
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000), // Minimum date
+                                lastDate: DateTime(2100), // Maximum date
+                              );
+
+                              if (pickedDate != null) {
+                                // Convert DateTime to String and assign to TextEditingController
+                                controller.repaymentDate.text =
+                                    "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                              }
+                            },
+                            decoration: InputDecoration(
+                              
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select a repayment date';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 30),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Processing request...')),
+                                  );
+                                  controller
+                                      .withdraw(context)
+                                      .then((isSuccess) {
+                                    if (isSuccess) {
+                                      showWithdrawDetailsPopup(context);
+                                      
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Form Submitted!')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Failed to process request.')),
+                                      );
+                                    }
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 150),
+                              ),
+                              child: const Text(
+                                'Proceed',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   )),
             )));
@@ -497,10 +571,13 @@ class _DashboardPageSState extends State<DashboardPageS> {
                           child: Text(
                             "Bank Details",
                             textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.w900),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900),
                           ),
                         ),
-                        const SizedBox(height:10),
+                        const SizedBox(height: 10),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -574,16 +651,19 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             ],
                           ),
                         ),
-                         const SizedBox(height:10),
-                         const Align(
+                        const SizedBox(height: 10),
+                        const Align(
                           alignment: Alignment.bottomLeft,
                           child: Text(
                             "Withdrawal",
                             textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.w900),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900),
                           ),
                         ),
-                        const SizedBox(height:10),
+                        const SizedBox(height: 10),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -654,7 +734,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   )
                                 ],
                               ),
-                               Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -670,24 +750,26 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
                                   ),
-                                
                                 ],
                               ),
-                                 Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Disbursed Amount",
                                     style: TextStyle(
-                                        color: Colors.black, fontSize: 12,fontWeight: FontWeight.w900),
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w900),
                                   ),
                                   Text(
                                     "NGN 70,000",
                                     style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,),
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   )
                                 ],
                               )
@@ -697,8 +779,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
                         const SizedBox(height: 25),
                         ElevatedButton(
                           onPressed: () {
-                             Navigator.pop(context); 
-                         showwithdrawSuccessPopup(context);
+                            Navigator.pop(context);
+                            showwithdrawSuccessPopup(context);
                           },
                           //
                           style: ElevatedButton.styleFrom(
@@ -716,6 +798,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                   )),
             ));
   }
+
   void showwithdrawSuccessPopup(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -751,7 +834,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Main_Dashboard(), // Start with MortgageHome
+                                    const Main_Dashboard(), // Start with MortgagePage
                               ),
                             );
                           },
@@ -1012,7 +1095,7 @@ class GaugeChartWidget extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Main_Dashboard(), // Start with MortgageHome
+                                    const Main_Dashboard(), // Start with MortgagePage
                               ),
                             );
                           },

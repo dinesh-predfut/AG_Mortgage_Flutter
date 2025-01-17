@@ -1,8 +1,11 @@
+import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/PIN_Creation/pin.dart';
 import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void main() {
+   Get.put(ProfileController());
   runApp(const Authentication());
 }
 

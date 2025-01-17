@@ -101,7 +101,7 @@ class AddCardDetailsPage extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Card_Success(), // Start with MortgageHome
+                    builder: (context) => const Card_Success(), // Start with MortgagePage
                   ),
                 );
               },
