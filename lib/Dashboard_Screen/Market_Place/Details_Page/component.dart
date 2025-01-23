@@ -1,261 +1,295 @@
-// ignore_for_file: depend_on_referenced_packages
-
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
-import 'package:ag_mortgage/const/Image.dart';
-import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:get/get.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class PropertyDetailsPage extends StatelessWidget {
-  PropertyDetailsPage({super.key});
-  final List<String> imageUrls = [
-    'assets/1.jpg',
-    'assets/2.jpg',
-    'assets/3.jpg',
-  ];
+import '../../Mortgage/MortgageHome.dart';
+import 'controller.dart'; // Replace with actual import
+import 'models.dart'; // Replace with actual import
+import '../../Mortgage/MortgagePage.dart'; // Replace with actual import
+import '../../../const/colors.dart';
+import '../../../const/Image.dart';
 
-  num get rating => 4;
+class PropertyDetailsPage extends StatefulWidget {
+  final int? id;
+
+  const PropertyDetailsPage({Key? key, required this.id}) : super(key: key);
+
+  @override
+  _PropertyDetailsPageState createState() => _PropertyDetailsPageState();
+}
+
+class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
+  String? _selectedPlan;
+  final controller = Get.put(House_view_controller());
+  late Future<Houseview> fetchhouseViewedHouses;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchhouseViewedHouses = controller.fetchMostviewList(widget.id);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Property Details'),
+        title: Text("Property ID: ${widget.id}"),
         centerTitle: true,
-         leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Slider
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 250.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-              ),
-              items: imageUrls.map((url) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: AssetImage(url),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-
-            // Price and Details
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+      body: FutureBuilder<Houseview>(
+        future: fetchhouseViewedHouses,
+        builder: (context, snapshot) {
+          print('`maintance${snapshot}`');
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            final house = snapshot.data!;
+            return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                       
-                      const Text(
-                        'NGN 40,000,000',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        children: List.generate(5, (index) {
-                          // Determine if the current index is less than the rating
-                          if (index < rating) {
-                            return const Icon(
-                              Icons.star,
-                              color: Colors.orange,
-                              
-                            );
-                          } else {
-                            return const Icon(
-                              Icons.star_border,
-                              color: Colors.orange,
-                            );
-                          }
-                          
+                  // Image Slider
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 250.0,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                    ),
+                    items: house.housePictures.map((url) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: NetworkImage(url),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
                         },
-                        
+                      );
+                    }).toList(),
+                  ),
+
+                  // Price and Details
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'NGN ${house.price}',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                              children: List.generate(5, (index) {
+                                if (index < house.rating) {
+                                  return const Icon(
+                                    Icons.star,
+                                    color: Colors.orange,
+                                  );
+                                } else {
+                                  return const Icon(
+                                    Icons.star_border,
+                                    color: Colors.orange,
+                                  );
+                                }
+                              }),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const Row(
-                    children: [
-                      Icon(Icons.location_on, size: 16),
-                      SizedBox(width: 5),
-                      Text('Lagos'),
-                      SizedBox(width: 10),
-                      Icon(Icons.apartment, size: 16),
-                      SizedBox(width: 5),
-                      Text('Studio'),
-                      SizedBox(width: 10),
-                      Icon(Icons.square_foot, size: 16),
-                      SizedBox(width: 5),
-                      Text('3,890 SqFt'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // About Section
-            sectionCard(
-              title: 'About',
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Leo mattis id diam nec laoreet aliquam...',
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () => showReadMorePopup(
-                      context,
-                      'About',
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Leo mattis id diam nec laoreet aliquam. At lectus netus morbi ornare morbi volutpat. Volutpat, id vivamus gravida nullam et aliquam. Vitae et elit est rhoncus tempor ullamcorper nunc eu tempor. Dui interdum volutpat nunc augue phasellus feugiat.',
-                      null
-                    ),
-                    child: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Read More',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on, size: 16),
+                            const SizedBox(width: 5),
+                            Text(house.street),
+                            const SizedBox(width: 10),
+                            const Icon(Icons.apartment, size: 16),
+                            const SizedBox(width: 5),
+                            Text(house.houseType),
+                            const SizedBox(width: 10),
+                            const Icon(Icons.square_foot, size: 16),
+                            const SizedBox(width: 5),
+                            Text('${house.totalArea} SqFt'),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
 
-            // Amenities Section
-            sectionCard(
-              title: 'Amenities',
-              content: amenitiesGrid(),
-            ),
-
-            // Location Section with Map
-            sectionCard(
-              title: 'Location',
-              content: const Column(
-                children: [
-                  Text('No 4, Ogunlana Area, Lagos, Lagos State, Nigeria.'),
-                  SizedBox(height: 10),
-                  SizedBox(
-                    height: 400,
-                    // child: GoogleMap(
-                    //   initialCameraPosition: CameraPosition(
-                    //     target: LatLng(6.5244, 3.3792),
-                    //     zoom: 14,
-                    //   ),
-                    // ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Developer Section
-            sectionCard(
-              title: 'Developer',
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                      child: Image.asset(Images.logo,
-                          fit: BoxFit.cover, width: 100)),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Leo mattis id diam nec laoreet aliquam...',
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () => showReadMorePopup(
-                      context,
-                      'Developer',
-                      'Detailed developer information goes here. This can include information about the company, projects, history, etc.',
-                      "assets/logo.jpg"
-                      
-                    ),
-                    child: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Read More',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                  // About Section
+                  sectionCard(
+                    title: 'About',
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          house.houseDescription,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => showReadMorePopup(
+                            context,
+                            'About',
+                            house.houseDescription,
+                            null,
+                          ),
+                          child: const Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Read More',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Amenities Section
+                  sectionCard(
+                    title: 'Amenities',
+                    content: amenitiesGrid(house.houseAmenities),
+                  ),
+
+                  // Location Section with Map
+                  sectionCard(
+                    title: 'Location',
+                    content: Column(
+                      children: [
+                        Text(house.street),
+                        const SizedBox(height: 10),
+                        const SizedBox(
+                            // height: 400,
+                            // Uncomment and configure this section for Google Map
+                            // child: GoogleMap(
+                            //   initialCameraPosition: CameraPosition(
+                            //     target: LatLng(house.latitude, house.longitude),
+                            //     zoom: 14,
+                            //   ),
+                            // ),
+                            ),
+                      ],
+                    ),
+                  ),
+                  sectionCard(
+                    title: 'Developer',
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                            child: Image.asset(Images.logo,
+                                fit: BoxFit.cover, width: 100)),
+                        const SizedBox(height: 10),
+                        Text(
+                          house.contractorNameAndDescription,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => showReadMorePopup(
+                              context,
+                              'Develope',
+                              house.contractorNameAndDescription,
+                              "assets/logo.jpg"),
+                          child: const Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Read More',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Plan Selector and Proceed Button
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DropdownButtonFormField<String>(
+                          value: _selectedPlan,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'mortgage',
+                              child: Text('Mortgage'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'rentToOwn',
+                              child: Text('Rent-To-Own'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPlan =
+                                  value; // Update the selected value
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Choose Plan',
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(40))),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    _selectedPlan == "mortgage"
+                                        ?  MortgageFormPage(viewBtn:false,house: house)
+                                        : const MortgagePage(startIndex: 1),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: baseColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            'Proceed',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-
-            // Plan Selector and Proceed Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DropdownButtonFormField<String>(
-                    items: ['Plan A', 'Plan B', 'Plan C']
-                        .map((plan) => DropdownMenuItem(
-                              value: plan,
-                              child: Text(plan),
-                            ))
-                        .toList(),
-                    onChanged: (value) {},
-                    decoration: const InputDecoration(
-                      labelText: 'Choose Plan',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const MortgagePage(startIndex: 1),
-                  ),
-                );
-              },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: baseColor,
-
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text('Proceed',style: TextStyle(color: Colors.white),),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+            );
+          } else {
+            return const Center(child: Text('No Data Available'));
+          }
+        },
       ),
     );
   }
@@ -264,10 +298,8 @@ class PropertyDetailsPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
-        color: Colors.white, // Set the desired background color here
         elevation: 8,
-        shadowColor:
-            Colors.black.withOpacity(0.3), // Customize the shadow color
+        shadowColor: Colors.black.withOpacity(0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -292,15 +324,7 @@ class PropertyDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget amenitiesGrid() {
-    final amenities = [
-      {'icon': Icons.home, 'label': 'Area\n200,000 SqFt'},
-      {'icon': Icons.bed, 'label': 'Rooms\n3 Bedrooms'},
-      {'icon': Icons.pool, 'label': 'Pool\n1 Big Pool'},
-      {'icon': Icons.park, 'label': 'Garden\n30,000 SqFt'},
-      {'icon': Icons.car_rental, 'label': 'Parking\n3 Cars'},
-    ];
-
+  Widget amenitiesGrid(List<dynamic> amenities) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -316,10 +340,10 @@ class PropertyDetailsPage extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(item['icon'] as IconData, size: 20),
+            Icon(item.icon, size: 20),
             const SizedBox(height: 5),
             Text(
-              item['label'] as String,
+              item.label,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 12),
             ),
@@ -328,33 +352,37 @@ class PropertyDetailsPage extends StatelessWidget {
       },
     );
   }
-void showReadMorePopup(BuildContext context, String title, String content, String? image) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (image != null) // Check if image is provided
-                Image.asset(image, height: 50, width: 50),
-              Text(content),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Close'),
-          ),
-        ],
-      );
-    },
-  );
-}
 
+  void showReadMorePopup(
+    BuildContext context,
+    String title,
+    String content,
+    String? image,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (image != null) Image.asset(image, height: 50, width: 50),
+                Text(content),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

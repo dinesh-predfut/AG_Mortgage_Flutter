@@ -1,4 +1,6 @@
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class FilterHousePage extends StatefulWidget {
   const FilterHousePage({super.key});
@@ -9,10 +11,7 @@ class FilterHousePage extends StatefulWidget {
 
 class _FilterHousePageState extends State<FilterHousePage>
     with SingleTickerProviderStateMixin {
-  String? selectedLocation;
-  String? selectedHouseType;
-  int? selectedBedrooms;
-  double? budget;
+        final controller = Get.put(Market_Place_controller());
   late TabController _tabController;
   List<String> amenities = [
     'Parking Lot',
@@ -29,7 +28,7 @@ class _FilterHousePageState extends State<FilterHousePage>
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 12, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(() {
       setState(() {}); // Refresh UI when tab changes
     });
@@ -138,7 +137,7 @@ class _FilterHousePageState extends State<FilterHousePage>
               ),
               DropdownButtonFormField<String>(
                 hint: const Text("Select Preferred Location"),
-                value: selectedLocation,
+                value: controller.selectedLocation,
                 items: ["Lagos", "Ogun", "Anambra", "Abuja"]
                     .map((location) => DropdownMenuItem<String>(
                           value: location,
@@ -147,7 +146,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                     .toList(),
                 onChanged: (value) {
                   setState(() {
-                    selectedLocation = value;
+                    controller.selectedLocation = value;
                   });
                 },
                 decoration: InputDecoration(
@@ -163,8 +162,8 @@ class _FilterHousePageState extends State<FilterHousePage>
               ),
               DropdownButtonFormField<String>(
                 hint: const Text("Select Preferred House Type"),
-                value: selectedHouseType,
-                items: ["Apartment", "Bungalow", "Duplex", "Villa"]
+                value: controller.selectedHouseType,
+                items: ["Apartment", "NewHouse"]
                     .map((type) => DropdownMenuItem<String>(
                           value: type,
                           child: Text(type),
@@ -172,7 +171,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                     .toList(),
                 onChanged: (value) {
                   setState(() {
-                    selectedHouseType = value;
+                    controller.selectedHouseType = value;
                   });
                 },
                 decoration: InputDecoration(
@@ -195,7 +194,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                     )),
                 onChanged: (value) {
                   setState(() {
-                    selectedBedrooms = int.tryParse(value);
+                    controller.selectedBedrooms = int.tryParse(value);
                   });
                 },
               ),
@@ -214,7 +213,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                 ),
                 onChanged: (value) {
                   setState(() {
-                    budget = double.tryParse(value);
+                    controller.budget = double.tryParse(value);
                   });
                 },
               ),

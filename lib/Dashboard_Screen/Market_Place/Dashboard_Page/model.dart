@@ -1,12 +1,10 @@
-
 import 'dart:convert';
 
 class House {
- 
   final String houseType;
 
   final double price;
-  
+
   final String totalArea;
   final String rooms;
   final String houseAmenities;
@@ -19,7 +17,6 @@ class House {
   final String houseStatus;
 
   House({
-  
     required this.houseType,
     required this.price,
     required this.totalArea,
@@ -41,7 +38,7 @@ class House {
       price: json['price'],
       totalArea: json['totalArea'],
       rooms: json['rooms'],
-      houseAmenities: json['houseAmenities'],
+      houseAmenities: (json['houseAmenities'] as List<dynamic>).join(', '),
       contractorNameAndDescription: json['contractorNameAndDescription'],
       houseDescription: json['houseDescription'],
       street: json['street'],
@@ -71,16 +68,16 @@ class ApiResponse {
       totalItems: json['totalItems'],
       totalPages: json['totalPages'],
       currentPage: json['currentPage'],
-      items: (json['items'] as List).map((item) => House.fromJson(item)).toList(),
+      items:
+          (json['items'] as List).map((item) => House.fromJson(item)).toList(),
     );
   }
 }
-class Mostview {
- 
-  final String houseType;
 
+class Mostview {
+  final int id;
+  final String houseType;
   final double price;
-  
   final String totalArea;
   final String rooms;
   final String houseAmenities;
@@ -93,8 +90,8 @@ class Mostview {
   final String houseStatus;
 
   Mostview({
-  
     required this.houseType,
+      required this.id,
     required this.price,
     required this.totalArea,
     required this.rooms,
@@ -112,15 +109,18 @@ class Mostview {
   factory Mostview.fromJson(Map<String, dynamic> json) {
     return Mostview(
       houseType: json['houseType'],
+       id: json['id'],
       price: json['price'],
       totalArea: json['totalArea'],
       rooms: json['rooms'],
-      houseAmenities: json['houseAmenities'],
+      houseAmenities: (json['houseAmenities'] as List<dynamic>).join(', '),
       contractorNameAndDescription: json['contractorNameAndDescription'],
       houseDescription: json['houseDescription'],
       street: json['street'],
       houseNumber: json['houseNumber'],
-      housePictures: List<String>.from(json['housePictures']),
+      housePictures: (json['housePictures'] as List<dynamic>)
+          .map((e) => e.toString())
+          .toList(),
       embedMapDirection: json['embedMapDirection'],
       houseStatus: json['houseStatus'],
     );
@@ -145,17 +145,24 @@ class ApiResponsemostview {
       totalItems: json['totalItems'],
       totalPages: json['totalPages'],
       currentPage: json['currentPage'],
-      items: (json['items'] as List).map((item) => Mostview.fromJson(item)).toList(),
+      items: (json['items'] as List)
+          .map((item) => Mostview.fromJson(item))
+          .toList(),
     );
   }
 }
+
 class Home {
   final String image;
   final String price;
   final String type;
   final String location;
 
-  Home({required this.image, required this.price, required this.type, required this.location});
+  Home(
+      {required this.image,
+      required this.price,
+      required this.type,
+      required this.location});
 
   factory Home.fromJson(Map<String, dynamic> json) {
     return Home(
@@ -166,6 +173,57 @@ class Home {
     );
   }
 }
+
+class ApinewHoseview {
+  final int totalItems;
+  final int totalPages;
+  final int currentPage;
+  final List<Mostview> items;
+
+  ApinewHoseview({
+    required this.totalItems,
+    required this.totalPages,
+    required this.currentPage,
+    required this.items,
+  });
+
+  factory ApinewHoseview.fromJson(Map<String, dynamic> json) {
+    return ApinewHoseview(
+      totalItems: json['totalItems'],
+      totalPages: json['totalPages'],
+      currentPage: json['currentPage'],
+      items: (json['items'] as List)
+          .map((item) => Mostview.fromJson(item))
+          .toList(),
+    );
+  }
+}
+
+class ApiTodayDeals {
+  final int totalItems;
+  final int totalPages;
+  final int currentPage;
+  final List<Mostview> items;
+
+  ApiTodayDeals({
+    required this.totalItems,
+    required this.totalPages,
+    required this.currentPage,
+    required this.items,
+  });
+
+  factory ApiTodayDeals.fromJson(Map<String, dynamic> json) {
+    return ApiTodayDeals(
+      totalItems: json['totalItems'],
+      totalPages: json['totalPages'],
+      currentPage: json['currentPage'],
+      items: (json['items'] as List)
+          .map((item) => Mostview.fromJson(item))
+          .toList(),
+    );
+  }
+}
+
 class HomeSponsers extends Home {
   HomeSponsers({
     required String image,
@@ -182,5 +240,27 @@ class HomeSponsers extends Home {
       location: json['location'],
     );
   }
-  
+}
+
+class Location {
+  final int id;
+  final String name;
+
+  Location({required this.id, required this.name});
+
+  // Factory constructor to create a Location from a map
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(
+      id: json['id'],
+      name: json['name'],
+    );
+  }
+
+  // Method to convert Location object to a map
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
 }

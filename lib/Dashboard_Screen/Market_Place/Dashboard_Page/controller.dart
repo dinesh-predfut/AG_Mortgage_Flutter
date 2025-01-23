@@ -12,11 +12,38 @@ import 'package:http/http.dart' as http;
 
 // ignore: camel_case_types
 class Market_Place_controller extends ChangeNotifier {
+  String? selectedLocation;
+  String? selectedHouseType;
+  int? selectedBedrooms;
+  double? budget;
+  late TabController _tabController;
+  
+ Future<ApinewHoseview> fetchnewtViewedHouses() async {
+    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10&newHouses=true');
 
- Future<ApiResponsemostview> fetchMostViewedHouses() async {
-    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10');
+    // Create a GET request with headers   
+    final request = http.Request('GET', uri)
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
 
-    // Create a GET request with headers
+    // Send the request
+    final response = await request.send();
+
+    // Read the response body and decode it
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      return ApinewHoseview.fromJson(json.decode(responseBody));
+    } else {
+      throw Exception('Failed to load houses');
+    }
+  }  
+  Future<ApiResponsemostview> fetchmostViewedHouses() async {
+    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10&mostViewed=true');
+
+    // Create a GET request with headers   
     final request = http.Request('GET', uri)
       ..headers.addAll({
         'Content-Type': 'application/json',
@@ -36,7 +63,7 @@ class Market_Place_controller extends ChangeNotifier {
     }
   }
    Future<ApiResponse> fetchHouses() async {
-    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10&newHouses=true');
+    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10&sponsored=true');
 
     // Create a GET request with headers
     final request = http.Request('GET', uri)
@@ -53,6 +80,52 @@ class Market_Place_controller extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       return ApiResponse.fromJson(json.decode(responseBody));
+    } else {
+      throw Exception('Failed to load houses');
+    }
+  }
+  Future<ApiTodayDeals> fetchTodayDeals() async {
+    final uri = Uri.parse('${Urls.marketPlace}?page=0&size=10');
+
+    // Create a GET request with headers   
+    final request = http.Request('GET', uri)
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
+
+    // Send the request
+    final response = await request.send();
+
+    // Read the response body and decode it
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      return ApiTodayDeals.fromJson(json.decode(responseBody));
+    } else {
+      throw Exception('Failed to load houses');
+    }
+  }
+  Future<List<String>> tabFetch() async {
+    final uri = Uri.parse(Urls.allCity);
+
+    // Create a GET request with headers
+    final request = http.Request('GET', uri)
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
+
+    // Send the request
+    final response = await request.send();
+
+    // Read the response body and decode it
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode == 200) {
+      // return ApiResponse.fromJson(json.decode(responseBody));
+      List<dynamic> data = json.decode(responseBody);
+       return data.map<String>((item) => item['name'].toString()).toList();
     } else {
       throw Exception('Failed to load houses');
     }

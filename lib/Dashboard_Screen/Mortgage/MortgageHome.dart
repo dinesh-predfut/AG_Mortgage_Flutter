@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/models.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
@@ -108,13 +112,12 @@ class Landing_Mortgage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ),
+          leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      )),
       body: Stack(children: [
         Center(
           child: Column(
@@ -186,8 +189,14 @@ class Landing_Mortgage extends StatelessWidget {
 }
 
 class MortgageFormPage extends StatefulWidget {
-  const MortgageFormPage({super.key});
-
+  // ignore: prefer_typing_uninitialized_variables
+  final Houseview? house;
+  final bool? viewBtn;
+  const MortgageFormPage({
+    Key? key,
+    this.viewBtn,
+    this.house,
+  }) : super(key: key);
   @override
   _MortgageFormPageState createState() => _MortgageFormPageState();
 }
@@ -195,8 +204,66 @@ class MortgageFormPage extends StatefulWidget {
 class _MortgageFormPageState extends State<MortgageFormPage> {
   final controller = Get.put(MortgagController());
   MortgagController controllerFeild = MortgagController();
+
   final _formKey = GlobalKey<FormState>();
 // Default value for slider
+  double interestRate = 18; // Annual interest rate in percentage
+  void calculateEMI() {
+    // Parse property value
+    double propertyValue =
+        double.tryParse(controller.propertyValueController.text) ?? 0;
+
+    // Calculate initial deposit and loan amount
+    double initialDeposit = propertyValue * 0.3; // 30% of property value
+    double loanAmount = propertyValue * 0.7; // 70% of property value
+
+    // Set the initial deposit in the controller
+    controller.initialDepositController.text =
+        initialDeposit.toStringAsFixed(2);
+
+    // EMI Calculation
+    double interestRate = 18.0; // Assuming 18% annual interest rate
+    double monthlyInterestRate =
+        (interestRate / 100) / 12; // Monthly interest rate
+    int loanTenureInMonths =
+        (controller.sliderValue * 12).toInt(); // Tenure in months
+
+    double emiAmount;
+
+    if (loanAmount > 0 && loanTenureInMonths > 0) {
+      emiAmount = (loanAmount *
+              monthlyInterestRate *
+              pow(1 + monthlyInterestRate, loanTenureInMonths)) /
+          (pow(1 + monthlyInterestRate, loanTenureInMonths) - 1);
+      controller.monthlyRepaymentController.text = emiAmount.toString();
+    } else {
+      emiAmount = 0;
+    }
+
+    // Set the EMI value in the controller
+    controller.monthlyRepaymentController.text = emiAmount.toStringAsFixed(2);
+
+    // Update UI
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.house != null) {
+      controller.propertyValueController.text = widget.house!.price.toString();
+      controller.selectedCity = widget.house!.city;
+      controller.selectedArea = widget.house!.localGovernmentArea;
+      controller.selectedApartmentType = widget.house!.typeOfApartment;
+      // Calculate the initial deposit (30% of the property value)
+      double propertyValue = widget.house!.price.toDouble();
+      double initialDeposit = propertyValue * 0.3;
+      controller.initialDepositController.text =
+          initialDeposit.toStringAsFixed(2);
+      calculateEMI();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +271,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
       appBar: AppBar(
         title: const Text('Mortgage'),
         centerTitle: true,
-         leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
@@ -224,7 +291,32 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
+              if (widget.viewBtn == null)
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const MarketMain() // Start with MortgagePage
+                            ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: baseColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Text("View House",
+                        style: TextStyle(color: Colors.white, fontSize: 12)),
+                  ),
+                ),
+              const SizedBox(height: 10),
               // Apartment Type Dropdown
               const Text('Apartment Type'),
               DropdownButtonFormField<int>(
@@ -362,6 +454,20 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        double propertyValue = double.tryParse(value) ?? 0;
+                        // Calculate 30% of the property value
+                        double initialDeposit = propertyValue * 0.3;
+                        // Update the initial deposit controller value
+                        controller.initialDepositController.text =
+                            initialDeposit.toStringAsFixed(
+                                2); // Format to 2 decimal places
+                      } else {
+                        // Reset the initial deposit value if the input is cleared
+                        controller.initialDepositController.clear();
+                      }
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter the estimated property value';
@@ -381,6 +487,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
+                    readOnly: true,
                   ),
                   const SizedBox(height: 10),
 
@@ -395,6 +502,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                     onChanged: (value) {
                       setState(() {
                         controller.sliderValue = value; // Update slider value
+                        calculateEMI();
                       });
                     },
                   ),
@@ -509,7 +617,7 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: const Text('Anniversaryss'),
         centerTitle: true,
-         leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
@@ -705,7 +813,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   }
 }
 
-
 class TermSheetPage extends StatelessWidget {
   const TermSheetPage({super.key});
 
@@ -817,7 +924,8 @@ class TermSheetPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const DashboardPageS("Mortgage"), // Start with MortgagePage
+                      builder: (context) => const DashboardPageS(
+                          "Mortgage"), // Start with MortgagePage
                     ),
                   )
                 },
