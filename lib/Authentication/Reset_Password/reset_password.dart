@@ -1,13 +1,7 @@
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:ag_mortgage/Authentication/OTP_Reset/otp_reset.dart';
 import 'package:flutter/material.dart';
-import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
-
-void main() {
-  runApp(const Rest_Password());
-}
-
-// ignore: camel_case_types
+import 'package:ag_mortgage/const/Image.dart'; 
 class Rest_Password extends StatelessWidget {
   const Rest_Password({Key? key}) : super(key: key);
 
@@ -93,7 +87,7 @@ class RegisterScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OTP_Reset(),
+                            builder: (context) => const OTPAuthentication(),
                           ));
                     },
                     

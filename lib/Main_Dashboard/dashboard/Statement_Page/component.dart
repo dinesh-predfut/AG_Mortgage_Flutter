@@ -298,7 +298,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            ALL_Card()
+            Get_All_Cards()
           ],
         ),
       ),
@@ -514,7 +514,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Main_Dashboard(), // Start with MortgagePage
+                                    const DashboardPageS(''), // Start with MortgagePage
                               ),
                             );
                           },
@@ -536,9 +536,3 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    home: StatementOfAccount(),
-    debugShowCheckedModeBanner: false,
-  ));
-}

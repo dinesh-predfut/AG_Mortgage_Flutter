@@ -267,7 +267,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                 builder: (context) =>
                                     _selectedPlan == "mortgage"
                                         ?  MortgageFormPage(viewBtn:false,house: house)
-                                        : const MortgagePage(startIndex: 1),
+                                        : const MortgagePageHome(startIndex: 1),
                               ),
                             );
                           },

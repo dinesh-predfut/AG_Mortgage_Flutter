@@ -1,33 +1,17 @@
 import 'package:ag_mortgage/Authentication/Changepassword/changpassword.dart';
 import 'package:ag_mortgage/Authentication/PIN_Creation/pin.dart';
+import 'package:ag_mortgage/Authentication/Reset_Password/reset_password.dart';
 import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const OTP_Reset());
-}
-
-// ignore: camel_case_types
-class OTP_Reset extends StatelessWidget {
-  const OTP_Reset({Key? key}) : super(key: key);
+class OTPAuthentication extends StatefulWidget {
+  const OTPAuthentication({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AuthenticationScreen(),
-    );
-  }
+  State<OTPAuthentication> createState() => _OTPAuthenticationState();
 }
 
-class AuthenticationScreen extends StatefulWidget {
-  const AuthenticationScreen({Key? key}) : super(key: key);
-
-  @override
-  State<AuthenticationScreen> createState() => _AuthenticationScreenState();
-}
-
-class _AuthenticationScreenState extends State<AuthenticationScreen> {
+class _OTPAuthenticationState extends State<OTPAuthentication> {
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -149,7 +133,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const Reset_Password(),
+                                builder: (context) => const Rest_Password(),
                               ));
                       // Add your API call or verification logic here.
                     },

@@ -67,7 +67,7 @@ class _TodayDealsState extends State<TodayDeals>
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 6),
+                        const MarketMain(startIndex: 6),
                   ),
                 );
               },
@@ -78,7 +78,7 @@ class _TodayDealsState extends State<TodayDeals>
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 5),
+                        const MarketMain(startIndex: 5),
                   ),
                 );
               },

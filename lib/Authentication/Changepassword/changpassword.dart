@@ -2,21 +2,6 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:flutter/material.dart';
-void main() {
-  runApp(const Reset_Password());
-}
-
-class Reset_Password extends StatelessWidget {
-  const Reset_Password({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SetupPasswordScreen(),
-    );
-  }
-}
 class SetupPasswordScreen extends StatefulWidget {
   const SetupPasswordScreen({Key? key}) : super(key: key);
 
@@ -165,7 +150,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                           Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const Login(navigation: true),
+                            builder: (context) => const Login(),
                           ));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

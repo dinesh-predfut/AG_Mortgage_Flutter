@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-void main() {
-  runApp(const Terms_andcondition());
-}
 
 class Terms_andcondition extends StatelessWidget {
   const Terms_andcondition({super.key});

@@ -1,25 +1,34 @@
 import 'package:ag_mortgage/Authentication/Login/login.dart';
+import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/NotificationScreen/notification.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
-
 
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/onboarding_pages/first_page.dart';
 import 'package:ag_mortgage/onboarding_pages/second_page.dart';
 import 'package:get/get.dart';
-
+import 'package:provider/provider.dart';
 
 import 'Authentication/Login_Controller/controller.dart';
 // Import the BottomNavBar
 
 void main() {
-    Get.lazyPut(() => ProfileController());
-  runApp(const MyApp());
+  Get.lazyPut(() => ProfileController());
+    runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MortgagController()), // Provide MortgageProvider
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -29,50 +38,72 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-     initialRoute: '/landing',
-      routes: {
-        '/landing': (context) => const LandingPage(),
-        // '/second': (context) =>  MortgagePage (),
-        '/login': (context) => const Login(navigation: true,),
-        // '/main_page':(context) => const MortgagePage(),
-        
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        print("Navigating to: ${settings.name}");
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (context) => const LandingPage(startIndex: 0));
+          case '/second':
+            return MaterialPageRoute(
+                builder: (context) => const MortgagePageHome(startIndex: 0));
+          case '/register':
+            return MaterialPageRoute(
+                builder: (context) => const RegisterScreen());
+          case '/login':
+            return MaterialPageRoute(builder: (context) => const Login());
+          case '/dashBoardPage':
+            return MaterialPageRoute(
+                builder: (context) => const LandingPage(startIndex: 1));
+          case '/dashBoardPage/mortgage':
+            return MaterialPageRoute(
+                builder: (context) => const MortgagePageHome(startIndex: 0));
+          case '/main_page':
+            return MaterialPageRoute(
+                builder: (context) => const MortgagePageHome());
+          default:
+            return MaterialPageRoute(
+                builder: (context) =>
+                    const LandingPage()); // Handle unknown routes
+        }
       },
-    );  
+    );
   }
 }
 
 class LandingPage extends StatefulWidget {
-
-   final int startIndex;
+  final int startIndex;
   const LandingPage({super.key, this.startIndex = 0});
   @override
   _LandingPageState createState() => _LandingPageState();
 }
 
 class _LandingPageState extends State<LandingPage> {
-  int _currentIndex = 1;
+  int _currentIndex = 1; 
 
- @override
+  @override
   void initState() {
     super.initState();
-    _currentIndex = widget.startIndex; // Initialize with provided index
+    _currentIndex = widget.startIndex; // ✅ Initialize with provided index
   }
-  // List of pages to show based on the index
+
+  // ✅ Corrected List of Pages (Should be Widgets, not Routes)
   final List<Widget> _pages = [
     const Logo_Screen(),
     const DashboardPage(),
-     const MarketMain(),
+    const MarketMain(),
     const NotificationsPage(),
-    const ProfilePage(),
-    
-  ];  
+    const ProfilePagewidget(startIndex: 0),
+    const MortgagePageHome(startIndex: 0)
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     final bool showBottomNavBar = _currentIndex != 0; // H
     return Scaffold(
@@ -88,3 +119,4 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 }
+

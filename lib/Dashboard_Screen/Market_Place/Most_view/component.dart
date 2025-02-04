@@ -65,7 +65,7 @@ late Future<ApiResponsemostview> fetchmostViewedHouses;
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 6),
+                        const MarketMain(startIndex: 6),
                   ),
                 );
               },
@@ -76,7 +76,7 @@ late Future<ApiResponsemostview> fetchmostViewedHouses;
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 5),
+                        const MarketMain(startIndex: 5),
                   ),
                 );
               },

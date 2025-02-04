@@ -89,9 +89,3 @@ class HomePage extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Logo_Screen(),
-  ));
-}

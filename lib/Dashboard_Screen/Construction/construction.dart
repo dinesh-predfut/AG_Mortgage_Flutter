@@ -7,33 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
-
-void main() {
-  runApp(const ConstructionPage());
-}
-
-class ConstructionPage extends StatelessWidget {
-  const ConstructionPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AG Mortgage',
-      home: Constuction(),
-    );
-  }
-}
-
-class Constuction extends StatefulWidget {
+class ConstructionPage extends StatefulWidget {
   final int startIndex;
-  const Constuction({super.key, this.startIndex = 0});
+  const ConstructionPage({super.key, this.startIndex = 0});
   @override
   // ignore: library_private_types_in_public_api
-  _ConstuctionState createState() => _ConstuctionState();
+  _ConstructionPageState createState() => _ConstructionPageState();
 }
 
-class _ConstuctionState extends State<Constuction> {
+class _ConstructionPageState extends State<ConstructionPage> {
   int _currentStepIndex = 0;
   @override
   void initState() {
@@ -47,7 +29,7 @@ class _ConstuctionState extends State<Constuction> {
     const ConstructionFinancePage(),
     const PaymentMethodPage(),
     const CardDetailsPage(),
-    const ALL_Card(),
+    const Get_All_Cards(),
     const PaymentPage(),
     const Success(),
      const Construction_CalendarPage(),
@@ -255,7 +237,7 @@ class Construction_Landing extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 1), // Start with MortgagePage
                     ),
                   );
@@ -518,7 +500,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                       Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 2), // Start with MortgagePage
                     ),
                   );
@@ -630,7 +612,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Constuction(startIndex: 9),
+                        builder: (context) => const ConstructionPage(startIndex: 9),
                       ),
                     );
                   },
@@ -750,7 +732,7 @@ class CardDetailsPage extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Constuction(
+                    builder: (context) => const ConstructionPage(
                         startIndex: 5), // Start with ConstructionPage
                   ),
                 );
@@ -831,7 +813,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 10), // Example for Bank Transfer
                     ),
                   );
@@ -840,7 +822,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 4), // Example for Card payment
                     ),
                   );
@@ -850,7 +832,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const Constuction(startIndex: 10), // Default case
+                          const ConstructionPage(startIndex: 10), // Default case
                     ),
                   );
                 }
@@ -1038,7 +1020,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Constuction(
+                    builder: (context) => const ConstructionPage(
                         startIndex: 7), // Start with ConstructionPage
                   ),
                 );
@@ -1094,7 +1076,7 @@ class Success extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Constuction(
+                        builder: (context) => const ConstructionPage(
                             startIndex: 8), // Start with ConstructionPage
                       ),
                     );
@@ -1385,7 +1367,7 @@ class BankTransferPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 7), // Start with ConstructionPage
                     ),
                   );
@@ -1537,7 +1519,7 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Constuction(
+                      builder: (context) => const ConstructionPage(
                           startIndex: 3), // Start with MortgagePage
                     ),
                   );

@@ -180,8 +180,8 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MortgagePage(
-                        startIndex: 7), // Start with MortgagePage
+                    builder: (context) => const MortgagePageHome(
+                        startIndex: 7), // Start with MortgagePageHome
                   ),
                 );
               },

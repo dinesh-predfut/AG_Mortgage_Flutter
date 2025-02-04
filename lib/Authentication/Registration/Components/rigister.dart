@@ -6,22 +6,6 @@ import 'package:ag_mortgage/const/Image.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart'; // Update this with the correct path to your image.dart file.
 
-void main() {
-  runApp(const Register());
-}
-
-class Register extends StatelessWidget {
-  const Register({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // ignore: prefer_const_constructors
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const RegisterScreen(),
-    );
-  }
-}
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -32,7 +16,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-    ProfileController signupController = Get.find<ProfileController>();
+  ProfileController signupController = Get.find<ProfileController>();
 
   @override
   void initState() {
@@ -46,10 +30,11 @@ class _RegisterScreenState extends State<RegisterScreen>
     super.dispose();
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+        body: SingleChildScrollView(
+      child: Stack(
         children: [
           // Background image
           Positioned.fill(
@@ -107,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   const SizedBox(height: 20),
                   // Phone Number Field
                   TextField(
-                     controller:signupController.lasttNameController,
+                    controller: signupController.lasttNameController,
                     decoration: InputDecoration(
                       labelText: "Last Name",
                       border: OutlineInputBorder(
@@ -131,9 +116,23 @@ class _RegisterScreenState extends State<RegisterScreen>
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Phone Number Field
+                  TextField(
+                    controller: signupController.emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   // Promo Code Field
                   TextField(
-                     controller: signupController.promoCode,
+                    controller: signupController.promoCode,
                     decoration: InputDecoration(
                       labelText: "Promo Code (Optional)",
                       border: OutlineInputBorder(
@@ -146,13 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   // Register Button
                   ElevatedButton(
                     onPressed: () {
-                        signupController.sendOTP();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Authentication(),
-                           
-                          ));
+                      signupController.nextFuncation(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
@@ -177,12 +170,14 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const Login(navigation: true),
-                              ));
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           const Login(navigation: true),
+                          //     ));
+                              //  Navigator.of(context).pushNamed('/login');
+                               Navigator.pushNamed(context, "/login");
                         },
                         child: const Text(
                           "Login",
@@ -197,6 +192,6 @@ class _RegisterScreenState extends State<RegisterScreen>
           ),
         ],
       ),
-    );
+    ));
   }
 }

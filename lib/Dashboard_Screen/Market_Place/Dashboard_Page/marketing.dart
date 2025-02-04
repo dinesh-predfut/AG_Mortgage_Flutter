@@ -82,7 +82,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const Market_place_connection(startIndex: 6),
+                      const MarketMain(startIndex: 6),
                 ),
               );
             },
@@ -94,7 +94,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const Market_place_connection(startIndex: 4),
+                      const MarketMain(startIndex: 4),
                 ),  
               );
             },
@@ -394,7 +394,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 1),
+                        const MarketMain(startIndex: 1),
                   ),
                 );
               },
@@ -515,7 +515,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const Market_place_connection(
+                                                const MarketMain(
                                                     startIndex: 4),
                                           ),
                                         );
@@ -571,7 +571,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const Market_place_connection(startIndex: 2),
+                        const MarketMain(startIndex: 2),
                   ),
                 );
               },
@@ -661,7 +661,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Market_place_connection(
+                                    const MarketMain(
                                         startIndex: 4),
                               ),
                             );
@@ -780,7 +780,7 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const Market_place_connection(startIndex: 3),
+                      const MarketMain(startIndex: 3),
                 ),
               );
             },
@@ -912,7 +912,7 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              Market_place_connection(
+                                              MarketMain(
                                                   startIndex: 3,
                                                   id: home.id),
                                         ),

@@ -7,32 +7,16 @@ import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:get/get.dart'; // Update this with the correct path to your image.dart file.
+import 'package:intl_phone_field/intl_phone_field.dart';
 
-void main() {
-  runApp(const Login(navigation: true));
-}
-
-class Login extends StatelessWidget {
-  const Login({Key? key, required bool navigation}) : super(key: key);
+class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // ignore: prefer_const_constructors
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const RegisterScreen(),
-    );
-  }
+  State<Login> createState() => _LoginState();
 }
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginState extends State<Login> {
   ProfileController signupController = Get.find<ProfileController>();
   bool _obscureText = true;
   @override
@@ -83,9 +67,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 30),
                   // Phone Number Field
-                  TextField(
-                    controller: signupController.numberController,
-                    keyboardType: TextInputType.number,
+                  IntlPhoneField(
+                  
+                    keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
@@ -93,6 +77,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderSide: const BorderSide(color: Colors.deepPurple),
                       ),
                     ),
+                    initialCountryCode: 'NG', // Nigeria as default
+                    onChanged: (phone) {
+                      signupController.numberController.text=phone.completeNumber;
+                      print(phone
+                          .completeNumber); // Prints full number with country code
+                    },
                   ),
                   const SizedBox(height: 20),
                   // Promo Code Field

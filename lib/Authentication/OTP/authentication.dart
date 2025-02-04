@@ -4,31 +4,15 @@ import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct p
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
-   Get.put(ProfileController());
-  runApp(const Authentication());
-}
 
-class Authentication extends StatelessWidget {
+class Authentication extends StatefulWidget {
   const Authentication({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AuthenticationScreen(),
-    );
-  }
+  State<Authentication> createState() => _AuthenticationState();
 }
 
-class AuthenticationScreen extends StatefulWidget {
-  const AuthenticationScreen({Key? key}) : super(key: key);
-
-  @override
-  State<AuthenticationScreen> createState() => _AuthenticationScreenState();
-}
-
-class _AuthenticationScreenState extends State<AuthenticationScreen> {
+class _AuthenticationState extends State<Authentication> {
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),

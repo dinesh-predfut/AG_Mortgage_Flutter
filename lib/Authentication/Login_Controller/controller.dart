@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ag_mortgage/Authentication/FinalPage/final.dart';
+import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Login/signin_model.dart';
 import 'package:ag_mortgage/Authentication/Login_Models.dart/profile_model.dart';
+import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
+import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:ag_mortgage/main.dart';
@@ -11,23 +15,31 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+
 class ProfileController extends GetxController {
-    RxBool showMsg = false.obs;
-   RxBool isLoading = false.obs;
+  RxBool showMsg = false.obs;
+  RxBool isLoading = false.obs;
   RxBool isTermChecked = false.obs;
   RxBool pinMatch = false.obs;
   RxBool showTimer = false.obs;
   RxString gender = 'Female'.obs;
-  String countryCode = "234";
+  String countryCode = "";
   String countryName = "TZ";
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lasttNameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
-   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   TextEditingController pin1Controller = TextEditingController();
   TextEditingController pin2Controller = TextEditingController();
-   TextEditingController promoCode = TextEditingController();
+  TextEditingController promoCode = TextEditingController();
+  TextEditingController dobController = TextEditingController();
+  final TextEditingController countryCodeController = TextEditingController();
+  TextEditingController nin = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  String? selectedGender;
+
   RxInt secondsRemaining = 120.obs;
   Timer? timer;
   XFile path = XFile("null");
@@ -37,58 +49,47 @@ class ProfileController extends GetxController {
     // userProfile();
     super.onInit();
   }
-    nextFuncation() {
+
+  nextFuncation(BuildContext context) {
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (firstNameController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "enter_first_name_msg".tr);
+      Fluttertoast.showToast(msg: "enter_first_name_msg");
     } else if (lasttNameController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "enter_last_name_msg".tr);
+      Fluttertoast.showToast(msg: "enter_last_name_msg");
     } else if (numberController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "enter_number_msg".tr);
+      Fluttertoast.showToast(msg: "enter_number_msg");
     } else if (numberController.text.length < 9) {
-      Fluttertoast.showToast(msg: "enter_valid_number_msg".tr);
-    } else if (isTermChecked.value == false) {
-      Fluttertoast.showToast(msg: "read_condition_msg".tr);
+      Fluttertoast.showToast(msg: "enter_valid_number_msg");
+    }
+    // ignore: unnecessary_null_comparison
+    if (emailController.value == null || emailController.value.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Email cannot be empty");
+    } else if (!emailRegex.hasMatch(emailController.value.text)) {
+      Fluttertoast.showToast(msg: "Invalid email address");
     } else {
-      checkUser();
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Authentication(),
+          ));
     }
   }
-   Future checkUser() async {
-    try {
-      isLoading(true);
-      var request = http.Request(
-          'GET',
-          Uri.parse(
-              "${Urls.signIn}/${countryCode + numberController.text.trim()}"));
 
-      http.StreamedResponse response = await request.send();
-      var decodeData = await http.Response.fromStream(response);
-      final result = jsonDecode(decodeData.body);
-      print("check user ==> ${result["exists"]}");
-
-      if (result["exists"] == true) {
-        Fluttertoast.showToast(msg: "already_use".tr);
-
-        isLoading(false);
-      } else {
-        // sendOTP();
-        isLoading(false);
-      }
-    } catch (e) {
-      isLoading(false);
-      rethrow;
-    }
-  }
-  
-  Future sendOTP() async {
+  Future checkUser(BuildContext context) async {
     try {
       isLoading(true);
 
-      var request = http.Request('POST', Uri.parse(Urls.sendOTP));
+      var request = http.Request('POST', Uri.parse(Urls.signIn));
       request.body = json.encode({
-        "email": countryCode + numberController.text.trim(),
-        "userType": "customer",
-        "resendType": "emailVerification"
-
+        "firstName": firstNameController.text,
+        "lastName": lasttNameController.text,
+        "dateOfBirth": dobController.text,
+        "phoneNumber": numberController.text,
+        "email": emailController.text,
+        "gender": selectedGender.toString(),
+        "password": newPasswordController.text,
+        "nin": nin.text
       });
       request.headers.addAll({'Content-Type': 'application/json'});
 
@@ -99,12 +100,41 @@ class ProfileController extends GetxController {
 
       if (response.statusCode == 200) {
         // Get.to(() => Authentication(isReset: false), binding: InitialBinding());
+        // Fluttertoast.showToast(
+        //     msg:
+        //         "${"otp_sent".tr} ${countryCode + numberController.text.trim()}",
+        //     toastLength: Toast.LENGTH_LONG);
+        // isLoading(false);
+        // ignore: use_build_context_synchronously
         Fluttertoast.showToast(
-            msg:
-                "${"otp_sent".tr} ${countryCode + numberController.text.trim()}",
-            toastLength: Toast.LENGTH_LONG);
-        isLoading(false);
+          msg: "User Created successful!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FinalPageAuth(),
+            ));
       } else {
+        Fluttertoast.showToast(
+          msg: "Already Account Created Please Login",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+         // ignore: use_build_context_synchronously
+         Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>   Login(),
+            ));
         // Fluttertoast.showToast(msg: result["message"]);
         isLoading(false);
       }
@@ -113,82 +143,139 @@ class ProfileController extends GetxController {
       rethrow;
     }
   }
-  Future signIn(BuildContext context) async {
-  try {
-    isLoading(true);
-    showMsg(false);
 
-    var request = http.Request('POST', Uri.parse(Urls.signIn));
-    request.body = json.encode({
-      "username": countryCode + numberController.text.trim(),
-      "password": passwordController.text.trim(),
-    });
-    request.headers.addAll({'Content-Type': 'application/json'});
+  Future sendOTP() async {
+    try {
+      isLoading(true);
 
-    http.StreamedResponse response = await request.send();
-    var decodeData = jsonDecode(await response.stream.bytesToString());
+      var request = http.Request('POST', Uri.parse(Urls.sendOTP));
+      request.body = json.encode({
+        "email": countryCodeController.text.trim() + numberController.text.trim(),
+        "userType": "customer",
+        "resendType": "emailVerification"
+      });
+      request.headers.addAll({'Content-Type': 'application/json'});
 
-    if (response.statusCode == 200) {
-      signInModel.value = SignInModel.fromJson(decodeData);
-      print("login response ==> $signInModel");
+      http.StreamedResponse response = await request.send();
+      var decodeData = await http.Response.fromStream(response);
+      // final result = jsonDecode(decodeData.body);
+      print("result ==> ${decodeData.body}");
 
-      SetSharedPref().setData(
-        token: signInModel.value.token ?? "null",
-        phoneNumber: signInModel.value.username ?? "null",
-        userId: signInModel.value.id ?? "null",
-      );
+      if (response.statusCode == 200) {
+        // Get.to(() => Authentication(isReset: false), binding: InitialBinding());
+        // Show success toast
+        Fluttertoast.showToast(
+          msg: "User Created successful!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
 
+        isLoading(false);
+      } else {
+        Fluttertoast.showToast(
+          msg: "Already Account Created Please Login",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        // Fluttertoast.showToast(msg: result["message"]);
+        isLoading(false);
+      }
+    } catch (e) {
       isLoading(false);
+      rethrow;
+    }
+  }
+
+  Future signIn(BuildContext context) async {
+    try {
+      isLoading(true);
       showMsg(false);
 
-      // Show success toast
-      Fluttertoast.showToast(
-        msg: "Login successful!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      var request = http.Request('POST', Uri.parse(Urls.signup));
+      request.body = json.encode({
+        "username": countryCodeController.text.trim() + numberController.text.trim(),
+        "password": passwordController.text.trim(),
+      });
+      request.headers.addAll({'Content-Type': 'application/json'});
 
-      // Navigate to LandingPage
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const LandingPage(startIndex: 1),
-        ),
-      );
-    } else {
+      http.StreamedResponse response = await request.send();
+      var decodeData = jsonDecode(await response.stream.bytesToString());
+
+      if (response.statusCode == 200) {
+        signInModel.value = SignInModel.fromJson(decodeData);
+        print("login response ==> $signInModel");
+
+        SetSharedPref().setData(
+          token: signInModel.value.token ?? "null",
+          phoneNumber: signInModel.value.username ?? "null",
+          userId: signInModel.value.id ?? "null",
+        );
+
+        isLoading(false);
+        showMsg(false);
+
+        // Show success toast
+        Fluttertoast.showToast(
+          msg: "Login successful!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
+        // Navigate to LandingPage
+        // ignore: use_build_context_synchronously
+        Navigator.pushNamed(context, "/dashBoardPage");
+      } else {
+        showMsg(true);
+        isLoading(false);
+
+        // Show error toast
+        Fluttertoast.showToast(
+          msg: decodeData["message"] ?? "Login failed. Please try again.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e) {
       showMsg(true);
       isLoading(false);
 
-      // Show error toast
+      // Show exception toast
       Fluttertoast.showToast(
-        msg: decodeData["message"] ?? "Login failed. Please try again.",
+        msg: "An error occurred: $e",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 16.0,
       );
-    }
-  } catch (e) {
-    showMsg(true);
-    isLoading(false);
 
-    // Show exception toast
-    Fluttertoast.showToast(
-      msg: "An error occurred: $e",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
+      rethrow;
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
 
-    rethrow;
+    if (pickedDate != null) {
+      dobController.text =
+          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+    }
   }
-}
-
 }

@@ -9,22 +9,9 @@ import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
-  runApp(const ProfilePage());
-}
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AG Mortgage',
-      home: AccountPage(),
-    );
-  }
-}
+
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});

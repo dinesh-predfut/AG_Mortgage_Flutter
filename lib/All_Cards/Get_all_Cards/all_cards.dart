@@ -8,21 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const ALL_Card());
-}
 
-class ALL_Card extends StatelessWidget {
-  const ALL_Card({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Get_All_Cards(),
-    );
-  }
-}
 
 class Get_All_Cards extends StatefulWidget {
   const Get_All_Cards({super.key});
@@ -108,7 +94,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const MortgagePage(startIndex:6 ),
+                                      const MortgagePageHome(startIndex:7 ),
                                 ),
                               );
                             },
@@ -246,7 +232,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const ADD_CardDetailsPage(), // Start with MortgagePage
+                              const ADD_CardDetailsPage(), // Start with MortgagePageHome
                         ),
                       );
                     },

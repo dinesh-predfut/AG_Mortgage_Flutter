@@ -8,37 +8,8 @@ import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
-
-
-
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AG Mortgage',
-      home: HomePage(),
-    );
-  }
-}
-
-class Main_Access_Dashboard extends StatefulWidget {
-  const Main_Access_Dashboard({super.key});
-
-  @override
-  State<Main_Access_Dashboard> createState() => _Main_Access_DashboardState();
-}
-
-class _Main_Access_DashboardState extends State<Main_Access_Dashboard> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +39,8 @@ class HomePage extends StatelessWidget {
                     title: 'Mortgage',
                     icon: Icons.home,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MortgagePage(),
-                        ),
-                      );
+                       Navigator.pushNamed(context, "/dashBoardPage/mortgage");
+                    
                     },
                   ),
                   MenuButton(
@@ -117,7 +84,7 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const Market_place_connection(),
+                          builder: (_) => const MarketMain(),
                         ),
                       );
                     },

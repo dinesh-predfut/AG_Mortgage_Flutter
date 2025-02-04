@@ -1,45 +1,41 @@
+import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:flutter/material.dart';
-void main() {
-  runApp(const PIN_Creation());
-}
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
-class PIN_Creation extends StatelessWidget {
+class PIN_Creation extends StatefulWidget {
   const PIN_Creation({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SetupPasswordScreen(),
-    );
-  }
-}
-class SetupPasswordScreen extends StatefulWidget {
-  const SetupPasswordScreen({Key? key}) : super(key: key);
-
-  @override
-  State<SetupPasswordScreen> createState() => _SetupPasswordScreenState();
+  State<PIN_Creation> createState() => _PIN_CreationState();
 }
 
-class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+class _PIN_CreationState extends State<PIN_Creation> {
+  ProfileController signupController = Get.find<ProfileController>();
+
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool hasMinLength = false;
   bool hasNumber = false;
   bool hasUpperCase = false;
   bool hasSpecialChar = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+   
 
   @override
   void initState() {
     super.initState();
-    _newPasswordController.addListener(_validatePassword);
+    if (signupController.newPasswordController != null) {
+      signupController.newPasswordController.addListener(_validatePassword);
+    }
   }
 
   void _validatePassword() {
-    final password = _newPasswordController.text;
+    final password = signupController.newPasswordController?.text ?? '';
     setState(() {
       hasMinLength = password.length >= 8;
       hasNumber = password.contains(RegExp(r'[0-9]'));
@@ -50,7 +46,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
 
   @override
   void dispose() {
-    _newPasswordController.dispose();
+    // signupController.newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
@@ -63,8 +59,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
           // Background image
           Positioned.fill(
             child: Image.asset(
-             Images
-                  .house1, // Replace with your image path
+              Images.house1, // Replace with your image path
               fit: BoxFit.cover,
             ),
           ),
@@ -104,26 +99,47 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                   const SizedBox(height: 20),
                   // New Password Field
                   TextField(
-                    controller: _newPasswordController,
-                    obscureText: true,
+                    controller: signupController.newPasswordController,
+                    obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: "New Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(color: Colors.deepPurple),
                       ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
+
                   // Confirm Password Field
                   TextField(
                     controller: _confirmPasswordController,
-                    obscureText: true,
+                    obscureText: !_isConfirmPasswordVisible,
                     decoration: InputDecoration(
                       labelText: "Confirm Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(color: Colors.deepPurple),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -132,18 +148,22 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildPasswordCondition("Minimum 8 Characters", hasMinLength),
-                      _buildPasswordCondition("Must Contain a number", hasNumber),
-                      _buildPasswordCondition("Must contain upper case letters", hasUpperCase),
                       _buildPasswordCondition(
-                          "Must contain special character (e.g. @, #, %, etc.)", hasSpecialChar),
+                          "Minimum 8 Characters", hasMinLength),
+                      _buildPasswordCondition(
+                          "Must Contain a number", hasNumber),
+                      _buildPasswordCondition(
+                          "Must contain upper case letters", hasUpperCase),
+                      _buildPasswordCondition(
+                          "Must contain special character (e.g. @, #, %, etc.)",
+                          hasSpecialChar),
                     ],
                   ),
                   const SizedBox(height: 30),
                   // Submit Button
                   ElevatedButton(
                     onPressed: () {
-                      if (_newPasswordController.text !=
+                      if (signupController.newPasswordController.text !=
                           _confirmPasswordController.text) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -161,15 +181,16 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                          Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Profile(),
-                          ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegistrationScreen(),
+                            ));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Password does not meet requirements."),
+                            content:
+                                Text("Password does not meet requirements."),
                             backgroundColor: Colors.red,
                           ),
                         );

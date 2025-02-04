@@ -1,30 +1,18 @@
+import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/image.dart'; // Import Images class.
 import 'package:ag_mortgage/onboarding_pages/termsandcondition.dart';
-void main() {
-  runApp(const LandingScreen());
-}
 
-class LandingScreen extends StatelessWidget {
-  const LandingScreen({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: OnboardingScreen(),
-    );
-  }
-}
 
-class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+class LandingScreen extends StatefulWidget {
+  const LandingScreen({super.key});
 
   @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
+  _LandingScreenState createState() => _LandingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _LandingScreenState extends State<LandingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -64,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const Termsandcondition(),)
+        MaterialPageRoute(builder: (context) => const RegisterScreen())
       ); 
     }
   }

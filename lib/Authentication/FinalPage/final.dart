@@ -2,10 +2,6 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const FinalPageAuth());
-}
-
 class FinalPageAuth extends StatelessWidget {
   const FinalPageAuth({super.key});
 
@@ -68,7 +64,7 @@ class FinalPageAuth extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Login(navigation: true),
+                          builder: (context) => const Login(),
                         ));
                   },
                   child: const Text(

@@ -8,14 +8,17 @@ class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     Key? key,
     required this.currentIndex,
-    required this.onTap, required List<BottomNavigationBarItem> items,
+    required this.onTap, required List<BottomNavigationBarItem> items, 
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      onTap: onTap,
+       onTap: (index) {
+        print("Current Index: $currentIndex"); // Print the index when tapped
+        onTap(index); // Call the original onTap function passed from the parent
+      },
         items:  [
           BottomNavigationBarItem(
             icon: const Icon(Icons.home),

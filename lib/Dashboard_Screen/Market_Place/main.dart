@@ -8,36 +8,25 @@ import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Today_Deal/component.d
 import 'package:ag_mortgage/MarketPlace/component.dart';
 import 'package:flutter/material.dart';
 
-class MarketMain extends StatelessWidget {
-  const MarketMain({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AG Mortgage',
-      home: Market_place_connection(),
-    );
-  }
-}
 
 // ignore: camel_case_types
-class Market_place_connection extends StatefulWidget {
+class MarketMain extends StatefulWidget {
    final int startIndex;
   final int? id;
 
-  const Market_place_connection({
+  const MarketMain({
     super.key,
     this.startIndex = 0,
     this.id,
   });
   @override
-  State<Market_place_connection> createState() =>
-      _Market_place_connectionState();
+  State<MarketMain> createState() =>
+      _MarketMainState();
 }
 
 // ignore: camel_case_types
-class _Market_place_connectionState extends State<Market_place_connection> {
+class _MarketMainState extends State<MarketMain> {
   int _currentStepIndex = 0;
   @override
   void initState() {

@@ -31,7 +31,7 @@ class __InvestmenStateState extends State<Investment> {
     const InvestmentFormPage(),
      const CardPaymentPage(),
    const ADD_CardDetailsPage(),
-     const ALL_Card(),
+     const Get_All_Cards(),
     const CardPaymentPage(),
     const Success(),
     const CalendarPage(),

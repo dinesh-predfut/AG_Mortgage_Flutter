@@ -1,23 +1,14 @@
 import 'dart:io';
 import 'package:ag_mortgage/Authentication/FinalPage/final.dart';
+import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-void main() {
-  runApp(const Profile());
-}
 
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home:  RegistrationScreen(),
-    );
-  }
-}
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
 
@@ -29,9 +20,11 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  ProfileController signupController = Get.find<ProfileController>();
 
   Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -45,12 +38,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         const SnackBar(content: Text('Please select a picture')),
       );
       return;
-    }else{
-       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const FinalPageAuth(),
-          ));
+    } else {
+      signupController.checkUser(context);
     }
 
     // Mock API call to demonstrate backend sending
@@ -66,10 +55,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       body: Stack(
         children: [
           // Background image
-       Positioned.fill(
+          Positioned.fill(
             child: Image.asset(
-             Images
-                  .house1, // Replace with your image path
+              Images.house1, // Replace with your image path
               fit: BoxFit.cover,
             ),
           ),
@@ -90,7 +78,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundImage: _image != null ? FileImage(_image!) : null,
+                      backgroundImage:
+                          _image != null ? FileImage(_image!) : null,
                       child: _image == null
                           ? IconButton(
                               icon: const Icon(Icons.camera_alt, size: 30),
@@ -99,15 +88,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           : null,
                     ),
                     const SizedBox(height: 20),
-                    const TextField(
+                    TextField(
+                      controller: signupController.dobController,
+                      readOnly: true, // Prevent manual input
                       decoration: InputDecoration(
                         labelText: 'Date of Birth',
                         hintText: 'DD/MM/YYYY',
                         border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.calendar_today),
+                          onPressed: () => signupController.selectDate(context),
+                        ),
                       ),
+                      onTap: () => signupController
+                          .selectDate(context), // Open date picker on tap
                     ),
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
+                      value: signupController.selectedGender,
                       items: ['Male', 'Female']
                           .map((gender) => DropdownMenuItem<String>(
                                 value: gender,
@@ -121,8 +119,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      controller: signupController.nin,
+                      decoration: const InputDecoration(
                         labelText: 'NIN',
                         hintText: 'Input NIN',
                         border: OutlineInputBorder(),
@@ -130,7 +129,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: _submitData,
+                      onPressed: () {
+                        signupController.checkUser(context);
+                      },
                       child: const Text('Register'),
                     ),
                   ],

@@ -1,7 +1,7 @@
 class Urls {
   static const String baseUrl = "http://3.253.82.115";
-
-  static const String signIn = "$baseUrl/api/auth/signin";
+static const String signIn = "$baseUrl/api/auth/customer-signup";
+  static const String signup = "$baseUrl/api/auth/signin";
   static const String sendOTP =
       "$baseUrl/api/auth/resend-email-verification-otp";
   static const String getallCards = "$baseUrl/api/cards";
@@ -12,6 +12,7 @@ class Urls {
   static const String withdraw = "$baseUrl/api/withdraw";
   static const String getAllTransactions = "$baseUrl/api/getAllTransactions";
   static const String marketPlace = "$baseUrl/api/apartmentAndMarketplace";
+  static const String upDateTermsheet = "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer?id=9";
   static const String houseView =
       "$baseUrl/api/apartmentAndMarketplace/getApartmentAndMarketplaceById";
 }

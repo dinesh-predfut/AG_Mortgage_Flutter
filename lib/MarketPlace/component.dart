@@ -20,7 +20,7 @@ class _Market_PlaceRedirectPageState extends State<Market_PlaceRedirectPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => const Market_place_connection(),
+          builder: (_) => const MarketMain(),
         ),
       );
     });
@@ -64,8 +64,3 @@ class Market_PlaceRedirectPage_connection extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    home: Market_PlaceRedirectPage(), // Set Market_PlaceRedirectPage as the initial page
-  ));
-}
