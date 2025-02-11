@@ -8,6 +8,7 @@ import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
@@ -51,9 +52,7 @@ class MortgagController extends ChangeNotifier {
           );
         }).toList();
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
     throw Exception('error fetching data');
   }
 
@@ -139,13 +138,14 @@ class MortgagController extends ChangeNotifier {
       print('Response Body: ${decodedResponse.body}');
 
       if (decodedResponse.statusCode == 200) {
+        clearFields();
         final result = jsonDecode(decodedResponse.body);
         Fluttertoast.showToast(
           msg: "Mortgage Created Successfully",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.grey,
-          textColor: const Color.fromARGB(255, 77, 73, 73),
+          textColor: Color.fromARGB(255, 15, 15, 15),
         );
         print('API Success Response: $result');
 
@@ -154,7 +154,8 @@ class MortgagController extends ChangeNotifier {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MortgagePageHome(startIndex: 4),
+            builder: (context) =>
+                const DashboardPageS("Mortgage"), // Start with MortgagePage
           ),
         );
       } else {
@@ -165,6 +166,23 @@ class MortgagController extends ChangeNotifier {
     } catch (error) {
       print('Error Occurred: $error');
     }
+  }
+
+  void clearFields() {
+    // Clear the text controllers
+    propertyValueController.clear();
+    initialDepositController.clear();
+    monthlyRepaymentController.clear();
+
+    // Reset selected values to null or default
+    selectedApartmentType = null;
+    apartmentOrMarketplace = null;
+    selectedCity = null;
+    selectedArea = null;
+  
+
+    // Optionally, clear any other state or selections
+    selectedDay = DateTime.now(); // Reset the selected date, if necessary
   }
 
   Future<Map<String, dynamic>> getData(String userId) async {
@@ -270,9 +288,12 @@ class MortgagController extends ChangeNotifier {
 
     return formattedDate;
   }
+
   String formatProfileDateName(String profileDate) {
-  DateTime dateTime = DateTime.parse(profileDate);
-  // Format the date as "FEB 12"
-  return DateFormat('MMM dd').format(dateTime).toUpperCase(); // Convert to uppercase for "FEB"
-}
+    DateTime dateTime = DateTime.parse(profileDate);
+    // Format the date as "FEB 12"
+    return DateFormat('MMM dd')
+        .format(dateTime)
+        .toUpperCase(); // Convert to uppercase for "FEB"
+  }
 }

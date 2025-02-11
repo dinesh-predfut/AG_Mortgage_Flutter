@@ -1,23 +1,57 @@
 // ignore: file_names
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/Models.dart';
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
+import 'package:ag_mortgage/All_Cards/Select_Amount/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 
 import '../../Dashboard_Screen/Investment/investment.dart';
 
 // ignore: camel_case_types
 class CardPaymentPage extends StatefulWidget {
-  const CardPaymentPage({super.key});
+  final int? selectedID;
+  const CardPaymentPage({super.key, this.selectedID});
 
   @override
   _CardPaymentPageState createState() => _CardPaymentPageState();
 }
+
 class _CardPaymentPageState extends State<CardPaymentPage> {
-  // Create a TextEditingController to manage the TextFormField
   final TextEditingController _amountController = TextEditingController();
 
-  // Function to handle amount button clicks
+  late Future<CardModel?> cardDetails;
+  final controller = Get.put(CardControllerSelectAmount());
+  final paymentcontroller = Get.put(MortgagController());
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchCardDetails(widget.selectedID!);
+      double initialDeposit = double.tryParse(
+          paymentcontroller.initialDepositController.text.replaceAll(',', ''),
+        ) ??
+        0;
+          double monthlyRepayment = double.tryParse(
+          paymentcontroller.monthlyRepaymentController.text.replaceAll(',', ''),
+        ) ??
+        0;
+   _amountController.text = formattedEMI((initialDeposit + monthlyRepayment)).toString() ;
+  print("object12${ double.tryParse(
+          paymentcontroller.initialDepositController.text.replaceAll(',', ''),
+        ) ??
+        0}");
+  }
+ String formattedEMI(double amount) {
+    // Format the number with international commas (thousands separators)
+    final numberFormatter = NumberFormat(
+        '#,###.##', 'en_US'); // en_US for international comma formatting
+    return numberFormatter.format(amount);
+  }
   void _setAmount(int amount) {
     setState(() {
       _amountController.text = " $amount";
@@ -59,7 +93,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
       appBar: AppBar(
         title: const Text("Card"),
         centerTitle: true,
-         leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
@@ -78,70 +112,83 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             )),
             const SizedBox(height: 10),
             // Card Section
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 51, 170, 55),
-                    Color.fromARGB(209, 45, 245, 51)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.circle, color: Colors.green),
+            FutureBuilder<CardModel?>(
+              future: controller.fetchCardDetails(widget.selectedID!),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final card = snapshot.data;
+                  return SingleChildScrollView(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color.fromARGB(255, 51, 170, 55),
+                            Color.fromARGB(209, 45, 245, 51)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.white,
+                                child: Icon(Icons.circle, color: Colors.green),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.more_vert,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          Text(
+                            card!.cardName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            card.cardNumber,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "CVV: ${card.cvv}",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "EXP: ${card.expDate}",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Adeyemi Pelumi",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "3098 9576 1876 6521",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "CVV: 010",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "EXP: 12/29",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  );
+                } else {
+                  return const Center(child: Text('No card data available.'));
+                }
+              },
             ),
             const SizedBox(height: 20),
             TextFormField(
@@ -177,21 +224,14 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MortgagePageHome(
-                        startIndex: 7), // Start with MortgagePageHome
-                  ),
-                );
+                paymentcontroller.addMortgageForm(context);
               },
-              //
               style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor,
+                backgroundColor: Colors.deepPurple,
                 minimumSize: const Size.fromHeight(50),
               ),
               child: const Text(
-                "Processd",
+                "Proceed",
                 style: TextStyle(color: Colors.white, letterSpacing: 2),
               ),
             ),

@@ -1,7 +1,7 @@
 class SignInModel {
   String? token;
   String? type;
-  String? id;
+  int? userId;
   String? username;
   String? refreshToken;
   String? refreshTokenExpiry;
@@ -10,7 +10,7 @@ class SignInModel {
   SignInModel(
       {this.token,
       this.type,
-      this.id,
+      this.userId,
       this.username,
       this.refreshToken,
       this.refreshTokenExpiry,
@@ -19,7 +19,7 @@ class SignInModel {
   SignInModel.fromJson(Map<String, dynamic> json) {
     token = json['token'];
     type = json['type'];
-    id = json['id'];
+    userId = json['userId'];
     username = json['username'];
     refreshToken = json['refreshToken'];
     refreshTokenExpiry = json['refreshTokenExpiry'];
@@ -30,7 +30,7 @@ class SignInModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['token'] = token;
     data['type'] = type;
-    data['id'] = id;
+    data['userId'] = userId;
     data['username'] = username;
     data['refreshToken'] = refreshToken;
     data['refreshTokenExpiry'] = refreshTokenExpiry;

@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:dotted_border/dotted_border.dart';
 
@@ -20,22 +24,28 @@ class PersonalDetailsPage extends StatefulWidget {
 }
 
 class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
-  bool isDocumentUploaded = false;
-  bool isDocumentUploaded2 = false;
-  bool isEdited = false;
-  String? nationalIdPath;
-  String? passportIdPath;
-  String? nextOfKinPassportPath;
-  File? _image;
-  final ImagePicker _picker = ImagePicker();
+  final controller = Get.put(Profile_Controller());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchCustomerDetails();
+    controller.image!;
+    print("@@@2${controller.image!}");
+  }
 
   Future<void> _pickImage() async {
     final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
+        await controller.picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        controller.image = File(pickedFile.path);
       });
+    }
+    File? compressedImage = await controller.compressImage(controller.image!);
+    if (compressedImage != null) {
+      // Upload the compressed image
+      controller.uploadImage(compressedImage);
     }
   }
 
@@ -51,29 +61,41 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Profile Picture Section
+              // Profile e Section
               Center(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage:
-                          _image != null ? FileImage(_image!) : null,
-                      child: _image == null
-                          ? IconButton(
-                              icon: const Icon(Icons.camera_alt, size: 30),
-                              onPressed: _pickImage,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('Change Profile Picture'),
-                  ],
-                ),
+                child: Column(children: [
+                  Stack(
+                    alignment: Alignment
+                        .bottomRight, // Align the camera icon at the bottom-right
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: controller.image != null
+                            ? FileImage(controller.image!)
+                            : null,
+                        child: controller.image == null
+                            ? const Icon(Icons.person,
+                                size: 60,
+                                color:
+                                    Colors.grey) // Placeholder icon if no image
+                            : null,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.camera_alt, size: 30),
+                        onPressed: _pickImage,
+                        color: Colors.blue,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('Change Profile Picture'),
+                ]),
               ),
+
               const SizedBox(height: 16),
               // Form Section
-              isEdited ? _buildUploadedForm() : _buildInitialForm(),
+              // controller.isEdited ? _buildUploadedForm() : _buildInitialForm(),
+              _buildUploadedForm(),
               const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -88,6 +110,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                   ),
                 ),
                 onPressed: () {
+                  controller.kinDetails(context);
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -95,7 +118,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                             const ProfilePagewidget(startIndex: 3),
                       ));
                   setState(() {
-                    isEdited = true;
+                    controller.isEdited = true;
                   });
                 },
                 child: const Text('Save Changes'),
@@ -111,32 +134,59 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildEditableField('Date of Birth', value: '14/06/1980'),
-        _buildEditableField('Sex', value: 'Male'),
-        _buildEditableField('NIN', value: '41382913428'),
-        _buildDocumentViewSection('National ID', nationalIdPath),
+        TextFormField(
+          controller: TextEditingController(
+            text: controller.dob != null
+                ? DateFormat('yyyy-MM-dd').format(controller.dob!)
+                : '',
+          ), // Display selected date
+          readOnly: true, // Prevent manual text editing
+          decoration: InputDecoration(
+            labelText: 'Date of Birthsss',
+            suffixIcon: Icon(Icons.calendar_today), // Calendar icon
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          onTap: () async {
+            DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: controller.dob ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+            );
+
+            if (pickedDate != null) {
+              setState(() {
+                controller.dob = pickedDate;
+              });
+            }
+          },
+        ),
+        _buildEditableField('Sex', value: controller.gender),
+        _buildEditableField('NIN', value: controller.nin),
+        _buildDocumentViewSection('National ID', controller.nationalIdPathPd),
         const SizedBox(height: 16),
         const Text('Next of Kin Details',
             style: TextStyle(fontWeight: FontWeight.bold)),
-        _buildEditableField('Full Name', value: 'Adeyemi Feranmi'),
-        _buildEditableField('Relationship', value: 'Brother'),
-        _buildEditableField('Phone Number', value: '09145912290'),
-        _buildEditableField('Email (Optional)', value: 'Aferanmi123@gmail.com'),
-        _buildEditableField('Address',
-            value: 'NO 3, Coker Estate, Lagos, Lagos State'),
-        _buildDocumentViewSection('Possport ID', passportIdPath),
+        _buildEditableField('Full Name', value: controller.fullName),
+        _buildEditableField('Relationship', value: controller.relationShip),
+        _buildEditableField('Phone Number', value: controller.phoneNumber),
+        _buildEditableField('Email (Optional)', value: controller.email),
+        _buildEditableField('Address', value: controller.address),
+        _buildDocumentViewSection('Possport ID', controller.passportIdPathPd),
       ],
     );
   }
 
-  Widget _buildEditableField(String label, {required String value}) {
+  Widget _buildEditableField(String label, {required value}) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: TextField(
-          controller: TextEditingController(text: value),
+          controller: value,
           decoration: InputDecoration(
             labelText: label,
-            suffixIcon: const Icon(Icons.edit),
+            // suffixIcon: const Icon(Icons.edit),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(100),
             ),
@@ -148,36 +198,67 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField('Date of Birth', hintText: 'DD/MM/YYYY'),
+        TextFormField(
+          controller: TextEditingController(
+            text: controller.dob != null
+                ? DateFormat('dd-MM-yyyy').format(controller.dob!)
+                : '',
+          ), // Display selected date
+          readOnly: true, // Prevent manual text editing
+          decoration: InputDecoration(
+            labelText: 'Date of Birth',
+            suffixIcon: Icon(Icons.calendar_today), // Calendar icon
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          onTap: () async {
+            DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: controller.dob ?? DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+            );
+
+            if (pickedDate != null) {
+              setState(() {
+                controller.dob = pickedDate;
+              });
+            }
+          },
+        ),
+        const SizedBox(height: 10),
         _buildDropdown('Sex'),
         _buildTextField('NIN'),
-        isDocumentUploaded
-            ? _buildDocumentViewSection('National ID', nationalIdPath)
+        controller.isDocumentUploadedPd
+            ? _buildDocumentViewSection(
+                'National ID', controller.nationalIdPath)
             : _buildUploadBox(
                 'Upload Picture of your National ID',
                 onUpload: (filePath) {
                   setState(() {
-                    nationalIdPath = filePath;
-                    isDocumentUploaded = true;
+                    controller.nationalIdPath = filePath;
+                    controller.isDocumentUploadedPd = true;
                   });
                 },
               ),
         const SizedBox(height: 16),
         const Text('Next of Kin Details',
             style: TextStyle(fontWeight: FontWeight.bold)),
-        _buildTextField('Full Name'),
-        _buildTextField('Relationship'),
-        _buildTextField('Phone Number'),
-        _buildTextField('Email (Optional)'),
-        _buildTextField('Address'),
-        isDocumentUploaded2
-            ? _buildDocumentViewSection('Passport ID', passportIdPath)
+        _buildEditableField('Full Name', value: controller.fullName),
+        _buildEditableField('Relationship', value: controller.relationShip),
+        _buildEditableField('Phone Number', value: controller.phoneNumber),
+        _buildEditableField('Email (Optional)', value: controller.email),
+        _buildEditableField('Address', value: controller.fullName),
+        controller.isDocumentUploadedPD2
+            ? _buildDocumentViewSection(
+                'Passport ID', controller.passportIdPathPd)
             : _buildUploadBox(
                 'Upload Picture of your National ID',
                 onUpload: (filePath) {
                   setState(() {
-                    passportIdPath = filePath;
-                    isDocumentUploaded2 = true;
+                    controller.passportIdPathPd = filePath;
+                    controller.isDocumentUploadedPD2 = true;
                   });
                 },
               ),
@@ -211,8 +292,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
           ),
         ),
         items: const [
-          DropdownMenuItem(child: Text('Male'), value: 'Male'),
-          DropdownMenuItem(child: Text('Female'), value: 'Female'),
+          DropdownMenuItem(value: 'Male', child: Text('Male')),
+          DropdownMenuItem(value: 'Female', child: Text('Female')),
         ],
         onChanged: (value) {},
       ),
@@ -340,8 +421,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                       Navigator.of(context).pop();
                       setState(() {
                         label == "National ID"
-                            ? isDocumentUploaded = false
-                            : isDocumentUploaded2 = false;
+                            ? controller.isDocumentUploadedPd = false
+                            : controller.isDocumentUploadedPD2 = false;
                       });
                     },
                     child: const Text('Re-Attach'),

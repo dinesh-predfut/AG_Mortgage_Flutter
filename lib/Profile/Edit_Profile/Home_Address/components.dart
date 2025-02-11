@@ -1,9 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../const/url.dart';
 
 // ignore: camel_case_types
 class Home_Address extends StatefulWidget {
@@ -15,18 +24,164 @@ class Home_Address extends StatefulWidget {
 }
 
 class _Home_AddressState extends State<Home_Address> {
-  String? _selectedCity;
-  String? _selectedState;
-  String? _localgovernment;
+  final controller = Get.put(Profile_Controller());
   bool isDocumentUploaded = false;
   bool isDocumentUploaded2 = false;
   String? nationalIdPath;
   String? passportIdPath;
+  List<DropdownMenuItem<String>> _states = [];
+  List<DropdownMenuItem<String>> _city = [];
+  List<DropdownMenuItem<String>> _area = [];
 
   @override
   void initState() {
     super.initState();
-    _selectedCity = widget.initialCity; // Default value
+    // controller.selectedCityHome = widget.initialCity; // Default value
+    fetchStates();
+
+    fetchCity(controller.selectedState);
+
+    fetcharea(controller.selectedCityHome);
+
+    print("&&&&&${controller.selectedCity}");
+  }
+
+  Future<void> fetchStates() async {
+    try {
+      var url = Uri.parse('${Urls.stateList}?countryId=1');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
+
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          _states = data.map((state) {
+            return DropdownMenuItem(
+              value: state['id'].toString(), // Use state ID as value
+              child: Text(state['name']), // Use state name as display text
+            );
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load states');
+      }
+    } catch (error) {
+      print('Error fetching states: $error');
+    }
+  }
+
+  Future<void> fetchCity(String? value) async {
+    try {
+      var url = Uri.parse('${Urls.cityList}?stateId=$value');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
+
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          _city = data.map((state) {
+            return DropdownMenuItem(
+              value: state['id'].toString(), // Use state ID as value
+              child: Text(state['name']), // Use state name as display text
+            );
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load states');
+      }
+    } catch (error) {
+      print('Error fetching states: $error');
+    }
+  }
+
+  Future<void> fetcharea(String? value) async {
+    try {
+      var url = Uri.parse('${Urls.areaList}?cityId=$value');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
+
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          _area = data.map((state) {
+            return DropdownMenuItem(
+              value: state['id'].toString(), // Use state ID as value
+              child: Text(state['name']), // Use state name as display text
+            );
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load states');
+      }
+    } catch (error) {
+      print('Error fetching states: $error');
+    }
+  }
+
+  Future<bool> homeAddres(BuildContext context) async {
+    print('userId: ${Params.userId}');
+    try {
+      var request = http.Request('PUT', Uri.parse(Urls.homeAddress));
+      request.body = json.encode({
+        "id": Params.userId,
+        "city": controller.selectedCityHome,
+        "area": controller.selectedarea,
+        "state": controller.selectedState,
+      });
+
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
+
+      print('Request: ${request.body}');
+
+      // Send request
+      http.StreamedResponse streamedResponse = await request.send();
+      var decodedResponse = await http.Response.fromStream(streamedResponse);
+
+      print('decodedResponse Code: ${decodedResponse}');
+      print('Response Body: ${decodedResponse.body}');
+
+      if (decodedResponse.statusCode == 200) {
+        // ignore: use_build_context_synchronously
+
+        Fluttertoast.showToast(
+          msg: "Employment Updated Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+        );
+        return true;
+      } else {
+        print('Error: ${decodedResponse.body}');
+        Fluttertoast.showToast(
+          msg: "Error: ${decodedResponse.body}",
+          toastLength: Toast.LENGTH_SHORT,
+        );
+        return false;
+      }
+    } catch (error) {
+      print('Error Occurred: $error');
+      Fluttertoast.showToast(
+        msg: "An error occurred: $error",
+        toastLength: Toast.LENGTH_SHORT,
+      );
+      return false;
+    }
   }
 
   @override
@@ -51,16 +206,14 @@ class _Home_AddressState extends State<Home_Address> {
               const SizedBox(height: 16),
               const Text('State'),
               DropdownButtonFormField<String>(
-                value: _selectedState,
+                value: controller.selectedState,
                 hint: const Text('Select State'),
-                items: const [
-                  DropdownMenuItem(value: 'state-1', child: Text('State-1')),
-                  DropdownMenuItem(value: 'state-2', child: Text('State-2')),
-                ],
+                items: _states, // Use API-fetched values
                 onChanged: (value) {
                   setState(() {
-                    _selectedCity = value;
+                    controller.selectedState = value;
                   });
+                  fetchCity(value);
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -73,52 +226,39 @@ class _Home_AddressState extends State<Home_Address> {
               ),
               const Text('City'),
               DropdownButtonFormField<String>(
-                value: _selectedCity,
-                hint: const Text('Select Employment'),
-                items: const [
-                  DropdownMenuItem(value: 'city-1', child: Text('City-1')),
-                  DropdownMenuItem(value: 'city-2', child: Text('City-2')),
-                ],
+                value: controller.selectedCityHome,
+                hint: const Text('Select State'),
+                items: _city, // Use API-fetched values
                 onChanged: (value) {
                   setState(() {
-                    _selectedCity = value;
+                    controller.selectedCityHome = value;
                   });
+                  fetcharea(value);
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 16,
               ),
               const SizedBox(height: 16),
               const Text('Local Government'),
               DropdownButtonFormField<String>(
-                value: _localgovernment,
-                hint: const Text('Select Employment'),
-                items: const [
-                  DropdownMenuItem(value: '0-1', child: Text('Option-1')),
-                  DropdownMenuItem(value: '0-2', child: Text('Option-2')),
-                ],
+                value: controller.selectedarea,
+                hint: const Text('Select State'),
+                items: _area, // Use API-fetched values
                 onChanged: (value) {
                   setState(() {
-                    _selectedCity = value;
+                    controller.selectedarea = value;
                   });
+                  fetcharea(value);
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Local Government'),
-              // Phone Number Field
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Input Street",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                    borderSide: const BorderSide(color: Colors.deepPurple),
                   ),
                 ),
               ),
@@ -151,6 +291,7 @@ class _Home_AddressState extends State<Home_Address> {
                     ),
                   ),
                   onPressed: () {
+                    homeAddres(context);
                     //  setState(() {
                     //           isEditingPassword = false; // Enable editing mode
                     //           isEditingUsername = false;

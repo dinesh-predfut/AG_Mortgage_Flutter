@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -239,7 +240,18 @@ late Future<ApiResponsemostview> fetchmostViewedHouses;
                           ),
                           Align(
                             alignment: Alignment.topRight,
-                            child: Container(
+                            child: 
+                             GestureDetector(
+                              onTap: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                             PropertyDetailsPage(id: home.id)
+                                      )
+                                      );
+                                    },
+                            child:Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -255,6 +267,7 @@ late Future<ApiResponsemostview> fetchmostViewedHouses;
                                 ),
                               ),
                             ),
+                          ),
                           ),
                         ],
                       ),

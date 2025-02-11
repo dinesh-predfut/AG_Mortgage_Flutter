@@ -32,7 +32,7 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+       child:Column(
           children: [
             const Center(
                 child: Text(
@@ -166,9 +166,9 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
                   style: TextStyle(color: Colors.white)),
             ),
           ],
-        ),
-      ),
-    );
+        ),) 
+      );
+    
   }
   // ignore: non_constant_identifier_names
 }
@@ -183,7 +183,8 @@ class Success extends StatelessWidget {
         title: const Text(""),
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+child:Padding(
           padding: const EdgeInsets.all(16.0),
           child: Center(
             child: Column(
@@ -225,6 +226,7 @@ class Success extends StatelessWidget {
               ],
             ),
           )),
+    ),
     );
   }
 }

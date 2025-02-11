@@ -10,30 +10,32 @@ import 'package:ag_mortgage/Profile/Edit_Profile/Home_Address/components.dart';
 import 'package:ag_mortgage/Profile/Edit_Profile/Login_Details/components.dart';
 import 'package:ag_mortgage/Profile/Edit_Profile/Profile_Details/component.dart';
 import 'package:ag_mortgage/Profile/Edit_Profile/component.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/main.dart';
 
-
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class ProfilePagewidget extends StatefulWidget {
   final int startIndex;
-  const   ProfilePagewidget({super.key, required this.startIndex});
+  const ProfilePagewidget({super.key, required this.startIndex});
 
   @override
   State<ProfilePagewidget> createState() => _ProfilePagewidgetState();
 }
 
 class _ProfilePagewidgetState extends State<ProfilePagewidget> {
-   int _currentStepIndex = 0; // Controls mortgage flow
+  int _currentStepIndex = 0; // Controls mortgage flow
   int _selectedIndex = 0;
-   
-    @override
+
+  @override
   void initState() {
     super.initState();
     _currentStepIndex = widget.startIndex; // Initialize with provided index
   }
+
   // List of pages to show based on the index
   final List<Widget> _pages = [
     const AccountPage(),
@@ -45,9 +47,9 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
     const InviteFriendsPage(),
     const CalendarPage(),
     DocumentsPage()
-  ];    
+  ];
 
-   void _onItemTapped(int index) {
+  void _onItemTapped(int index) {
     print('indexof mare${index}`');
     setState(() {
       _selectedIndex = index;
@@ -59,9 +61,12 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
       ),
     );
   }
+
   final List<Widget> _navPages = [
     const DashboardPage(),
-    const LandingPage(startIndex: 1,),
+    const LandingPage(
+      startIndex: 1,
+    ),
     const NotificationsPage(),
     const ProfilePagewidget(startIndex: 0),
   ];
@@ -81,11 +86,12 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
 // H
-    
-     return Scaffold(
+
+    return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
         children: [
@@ -106,11 +112,12 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
       // bottomNavigationBar: BottomNavBar(
       //   currentIndex: 3,
       //   onTap: _onItemTapped,
-        
+
       // ),
     );
   }
 }
+
 class Edit_Profile extends StatefulWidget {
   const Edit_Profile({super.key});
 
@@ -120,6 +127,13 @@ class Edit_Profile extends StatefulWidget {
 
 class _Edit_ProfileState extends State<Edit_Profile> {
   bool hasElectricalDrawing = false;
+  final controller = Get.put(Profile_Controller());
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchCustomerDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,33 +169,36 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                     _buildMenuItem(
                       text: 'Personal Details',
                       onTap: () {
-                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 2),
-                        ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 2),
+                            ));
                         // Handle navigat                                 ion
                       },
                     ),
                     _buildMenuItem(
                       text: 'Login Details',
                       onTap: () {
-                          Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 3),
-                        ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 3),
+                            ));
                         // Handle navigation
                       },
                     ),
                     _buildMenuItem(
                       text: 'Employments Details',
                       onTap: () {
-                            Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 4),
-                        ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 4),
+                            ));
                         // Handle navigation
                       },
                     ),
@@ -189,11 +206,12 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       text: 'Home Address Details',
                       onTap: () {
                         // Handle navigation
-                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 5),
-                        ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 5),
+                            ));
                       },
                     ),
                     _buildMenuItem(
@@ -201,10 +219,11 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       onTap: () {
                         // Handle navigation
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 6),
-                        ));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 6),
+                            ));
                       },
                     ),
                     _buildMenuItem(
@@ -212,25 +231,27 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       onTap: () {
                         // Handle navigation
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 7),
-                        ));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 7),
+                            ));
                       },
                     ),
                     _buildMenuItem(
                       text: 'Documents',
                       onTap: () {
-                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 8),
-                        ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfilePagewidget(startIndex: 8),
+                            ));
                         // Handle navigation
                       },
                     ),
-                    _buildSwitchTile('Notification',
-                        hasElectricalDrawing, (value) {
+                    _buildSwitchTile('Notification', hasElectricalDrawing,
+                        (value) {
                       setState(() {
                         hasElectricalDrawing = value;
                       });
@@ -268,7 +289,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
 Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
   return Container(
     // padding: const EdgeInsets.all(6.0),
-  
+
     decoration: const BoxDecoration(
       border: Border(
         bottom:
@@ -276,7 +297,6 @@ Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
       ),
     ),
     child: SwitchListTile(
-      
       activeColor: Colors.white,
       activeTrackColor: Colors.orange,
       inactiveTrackColor: baseColor,

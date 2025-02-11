@@ -39,7 +39,7 @@ List<Widget> get _steps => [
     const MarketplacePage(),
     const MostViewedPage(),
     const TodayDeals(),
-    // const New_house(), 
+    const New_house(), 
      PropertyDetailsPage(id: widget.id),
     const FilterHousePage(),
     const FavoritesPage(),

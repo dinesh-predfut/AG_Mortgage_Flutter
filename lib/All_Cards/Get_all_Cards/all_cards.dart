@@ -1,14 +1,13 @@
 // screens/get_all_cards.dart
 import 'package:ag_mortgage/All_Cards/Add_New_Cards/add_cards.dart';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
+import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-
-
 
 class Get_All_Cards extends StatefulWidget {
   const Get_All_Cards({super.key});
@@ -53,12 +52,12 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
         appBar: AppBar(
           title: const Text("My Cards"),
           centerTitle: true,
-           leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -94,7 +93,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const MortgagePageHome(startIndex:7 ),
+                                      CardPaymentPage(selectedID: card.id),
                                 ),
                               );
                             },

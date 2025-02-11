@@ -1,3 +1,4 @@
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Profile/Dashboard/FAQs/components.dart';
 import 'package:ag_mortgage/Profile/Dashboard/Help_desk/compontent.dart';
@@ -8,10 +9,7 @@ import 'package:ag_mortgage/Profile/Dashboard/Terms_Condition/component.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-
-
-
+import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -110,11 +108,13 @@ class AccountPage extends StatelessWidget {
                         icon: Icons.credit_card,
                         text: 'My Cards',
                         onTap: () {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const MyCardsPage(), // Start with MortgagePage
+                              builder: (context) => ChangeNotifierProvider(
+                                create: (context) => CardController(),
+                                child: const MyCardsPage(),
+                              ),
                             ),
                           );
                         },
@@ -141,7 +141,7 @@ class AccountPage extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const HelpDeskPage(),
+                              builder: (context) => const HeplDeskPage(),
                             ),
                           );
                         },
@@ -183,7 +183,8 @@ class AccountPage extends StatelessWidget {
                             style: TextStyle(color: Colors.red),
                           ),
                           onTap: () {
-                        Navigator.of(context, rootNavigator: true).pushNamed("/login");
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamed("/login");
                           },
                         ),
                       )

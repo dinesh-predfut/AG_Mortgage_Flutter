@@ -1,6 +1,6 @@
 class Urls {
   static const String baseUrl = "http://3.253.82.115";
-static const String signIn = "$baseUrl/api/auth/customer-signup";
+  static const String signIn = "$baseUrl/api/auth/customer-signup";
   static const String signup = "$baseUrl/api/auth/signin";
   static const String sendOTP =
       "$baseUrl/api/auth/resend-email-verification-otp";
@@ -12,7 +12,21 @@ static const String signIn = "$baseUrl/api/auth/customer-signup";
   static const String withdraw = "$baseUrl/api/withdraw";
   static const String getAllTransactions = "$baseUrl/api/getAllTransactions";
   static const String marketPlace = "$baseUrl/api/apartmentAndMarketplace";
-  static const String upDateTermsheet = "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer?id=9";
+  static const String upDateTermsheet =
+      "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer?id=9";
+  static const String amountPay = "$baseUrl/api/cards/getCardsById";
+  static const String employeRegister =
+      "$baseUrl/api/customer/employmentDetails";
+  static const String getEmployeeDetailsID = "$baseUrl/api/customer";
   static const String houseView =
       "$baseUrl/api/apartmentAndMarketplace/getApartmentAndMarketplaceById";
+  static const String kinDetails = "$baseUrl/api/kin";
+  static const String profile = "$baseUrl/api/customer/profileImage";
+  static const String logInDetails = "$baseUrl/api/customer/loginDetails";
+  static const String stateList = "$baseUrl/api/location/state";
+  static const String cityList = "$baseUrl/api/location/city";
+  static const String areaList = "$baseUrl/api/location/area";
+  static const String homeAddress = "$baseUrl/api/customer/addressDetails";
+  static const String helpDisk = "$baseUrl/api/settings/helpDesk";
+  static const String plan = "$baseUrl/api/settings/helpDesk";
 }

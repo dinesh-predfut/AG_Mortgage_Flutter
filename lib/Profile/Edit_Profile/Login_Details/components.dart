@@ -1,6 +1,9 @@
 import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
 
 class EditLoginDetails extends StatefulWidget {
   const EditLoginDetails({super.key});
@@ -14,24 +17,21 @@ class _EditLoginDetailsState extends State<EditLoginDetails> {
   bool isEnable = false;
   bool isEditingPassword = false;
   bool isEditingUsername = false;
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  bool isEditingMail = false;
+
+  final controller = Get.put(Profile_Controller());
 
   @override
   void initState() {
     super.initState();
     // Initialize with default values
-    usernameController.text = "Salt";
-    passwordController.text = "********";
   }
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
+    // usernameController.dispose();
+    // passwordController.dispose();
+    // confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -47,17 +47,16 @@ class _EditLoginDetailsState extends State<EditLoginDetails> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextField(
-              controller: usernameController,
+              controller: controller.phoneNumber,
               readOnly:
                   !isEditingUsername, // This determines if the field is editable
-              
+
               decoration: InputDecoration(
-                labelText: "Enter Username",
+                labelText: "Phone Number",
                 suffixIcon: GestureDetector(
                   onTap: () {
                     setState(() {
                       isEditingUsername = true; // Enable editing mode
-                     
                     });
                   },
                   child: Icon(
@@ -74,12 +73,38 @@ class _EditLoginDetailsState extends State<EditLoginDetails> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: passwordController,
+              controller: controller.email,
+              readOnly:
+                  !isEditingMail, // This determines if the field is editable
+
+              decoration: InputDecoration(
+                labelText: "Email",
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isEditingMail = true; // Enable editing mode
+                    });
+                  },
+                  child: Icon(
+                    isEditingMail
+                        ? Icons.check
+                        : Icons.edit, // Change icon based on state
+                    color: isEditing ? Colors.green : Colors.grey,
+                  ),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller.passwordController,
               readOnly:
                   !isEditingPassword, // This determines if the field is editable
-              obscureText: true,
+
               decoration: InputDecoration(
-                labelText: "Enter Password",
+                labelText: "New Password",
                 suffixIcon: GestureDetector(
                   onTap: () {
                     setState(() {
@@ -102,39 +127,40 @@ class _EditLoginDetailsState extends State<EditLoginDetails> {
             const SizedBox(height: 16),
             if (isEditingPassword) // Show this field only when isEnable is true
               TextField(
-                controller: confirmPasswordController,
+                controller: controller.confirmPasswordController,
                 readOnly:
                     !isEditingPassword, // This determines if the field is editable
                 obscureText: true,
+
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
-                 
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
               ),
             const SizedBox(height: 16),
-             if (isEditingPassword || isEditingUsername )
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor, // Transparent background
-                elevation: 0, // Remove shadow
-                foregroundColor: Colors.white, // Text and icon color
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // Rounded corners
+            if (isEditingPassword || isEditingUsername)
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: baseColor, // Transparent background
+                  elevation: 0, // Remove shadow
+                  foregroundColor: Colors.white, // Text and icon color
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                  ),
                 ),
+                onPressed: () {
+                  controller.logInDetails(context);
+                  setState(() {
+                    isEditingPassword = false; // Enable editing mode
+                    isEditingUsername = false;
+                  });
+                },
+                child: const Text("Save Changes"),
               ),
-              onPressed: () {
-             setState(() {
-                      isEditingPassword = false; // Enable editing mode
-                      isEditingUsername = false;
-                    });
-              },
-              child: const Text("Save Changes"),
-            ),
           ],
         ),
       ),

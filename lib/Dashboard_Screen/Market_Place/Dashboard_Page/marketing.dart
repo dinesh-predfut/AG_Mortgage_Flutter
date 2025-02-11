@@ -28,9 +28,9 @@ class _MarketplacePageState extends State<MarketplacePage>
   void initState() {
     super.initState();
     futureHouses = controller.fetchHouses();
-      fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
-      fetchmostViewedHouses=controller.fetchmostViewedHouses();
-      futureTodayDeals=controller.fetchTodayDeals();
+    fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
+    fetchmostViewedHouses = controller.fetchmostViewedHouses();
+    futureTodayDeals = controller.fetchTodayDeals();
     _tabController = TabController(length: 12, vsync: this);
     _tabs;
   }
@@ -81,8 +81,7 @@ class _MarketplacePageState extends State<MarketplacePage>
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const MarketMain(startIndex: 6),
+                  builder: (context) => const MarketMain(startIndex: 6),
                 ),
               );
             },
@@ -93,126 +92,134 @@ class _MarketplacePageState extends State<MarketplacePage>
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const MarketMain(startIndex: 4),
-                ),  
+                  builder: (context) => const MarketMain(startIndex: 4),
+                ),
               );
             },
             icon: const Icon(Icons.tune),
           ),
         ],
       ),
-    body: ListView(
-  children: [
-    const SizedBox(height: 12),
+      body: ListView(
+        children: [
+          const SizedBox(height: 12),
 
-    // Sponsored Section
-    FutureBuilder<ApiResponse>(
-      future: futureHouses, // Replace with the API call for sponsored houses
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading sponsored data'));
-        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-          return buildSection(snapshot.data!.items); // Pass the sponsored items
-        } else {
-          return const SizedBox(); // Show nothing if no data
-        }
-      },
-    ),
+          // Sponsored Section
+          FutureBuilder<ApiResponse>(
+            future:
+                futureHouses, // Replace with the API call for sponsored houses
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(
+                    child: Text('Error loading sponsored data'));
+              } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+                return buildSection(
+                    snapshot.data!.items); // Pass the sponsored items
+              } else {
+                return const SizedBox(); // Show nothing if no data
+              }
+            },
+          ),
 
-    const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-    // TabBar for Most Viewed, Today's Deal, and New House
-    Align(
-      alignment: Alignment.centerLeft,
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        labelColor: Colors.white,
-        dividerHeight: 0,
-        unselectedLabelColor: Colors.orange,
-        indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
-          color: Colors.orange,
-        ),
-        tabs: _tabs.map((tab) {
-          return Tab(
-            child: Container(
-              width: 60,
-              height: 30,
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.orange),
-                borderRadius: BorderRadius.circular(20),
+          // TabBar for Most Viewed, Today's Deal, and New House
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              labelColor: Colors.white,
+              dividerHeight: 0,
+              unselectedLabelColor: Colors.orange,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.orange,
               ),
-              child: Center(
-                child: Text(tab, style: const TextStyle(fontSize: 14)),
-              ),
+              tabs: _tabs.map((tab) {
+                return Tab(
+                  child: Container(
+                    width: 60,
+                    height: 30,
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.orange),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(
+                      child: Text(tab, style: const TextStyle(fontSize: 14)),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
-          );
-        }).toList(),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Most Viewed Section
+          FutureBuilder<ApinewHoseview>(
+            future:
+                fetchnewtViewedHouses, // Replace with the API call for most viewed houses
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(
+                    child: Text('Error loading most viewed data'));
+              } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+                return newHouses(context,
+                    snapshot.data!.items); // Pass the most viewed items
+              } else {
+                return const SizedBox(); // Show nothing if no data
+              }
+            },
+          ),
+
+          // const SizedBox(height: 12),
+
+          // // Today's new hosu Section
+          FutureBuilder<ApiResponsemostview>(
+            future:
+                fetchmostViewedHouses, // Replace with the API call for today's deal houses
+            builder: (context, snapshot) {
+              print('_someMethod: Foo Error ${snapshot} Error:{e.toString()}');
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(
+                    child: Text('Error loading today\'s deals'));
+              } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+                return buildSectionmostview(
+                    snapshot.data!.items); // Pass today's deal items
+              } else {
+                return const SizedBox(); // Show nothing if no data
+              }
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          // New Houses Section
+          FutureBuilder<ApiTodayDeals>(
+            future:
+                futureTodayDeals, // Replace with the API call for new houses
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(child: Text('Error loading new houses'));
+              } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+                return todayDeals(snapshot.data!.items); // Pass new house items
+              } else {
+                return const SizedBox(); // Show nothing if no data
+              }
+            },
+          ),
+        ],
       ),
-    ),
-
-    const SizedBox(height: 12),
-
-    // Most Viewed Section
-    FutureBuilder<ApinewHoseview>(
-      future: fetchnewtViewedHouses, // Replace with the API call for most viewed houses
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading most viewed data'));
-        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty ) {
-          return newHouses(context,snapshot.data!.items); // Pass the most viewed items
-        } else {
-          return const SizedBox(); // Show nothing if no data
-        }
-      },
-    ),
-
-    // const SizedBox(height: 12),
-
-    // // Today's new hosu Section
-    FutureBuilder<ApiResponsemostview>(
-      future: fetchmostViewedHouses, // Replace with the API call for today's deal houses
-      builder: (context, snapshot) {
-         print('_someMethod: Foo Error ${snapshot} Error:{e.toString()}');
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading today\'s deals'));
-        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-          return buildSectionmostview (snapshot.data!.items); // Pass today's deal items
-        } else {
-          return const SizedBox(); // Show nothing if no data
-        }
-      },
-    ),
-
-    const SizedBox(height: 12),
-
-    // New Houses Section
-    FutureBuilder<ApiTodayDeals>(
-      future: futureTodayDeals, // Replace with the API call for new houses
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading new houses'));
-        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-          return todayDeals( snapshot.data!.items); // Pass new house items
-        } else {
-          return const SizedBox(); // Show nothing if no data
-        }
-      },
-    ),
-  ],
-),
-
     );
   }
 
@@ -238,8 +245,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                   ? home.housePictures[
                       0] // Assuming we take the first image for now
                   : ''; // Default image URL if not available
-
-                return Container(
+              return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: 340,
                 decoration: BoxDecoration(
@@ -305,6 +311,38 @@ class _MarketplacePageState extends State<MarketplacePage>
                           isFavorite ? Icons.favorite : Icons.favorite_border,
                           color: isFavorite ? Colors.red : Colors.white,
                           size: 24,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Handle the onTap function here
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                   MarketMain(startIndex: 4,id: home.id),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'View',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -393,8 +431,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const MarketMain(startIndex: 1),
+                    builder: (context) => const MarketMain(startIndex: 1),
                   ),
                 );
               },
@@ -428,10 +465,10 @@ class _MarketplacePageState extends State<MarketplacePage>
               itemCount: section.length,
               itemBuilder: (context, index) {
                 final home = section[index];
-               final imageUrl = home.housePictures.isNotEmpty
-                  ? home.housePictures[
-                      0] // Assuming we take the first image for now
-                  : ''; 
+                final imageUrl = home.housePictures.isNotEmpty
+                    ? home.housePictures[
+                        0] // Assuming we take the first image for now
+                    : '';
                 return Container(
                   width: 300,
                   decoration: BoxDecoration(
@@ -453,11 +490,13 @@ class _MarketplacePageState extends State<MarketplacePage>
                       children: [
                         Expanded(
                           child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(10)),
-                            child:Image(image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover, width: double.infinity,) 
-                          ),
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(10)),
+                              child: Image(
+                                image: NetworkImage(imageUrl),
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              )),
                         ),
                         Container(
                             color: Colors.white,
@@ -468,7 +507,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text( home.price.toString() ,
+                                  Text(home.price.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold)),
@@ -514,9 +553,8 @@ class _MarketplacePageState extends State<MarketplacePage>
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MarketMain(
-                                                    startIndex: 4),
+                                            builder: (context) => MarketMain(
+                                                startIndex: 4, id: home.id),
                                           ),
                                         );
                                       },
@@ -564,14 +602,13 @@ class _MarketplacePageState extends State<MarketplacePage>
             const Text(
               "Today Deals",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),  
+            ),
             TextButton(
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const MarketMain(startIndex: 2),
+                    builder: (context) => const MarketMain(startIndex: 2),
                   ),
                 );
               },
@@ -606,9 +643,9 @@ class _MarketplacePageState extends State<MarketplacePage>
               itemBuilder: (context, index) {
                 final home = section[index];
                 final imageUrl = home.housePictures.isNotEmpty
-                  ? home.housePictures[
-                      0] // Assuming we take the first image for now
-                  : ''; 
+                    ? home.housePictures[
+                        0] // Assuming we take the first image for now
+                    : '';
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: 340,
@@ -661,8 +698,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const MarketMain(
-                                        startIndex: 4),
+                                    MarketMain(startIndex: 4, id: home.id),
                               ),
                             );
                           },
@@ -734,12 +770,11 @@ class _MarketplacePageState extends State<MarketplacePage>
                                     size: 12, color: Colors.white70),
                                 const SizedBox(width: 3),
                                 Text(
-                               home.houseType.length > 10
-                                              ? home.houseType.substring(0, 10)
-                                              : home.houseType,
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
+                                    home.houseType.length > 10
+                                        ? home.houseType.substring(0, 10)
+                                        : home.houseType,
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.grey)),
                                 const SizedBox(width: 16),
                                 const Icon(Icons.square_foot,
                                     size: 12, color: Colors.white70),
@@ -763,6 +798,7 @@ class _MarketplacePageState extends State<MarketplacePage>
     ]);
   }
 }
+
 Widget newHouses(BuildContext context, List<dynamic> section) {
   return Column(children: [
     Padding(
@@ -779,8 +815,7 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const MarketMain(startIndex: 3),
+                  builder: (context) => const MarketMain(startIndex: 3),
                 ),
               );
             },
@@ -911,10 +946,8 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              MarketMain(
-                                                  startIndex: 3,
-                                                  id: home.id),
+                                          builder: (context) => MarketMain(
+                                              startIndex: 4, id: home.id),
                                         ),
                                       );
                                     },
@@ -951,4 +984,3 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
     )
   ]);
 }
-

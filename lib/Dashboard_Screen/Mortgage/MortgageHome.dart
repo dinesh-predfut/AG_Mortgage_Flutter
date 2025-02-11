@@ -745,7 +745,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ),
                     );
-                    controller.getData(Params.userId);
+                    controller.getData(Params.userId as String);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
@@ -1063,7 +1063,7 @@ class _TermSheetPageState extends State<TermSheetPage>
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text("Proceed to Home",
+                  child: const Text("Proceed to Pay",
                       style: TextStyle(color: Colors.white)),
                 ),
               ),

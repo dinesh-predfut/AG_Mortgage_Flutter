@@ -209,12 +209,12 @@ class ProfileController extends GetxController {
 
       if (response.statusCode == 200) {
         signInModel.value = SignInModel.fromJson(decodeData);
-        print("login response ==> $signInModel");
+        print("login response ==> ${signInModel.value.userId}");
 
         SetSharedPref().setData(
           token: signInModel.value.token ?? "null",
           phoneNumber: signInModel.value.username ?? "null",
-          userId: signInModel.value.id ?? "null",
+          userId: signInModel.value.userId ?? 0,
         );
 
         isLoading(false);

@@ -11,22 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-void main() {
-  runApp(const Main_Dashboard());
-}
 
-// ignore: camel_case_types
-class Main_Dashboard extends StatelessWidget {
-  const Main_Dashboard({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DashboardPageS(''),
-    );
-  }
-}
 
 class DashboardPageS extends StatefulWidget {
   final String plans;
@@ -834,7 +819,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Main_Dashboard(), // Start with MortgagePage
+                                    const DashboardPageS(''), // Start with MortgagePage
                               ),
                             );
                           },
@@ -1095,7 +1080,7 @@ class GaugeChartWidget extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const Main_Dashboard(), // Start with MortgagePage
+                                    const DashboardPageS(''), // Start with MortgagePage
                               ),
                             );
                           },

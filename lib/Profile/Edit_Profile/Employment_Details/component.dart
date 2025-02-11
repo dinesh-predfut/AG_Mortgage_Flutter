@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 
@@ -13,17 +16,15 @@ class EmploymentDetails extends StatefulWidget {
 }
 
 class _EmploymentDetailsState extends State<EmploymentDetails> {
-  String? _selectedCity;
-  bool isDocumentUploaded = false;
-  bool isDocumentUploaded2 = false;
-  String? nationalIdPath;
-  String? passportIdPath;
+  final controller = Get.put(Profile_Controller());
 
   @override
   void initState() {
     super.initState();
-    _selectedCity = widget.initialCity; // Default value
-  }
+    controller.selectedCity = widget.initialCity; // Default value
+    controller.fetchCustomerDetails();  
+    controller.selectedCity= controller.selectedCity ="Employed";
+     }
 
   @override
   Widget build(BuildContext context) {
@@ -45,28 +46,35 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Employment Type'),
-              DropdownButtonFormField<String>(
-                value: _selectedCity,
-                hint: const Text('Select Employment'),
-                items: const [
-                  DropdownMenuItem(value: 'employed', child: Text('Employed')),
-                  DropdownMenuItem(
-                      value: 'self_employed', child: Text('Self Employed')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCity = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
+                DropdownButtonFormField<String>(
+                  value: controller.selectedCity,
+                  hint: const Text('Select Employment'),
+                  selectedItemBuilder: (context) => [
+                    Text('Employed'),
+                    Text('Self Employed'),
+                  ],
+                  items: const [
+                    DropdownMenuItem(value: 'Employed', child: Text('Employed')),
+                    DropdownMenuItem(
+                        value: 'Self Employed', child: Text('Self Employed')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      controller.selectedCity =
+                          value ?? 'Employed'; 
+                    });
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 16),
-              if (_selectedCity == "employed") _buildEmployedForm(),
-              if (_selectedCity == "self_employed") _buildSelfEmployedForm(),
+              if (controller.selectedCity == "Employed")
+                _buildEmployedForm(context),
+              if (controller.selectedCity == "Self Employed")
+                _buildSelfEmployedForm(context),
             ],
           ),
         ),
@@ -74,171 +82,215 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
     );
   }
 
-  Widget _buildEmployedForm() {
+  Widget _buildEmployedForm(BuildContext context) {
     return SingleChildScrollView(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildEditableField('Employer', value: '', hintText: 'Input Employer'),
-        _buildEditableField('Job Title',
-            value: '', hintText: 'Input Job Title'),
-        _buildEditableField('Net Salary', value: '', hintText: 'NGN'),
-        _buildEditableField('Net Worth(Option)', value: '', hintText: 'NGN'),
-        isDocumentUploaded2
-            ? _buildDocumentViewSection(
-                'Business Registration Document', passportIdPath)
-            : _buildUploadBox(
-                'Upload Business Registration Document',
-                onUpload: (filePath) {
-                  setState(() {
-                    passportIdPath = filePath;
-                    isDocumentUploaded2 = true;
-                  });
-                },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildEditableField('Employer', controller.employerController,
+              'Input Employer', context),
+          _buildEditableField('Job Title', controller.jobTitleController,
+              'Input Job Title', context),
+          _buildEditableField(
+              'Net Salary', controller.netSalaryController, 'NGN', context),
+          _buildEditableField('Net Worth (Optional)',
+              controller.netWorthController, 'NGN', context),
+          controller.isDocumentUploaded2
+              ? _buildDocumentViewSection('Business Registration Document',
+                  controller.passportIdPath, context)
+              : _buildUploadBox(
+                  'Upload Business Registration Document',
+                  onUpload: (filePath) {
+                    setState(() {
+                      controller.passportIdPath = filePath;
+                      controller.isDocumentUploaded2 = true;
+                    });
+                  },
+                ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: baseColor, // Transparent background
+                elevation: 0, // Remove shadow
+                foregroundColor: Colors.white, // Text and icon color
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30), // Rounded corners
+                ),
               ),
-      ],
-    ));
+              onPressed: () {
+                controller.employementDetails(context);
+              },
+              child: const Text("Save Changes"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildSelfEmployedForm() {
+  Widget _buildSelfEmployedForm(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       _buildEditableField('Industry', value: '', hintText: 'Input Industry'),
-        _buildEditableField('Profession',
-            value: '', hintText: 'Input Profession'),
-        _buildEditableField('Monthly Income', value: '', hintText: 'NGN'),
-        _buildEditableField('Net Worth(Option)', value: '', hintText: 'NGN'),
-        isDocumentUploaded
-            ? _buildDocumentViewSection(
-                'Business Registration Document', passportIdPath)
+        _buildEditableField('Industry', controller.industryController,
+            'Input Industry', context),
+        _buildEditableField('Profession', controller.professionController,
+            'Input Profession', context),
+        _buildEditableField('Monthly Income',
+            controller.monthlyIncomeController, 'NGN', context),
+        _buildEditableField('Net Worth (Optional)',
+            controller.selfNetWorthController, 'NGN', context),
+        controller.isDocumentUploaded
+            ? _buildDocumentViewSection('Business Registration Document',
+                controller.passportIdPath, context)
             : _buildUploadBox(
                 'Upload Business Registration Document',
                 onUpload: (filePath) {
                   setState(() {
-                    passportIdPath = filePath;
-                    isDocumentUploaded2 = true;
+                    controller.passportIdPath = filePath;
+                    controller.isDocumentUploaded = true;
                   });
                 },
               ),
+               Align(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: baseColor, // Transparent background
+                elevation: 0, // Remove shadow
+                foregroundColor: Colors.white, // Text and icon color
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30), // Rounded corners
+                ),
+              ),
+              onPressed: () {
+                controller.employementDetails(context);
+              },
+              child: const Text("Save Changes"),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildEditableField(String label,
-      {required String value, required String hintText}) {
-    return SingleChildScrollView(
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: TextField(
-              controller: TextEditingController(text: value),
-              decoration: InputDecoration(
-                labelText: label,
-                hintText: hintText,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-            )));
+  Widget _buildEditableField(String label, TextEditingController controller,
+      String hintText, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
   }
+}
 
+Widget _buildUploadBox(String text, {required Function(String) onUpload}) {
+  return GestureDetector(
+      onTap: () async {
+        FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-
-  Widget _buildUploadBox(String text, {required Function(String) onUpload}) {
-    return GestureDetector(
-        onTap: () async {
-          FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-          if (result != null) {
-            String filePath = result.files.single.path!;
-            onUpload(filePath);
-          }
-        },
-        child: DottedBorder(
-          color: Colors.orange, // Border color
-          strokeWidth: 1, // Thickness of the dotted line
-          dashPattern: [4, 4], // Length and spacing of dashes
-          child: Container(
-              height: 100,
-              width: double.infinity,
-              color: Colors.orange[100],
-              child: Center(
-                  child: Column(
-                children: [
-                  const SizedBox(height: 18),
-                  const Center(
-                    child: Icon(
-                      Icons.cloud_download,
-                      color: Colors.orange,
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      text,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ))),
-        ));
-  }
-
-  Widget _buildDocumentViewSection(String label, String? filePath) {
-    return filePath != null
-        ? Container(
-            decoration: BoxDecoration(color: Colors.orange[300]),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        if (result != null) {
+          String filePath = result.files.single.path!;
+          onUpload(filePath);
+        }
+      },
+      child: DottedBorder(
+        color: Colors.orange, // Border color
+        strokeWidth: 1, // Thickness of the dotted line
+        dashPattern: [4, 4], // Length and spacing of dashes
+        child: Container(
+            height: 100,
+            width: double.infinity,
+            color: Colors.orange[100],
+            child: Center(
+                child: Column(
               children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.transparent, // Transparent background
-                    elevation: 0, // Remove shadow
-                    foregroundColor: Colors.white,
+                const SizedBox(height: 18),
+                const Center(
+                  child: Icon(
+                    Icons.cloud_download,
+                    color: Colors.orange,
                   ),
-                  onPressed: () {
-                    _showDocumentPopup(filePath, label);
-                  },
-                  icon: const Icon(Icons.check_circle),
-                  label: Text(label),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _showDocumentPopup(filePath, label);
-                  },
-                  child: const Text(
-                    'View',
-                    style: TextStyle(color: Colors.white),
+                Center(
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
-            ))
-        : Container();
-  }
+            ))),
+      ));
+}
 
-  void _showDocumentPopup(String filePath, String label) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(label),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Close'),
-            ),
-          ],
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+Widget _buildDocumentViewSection(
+    String label, String? filePath, BuildContext context) {
+  return filePath != null
+      ? Container(
+          decoration: BoxDecoration(color: Colors.orange[300]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.file(File(filePath), fit: BoxFit.contain),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent, // Transparent background
+                  elevation: 0, // Remove shadow
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  _showDocumentPopup(filePath, label, context);
+                },
+                icon: const Icon(Icons.check_circle),
+                label: Text(label),
+              ),
+              TextButton(
+                onPressed: () {
+                  _showDocumentPopup(filePath, label, context);
+                },
+                child: const Text(
+                  'View',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ],
+          ))
+      : Container();
+}
+
+void _showDocumentPopup(String filePath, String label, context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(label),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Close'),
           ),
-        );
-      },
-    );
-  }
+        ],
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.file(File(filePath), fit: BoxFit.contain),
+          ],
+        ),
+      );
+    },
+  );
 }

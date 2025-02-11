@@ -1,28 +1,44 @@
 import 'package:ag_mortgage/Profile/Dashboard/component.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class HelpDeskPage extends StatelessWidget {
-  const HelpDeskPage({super.key});
+class HeplDeskPage extends StatefulWidget {
+  const HeplDeskPage({super.key});
+
+  @override
+  State<HeplDeskPage> createState() => _HeplDeskPageState();
+}
+
+class _HeplDeskPageState extends State<HeplDeskPage> {
+  final cardControllers = Get.put(Profile_Controller());
+  @override
+  void initState() {
+    super.initState();
+    cardControllers.helpDisk(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Help Desk"),
-          centerTitle: true,
-          leading: IconButton(
+        centerTitle: true,
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => {
-              Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const AccountPage(), // Start with MortgagePage
-                            ),
-                          ),
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const AccountPage(), // Start with MortgagePage
+              ),
+            ),
           },
-      ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -52,29 +68,60 @@ class HelpDeskPage extends StatelessWidget {
                   _buildContactOption(
                     icon: Icons.phone,
                     label: "Call",
-                    onTap: () {
-                      // Handle Call action
+                    onTap: () async {
+                      final Uri phoneUri = Uri.parse(
+                          "tel:${cardControllers.HelpDiskPhone}"); // Replace with the desired phone number
+                      if (await canLaunchUrl(phoneUri)) {
+                        await launchUrl(phoneUri);
+                      } else {
+                        throw "Could not launch $phoneUri";
+                      }
                     },
                   ),
                   _buildContactOption(
                     icon: Icons.message,
                     label: "Text Message",
-                    onTap: () {
-                      // Handle Text Message action
+                    onTap: () async {
+                      final Uri smsUri = Uri.parse(
+                          "sms:${cardControllers.HelpDiskPhone}?body=Welcome to Ag Mortgage");
+
+                      if (await canLaunchUrl(smsUri)) {
+                        await launchUrl(smsUri);
+                      } else {
+                        throw "Could not launch $smsUri";
+                      }
                     },
                   ),
                   _buildContactOption(
                     icon: FontAwesomeIcons.whatsapp,
                     label: "Whatsapp",
-                    onTap: () {
-                      // Handle WhatsApp action
+                    onTap: () async {
+                      var phoneNumber = '7907412589';
+                      var url = 'https://wa.me/$phoneNumber';
+                      final Uri whatsappUri = Uri.parse(
+                          "https://wa.me/${cardControllers.HelpDiskWhatapp}");
+                      print(
+                          "cardControllers.HelpDiskWhatapp: ${cardControllers.HelpDiskWhatapp}");
+
+                      if (await canLaunchUrl(whatsappUri)) {
+                        await launchUrl(whatsappUri);
+                      } else {
+                        throw "Could not launch WhatsApp";
+                      }
                     },
                   ),
                   _buildContactOption(
                     icon: Icons.email,
                     label: "Send Email",
-                    onTap: () {
-                      // Handle Email action
+                    onTap: () async {
+                      final Uri emailUri = Uri.parse(
+                          "mailto:${cardControllers.HelpDiskEmail}");
+
+                      if (await canLaunchUrl(emailUri)) {
+                        await launchUrl(emailUri);
+                      } else {
+                        throw "Could not launch $emailUri";
+                      }
                     },
                   ),
                 ],
@@ -136,7 +183,7 @@ class HelpDeskPage extends StatelessWidget {
 
               const SizedBox(height: 8.0),
               Container(
-                padding: const EdgeInsets.all(13),
+                  padding: const EdgeInsets.all(13),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
