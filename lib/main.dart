@@ -1,11 +1,13 @@
 import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/NotificationScreen/notification.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
 
@@ -21,10 +23,11 @@ import 'Authentication/Login_Controller/controller.dart';
 
 void main() {
   Get.lazyPut(() => ProfileController());
-    runApp(
+  runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MortgagController()), // Provide MortgageProvider
+        ChangeNotifierProvider(
+            create: (_) => MortgagController()), // Provide MortgageProvider
       ],
       child: MyApp(),
     ),
@@ -43,7 +46,8 @@ class MyApp extends StatelessWidget {
         print("Navigating to: ${settings.name}");
         switch (settings.name) {
           case '/':
-            return MaterialPageRoute(builder: (context) => const LandingPage(startIndex: 0));
+            return MaterialPageRoute(
+                builder: (context) => const LandingPage(startIndex: 0));
           case '/second':
             return MaterialPageRoute(
                 builder: (context) => const MortgagePageHome(startIndex: 0));
@@ -61,6 +65,17 @@ class MyApp extends StatelessWidget {
           case '/main_page':
             return MaterialPageRoute(
                 builder: (context) => const MortgagePageHome());
+          case 'login/propertyView':
+            final argument = settings.arguments as int?;
+
+            return MaterialPageRoute(
+              builder: (context) => PropertyDetailsPage(id: argument),
+            );
+          case '/rent-to-own':
+            return MaterialPageRoute(
+              builder: (context) => const Rent_To_Own(),
+            );
+
           default:
             return MaterialPageRoute(
                 builder: (context) =>
@@ -79,7 +94,7 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  int _currentIndex = 1; 
+  int _currentIndex = 1;
 
   @override
   void initState() {
@@ -103,20 +118,18 @@ class _LandingPageState extends State<LandingPage> {
     });
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     final bool showBottomNavBar = _currentIndex != 0; // H
     return Scaffold(
-      
       body: _pages[_currentIndex],
       bottomNavigationBar: showBottomNavBar
           ? BottomNavBar(
               currentIndex: _currentIndex - 1,
-              onTap: (index) =>
-                  _onItemTapped(index + 1), items: const [], // Adjust for LandingPage
+              onTap: (index) => _onItemTapped(index + 1),
+              items: const [], // Adjust for LandingPage
             )
           : null,
     );
   }
 }
-

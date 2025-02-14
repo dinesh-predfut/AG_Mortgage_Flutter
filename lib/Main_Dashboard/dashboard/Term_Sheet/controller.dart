@@ -9,6 +9,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Term_Sheet/model.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
-class MortgagController extends ChangeNotifier {
-  TextEditingController propertyValueController = TextEditingController();
-  TextEditingController initialDepositController = TextEditingController();
-  TextEditingController monthlyRepaymentController = TextEditingController();
+class MortgagControllerDashboard extends ChangeNotifier {
   TextEditingController cityNameValue = TextEditingController();
   TextEditingController areaNameValue = TextEditingController();
   TextEditingController cvv = TextEditingController();
@@ -33,11 +31,17 @@ class MortgagController extends ChangeNotifier {
   DateTime selectedDay = DateTime.now();
 //  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
   int? selectedApartmentType = 1;
+  int? propertyValueController;
   int? selectedCity;
+  int? monthlyRepaymentController;
   int? selectedArea;
+  int? initialDepositController;
   double sliderValue = 10;
   int? apartmentOrMarketplace;
   String cityName = "";
+  int? loanRepaymentPeriod;
+  String? startDate = "";
+  String anniversary = "";
 
   Future<List<PostsModel>> getALLCityApi() async {
     try {
@@ -56,10 +60,10 @@ class MortgagController extends ChangeNotifier {
     throw Exception('error fetching data');
   }
 
-  Future<List<SeletArea>> fetchAreasByCity() async {
+  Future<List<SeletArea>> fetchAreasByCity( cityId) async {
     try {
       var response = await http.get(
-        Uri.parse('${Urls.allArea}$selectedCity'),
+        Uri.parse('${Urls.allArea}$cityId'),
         headers: {
           'Authorization': 'Bearer ${Params.userToken}',
           'Content-Type': 'application/json',
@@ -96,91 +100,6 @@ class MortgagController extends ChangeNotifier {
     return formatter.format(intNumber);
   }
 
-  Future<void> addMortgageForm(BuildContext context) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
-
-    try {
-      print('Preparing API request...');
-
-      // Prepare the request
-      var request = http.Request('POST', Uri.parse(Urls.mortagaform));
-      request.body = json.encode({
-        "typeOfApartment": selectedApartmentType ?? '',
-        "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
-        "city": selectedCity ?? '',
-        "area": selectedArea ?? '',
-        "estimatedPropertyValue":
-            double.tryParse(propertyValueController.text.replaceAll(',', '')) ??
-                0.0,
-        "initialDeposit": double.tryParse(
-                initialDepositController.text.replaceAll(',', '').trim()) ??
-            0.0,
-        "loanRepaymentPeriod": sliderValue,
-        "monthlyRepaymentAmount": double.tryParse(
-                monthlyRepaymentController.text.replaceAll(',', '').trim()) ??
-            0.0,
-        "anniversary": formattedDate, // Ensure DateTime is properly formatted
-      });
-      request.headers.addAll({
-        'Content-Type': 'application/json ',
-        'Authorization': 'Bearer ${Params.userToken}',
-      });
-
-      print('Request Headers: ${request.headers}');
-      print('Request Body: ${request.body}');
-
-      // Send the request
-      http.StreamedResponse streamedResponse = await request.send();
-      var decodedResponse = await http.Response.fromStream(streamedResponse);
-
-      // Log response
-      print('Response Status Code: ${decodedResponse.statusCode}');
-      print('Response Body: ${decodedResponse.body}');
-
-      if (decodedResponse.statusCode == 200) {
-        clearFields();
-        final result = jsonDecode(decodedResponse.body);
-        Fluttertoast.showToast(
-          msg: "Mortgage Created Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Color.fromARGB(255, 15, 15, 15),
-        );
-        print('API Success Response: $result');
-
-        // Navigate to MortgagePage
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const DashboardPageS("Mortgage"), // Start with MortgagePage
-          ),
-        );
-      } else {
-        print('API Error: HTTP ${decodedResponse.statusCode}');
-        final errorResult = jsonDecode(decodedResponse.body);
-        print('Error Response: $errorResult');
-      }
-    } catch (error) {
-      print('Error Occurred: $error');
-    }
-  }
-
-  void clearFields() {
-    propertyValueController.clear();
-    initialDepositController.clear();
-    monthlyRepaymentController.clear();
-
-    selectedApartmentType = null;
-    apartmentOrMarketplace = null;
-    selectedCity = null;
-    selectedArea = null;
-
-    selectedDay = DateTime.now();
-  }
-
   Future<Map<String, dynamic>> getData(String userId) async {
     Map<String, dynamic> data = {};
 
@@ -200,8 +119,6 @@ class MortgagController extends ChangeNotifier {
         final responseData = json.decode(response.body);
         if (responseData is List && responseData.isNotEmpty) {
           data = responseData[0];
-      
-          findAndSetCity();
           // Store the first item of the response
         } else {
           throw Exception("No data found.");
@@ -228,7 +145,7 @@ class MortgagController extends ChangeNotifier {
     }
   }
 
-  Future<void> findAndSetCity() async {
+  Future<void> findAndSetCity(int selectedCity) async {
     List<PostsModel> allCity = await getALLCityApi();
 
     var matchCity = allCity.firstWhere(
@@ -241,22 +158,21 @@ class MortgagController extends ChangeNotifier {
     print('Updated City Name: $cityName');
   }
 
-Future<String?> findAndSetArea(int id) async {
-  List<SeletArea> allArea = await fetchAreasByCity();
+  Future<void> findAndSetArea(int selectedArea) async {
+    List<SeletArea> allArea = await fetchAreasByCity(selectedArea);
 
-  if (allArea.isEmpty) {
-    areaNameValue.text = "No areas found";
-    return "No areas found";
+    if (allArea.isEmpty) {
+      areaNameValue.text = "No areas found";
+      return;
+    }
+    var matchArea = allArea.firstWhere(
+      (item) => item.id == selectedArea,
+      orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+    );
+
+    areaNameValue.text = matchArea.name.toString();
+    print("22222${areaNameValue.text}");
   }
-
-  var matchArea = allArea.firstWhere(
-    (item) => item.id == id,
-    orElse: () => SeletArea(id: -1, name: "Unknown Area"),
-  );
-
-  return matchArea.name;  // Return the matched area name
-}
-
 
   String calculateProfileDate(String anniversaryDate, int remainingMonths) {
     DateTime startDate = DateTime.parse(anniversaryDate);
@@ -284,6 +200,61 @@ Future<String?> findAndSetArea(int id) async {
 
   String formatProfileDateName(String profileDate) {
     DateTime dateTime = DateTime.parse(profileDate);
-    return DateFormat('MMM dd').format(dateTime).toUpperCase();
+    return DateFormat('MMM yyyy').format(dateTime).toUpperCase();
   }
+
+
+
+Future<List<CustomerModel>> fetchMortgageDetails() async {
+  try {
+    print('userId: ${Params.userId}');
+
+    final url = Uri.parse('${Urls.getMortgageDetails}?id=${Params.userId}');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${Params.userToken ?? ''}',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+     List<dynamic> data = json.decode(response.body);
+     
+      return data.map((json) => CustomerModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Failed to fetch mortgage details');
+  }
+}
+
+Future<List<CustomerModel>> fetchRentToOwnDetails() async {
+  try {
+    print('userId: ${Params.userId}');
+
+    final url = Uri.parse('${Urls.getRentToOwnDetails}?id=${Params.userId}');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${Params.userToken ?? ''}',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+     List<dynamic> data = json.decode(response.body);
+     
+      return data.map((json) => CustomerModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Failed to fetch mortgage details');
+  }
+}
+
 }

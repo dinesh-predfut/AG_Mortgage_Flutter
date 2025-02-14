@@ -7,7 +7,8 @@ import 'package:ag_mortgage/All_Cards/Get_all_Cards/Models.dart';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/models.dart';
+
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
@@ -18,12 +19,14 @@ import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
-class MortgagController extends ChangeNotifier {
+class RentToOwnController extends GetxController {
   TextEditingController propertyValueController = TextEditingController();
-  TextEditingController initialDepositController = TextEditingController();
+  TextEditingController downPayment = TextEditingController();
   TextEditingController monthlyRepaymentController = TextEditingController();
   TextEditingController cityNameValue = TextEditingController();
   TextEditingController areaNameValue = TextEditingController();
+  TextEditingController monthlyRendal = TextEditingController();
+  TextEditingController loanAmount = TextEditingController();
   TextEditingController cvv = TextEditingController();
   Map<String, dynamic> data = {};
   List allApartments = [];
@@ -35,9 +38,12 @@ class MortgagController extends ChangeNotifier {
   int? selectedApartmentType = 1;
   int? selectedCity;
   int? selectedArea;
-  double sliderValue = 10;
+  double sliderValue = 1;
   int? apartmentOrMarketplace;
   String cityName = "";
+  var screeningPeriods = <int>[].obs; // Observable list
+  var selectedPeriod = Rxn<int>();
+  var selectedLoan = Rxn<LoanModel>(); // Store the selected loan object
 
   Future<List<PostsModel>> getALLCityApi() async {
     try {
@@ -70,7 +76,7 @@ class MortgagController extends ChangeNotifier {
         List<dynamic> data = json.decode(response.body);
         if (data.isEmpty) {
           Fluttertoast.showToast(
-            msg: "No areas found for the selected city",
+            msg: "No areas found for the selected cityss",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.grey,
@@ -95,31 +101,40 @@ class MortgagController extends ChangeNotifier {
     if (intNumber == null) return number;
     return formatter.format(intNumber);
   }
+  int cleanNumbers(dynamic amount) {
+    if (amount == null) return 0;
 
-  Future<void> addMortgageForm(BuildContext context) async {
+    // Convert the amount to a string and remove commas
+    String amountString = amount.toString().replaceAll(',', '');
+
+    return int.tryParse(amountString) ?? 0;
+  }
+  Future<void> addRentoOwn(BuildContext context) async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
 
     try {
       print('Preparing API request...');
-
+final monthlyRendalCalculation={(cleanNumbers(propertyValueController.text) * 0.8 - cleanNumbers(downPayment.text)) / 25};
       // Prepare the request
-      var request = http.Request('POST', Uri.parse(Urls.mortagaform));
+      var request = http.Request('POST', Uri.parse(Urls.rentToOwn));
       request.body = json.encode({
         "typeOfApartment": selectedApartmentType ?? '',
         "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
         "city": selectedCity ?? '',
         "area": selectedArea ?? '',
+        "loanRepaymentPeriod": selectedLoan.value?.screeningPeriod,
         "estimatedPropertyValue":
             double.tryParse(propertyValueController.text.replaceAll(',', '')) ??
                 0.0,
-        "initialDeposit": double.tryParse(
-                initialDepositController.text.replaceAll(',', '').trim()) ??
-            0.0,
-        "loanRepaymentPeriod": sliderValue,
+        "initialDeposit":
+            double.tryParse(downPayment.text.replaceAll(',', '').trim()) ?? 0.0,
+        "rentalRepaymentPeriod": sliderValue,
         "monthlyRepaymentAmount": double.tryParse(
                 monthlyRepaymentController.text.replaceAll(',', '').trim()) ??
             0.0,
-        "anniversary": formattedDate, // Ensure DateTime is properly formatted
+            "monthlyLoanAmount": double.tryParse(loanAmount.text.replaceAll(",", "").trim()) ?? 0.0,
+        "anniversary": formattedDate,
+        "monthlyRentalAmount": monthlyRendalCalculation,
       });
       request.headers.addAll({
         'Content-Type': 'application/json ',
@@ -168,9 +183,26 @@ class MortgagController extends ChangeNotifier {
     }
   }
 
+  Future<List<LoanModel>> getScreeningPeriodsApi() async {
+    var response = await http.get(
+      Uri.parse(Urls.getsettingsData),
+      headers: {
+        'Authorization': 'Bearer ${Params.userToken}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => LoanModel.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to load screening periods');
+    }
+  }
+
   void clearFields() {
     propertyValueController.clear();
-    initialDepositController.clear();
+    downPayment.clear();
     monthlyRepaymentController.clear();
 
     selectedApartmentType = null;
@@ -200,8 +232,6 @@ class MortgagController extends ChangeNotifier {
         final responseData = json.decode(response.body);
         if (responseData is List && responseData.isNotEmpty) {
           data = responseData[0];
-      
-          findAndSetCity();
           // Store the first item of the response
         } else {
           throw Exception("No data found.");
@@ -241,22 +271,21 @@ class MortgagController extends ChangeNotifier {
     print('Updated City Name: $cityName');
   }
 
-Future<String?> findAndSetArea(int id) async {
-  List<SeletArea> allArea = await fetchAreasByCity();
+  Future<void> findAndSetArea() async {
+    List<SeletArea> allArea = await fetchAreasByCity();
 
-  if (allArea.isEmpty) {
-    areaNameValue.text = "No areas found";
-    return "No areas found";
+    if (allArea.isEmpty) {
+      areaNameValue.text = "No areas found";
+      return;
+    }
+    var matchArea = allArea.firstWhere(
+      (item) => item.id == selectedArea,
+      orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+    );
+
+    areaNameValue.text = matchArea.name.toString();
+    print("22222${areaNameValue.text}");
   }
-
-  var matchArea = allArea.firstWhere(
-    (item) => item.id == id,
-    orElse: () => SeletArea(id: -1, name: "Unknown Area"),
-  );
-
-  return matchArea.name;  // Return the matched area name
-}
-
 
   String calculateProfileDate(String anniversaryDate, int remainingMonths) {
     DateTime startDate = DateTime.parse(anniversaryDate);
@@ -286,4 +315,6 @@ Future<String?> findAndSetArea(int id) async {
     DateTime dateTime = DateTime.parse(profileDate);
     return DateFormat('MMM dd').format(dateTime).toUpperCase();
   }
+
+  void updateField(String name, String value) {}
 }

@@ -176,23 +176,42 @@ class Landing_Mortgage extends StatelessWidget {
   }
 }
 
-class MortgageFormPage extends StatefulWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final Houseview? house;
-  final bool? viewBtn;
-  const MortgageFormPage({
-    Key? key,
-    this.viewBtn,
-    this.house,
-  }) : super(key: key);
-  @override
-  _MortgageFormPageState createState() => _MortgageFormPageState();
-}
+  class MortgageFormPage extends StatefulWidget {
+    // ignore: prefer_typing_uninitialized_variables
+    final Houseview? house;
+    final bool? viewBtn;
+    const MortgageFormPage({
+      Key? key,
+      this.viewBtn,
+      this.house,
+    }) : super(key: key);
+    @override
+    _MortgageFormPageState createState() => _MortgageFormPageState();
+  }
 
-class _MortgageFormPageState extends State<MortgageFormPage> {
+  class _MortgageFormPageState extends State<MortgageFormPage> {
   final controller = Get.put(MortgagController());
   MortgagController controllerFeild = MortgagController();
 
+ @override
+  void initState() {
+    super.initState();
+    calculateEMI();
+    final initialAmount = controller.monthlyRepaymentController.text;
+  controller.initialDepositController.text = '0';
+    if (widget.house != null) {
+      controller.propertyValueController.text =
+          formattedEMI(widget.house!.price);
+      controller.selectedCity = widget.house!.city;
+      controller.selectedArea = widget.house!.localGovernmentArea;
+      controller.selectedApartmentType = widget.house!.typeOfApartment;
+      // Calculate the initial deposit (30% of the property value)
+      double propertyValue = widget.house!.price.toDouble();
+      controller.monthlyRepaymentController.text = "";
+      controller.apartmentOrMarketplace = widget.house!.id;
+      calculateEMI();
+    }
+  }
   final _formKey = GlobalKey<FormState>();
 // Default value for slider
   double interestRate = 18; // Annual interest rate in percentage
@@ -236,25 +255,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    calculateEMI();
-    final initialAmount = controller.monthlyRepaymentController.text;
-  controller.initialDepositController.text = '0';
-    if (widget.house != null) {
-      controller.propertyValueController.text =
-          formattedEMI(widget.house!.price);
-      controller.selectedCity = widget.house!.city;
-      controller.selectedArea = widget.house!.localGovernmentArea;
-      controller.selectedApartmentType = widget.house!.typeOfApartment;
-      // Calculate the initial deposit (30% of the property value)
-      double propertyValue = widget.house!.price.toDouble();
-      controller.monthlyRepaymentController.text = "";
-      controller.apartmentOrMarketplace = widget.house!.id;
-      calculateEMI();
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -378,10 +379,10 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                           if (value != null) {
                             setState(() {
                               controller.selectedCity = value;
-                              controller.fetchAreasByCity(value);
+                              controller.fetchAreasByCity();
                               controller.selectedArea = null;
                             });
-                            controller.findAndSetCity(value);
+                            controller.findAndSetCity();
                           }
                         },
                         validator: (value) {
@@ -398,7 +399,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
 // Area Dropdown
                   FutureBuilder<List<SeletArea>>(
                     future: controller.selectedCity != null
-                        ? controller.fetchAreasByCity(controller.selectedCity!)
+                        ? controller.fetchAreasByCity()
                         : Future.value(
                             []), // If selectedCity is null, return an empty list
                     builder: (context, areaSnapshot) {
@@ -430,7 +431,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                             setState(() {
                               controller.selectedArea = value;
                             });
-                            controller.findAndSetArea(value);
+                            // controller.findAndSetArea();
                           }
                         },
                         validator: (value) {
@@ -897,12 +898,11 @@ class _TermSheetPageState extends State<TermSheetPage>
     super.initState();
     fetchData();
     _fetchCityName();
-     controller.findAndSetArea(controller.selectedArea!.toInt());
-     controller.findAndSetCity(controller.selectedCity!.toInt());
+    
   }
 
   Future<void> _fetchCityName() async {
-    var cityName = await controller.findAndSetCity(data["city"]);
+    var cityName = await controller.findAndSetCity();
     setState(() {}); // Rebuild to display the city name
   }
 
@@ -964,7 +964,7 @@ class _TermSheetPageState extends State<TermSheetPage>
                 [
                   _buildRow("Apartment Type",
                       controller.selectedApartmentType.toString()),
-                  _buildRow("City", controller.cityNameValue.text),
+                  _buildRow("City", controller.findAndSetArea(controller.selectedArea as int)),
                   _buildRow("Area", controller.areaNameValue.text),
                   _buildRow("Selling Price",
                       "NGN ${controller.propertyValueController.text} "),

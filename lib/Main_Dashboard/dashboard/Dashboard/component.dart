@@ -7,6 +7,7 @@ import 'package:ag_mortgage/Main_Dashboard/dashboard/Statement_Page/component.da
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Term_Sheet/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -23,7 +24,10 @@ class DashboardPageS extends StatefulWidget {
 
 class _DashboardPageSState extends State<DashboardPageS> {
   final controller = Get.put(Main_Dashboard_controller());
-
+void initState() {
+    super.initState();
+    controller.fetchPlanOptions();
+  }
   late final String plans;
   @override
   Widget build(BuildContext context) {
@@ -37,25 +41,26 @@ class _DashboardPageSState extends State<DashboardPageS> {
             children: [
               const SizedBox(height: 40), // For safe area padding
               // Greeting Section
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: AssetImage(
-                          'assets/Profile_Pic.png'), // Replace with your image asset
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "Hello, Pelumi 👋",
-                      style: TextStyle(
+                 CircleAvatar(
+              radius: 25,
+              backgroundImage:controller.profileImageUrl != null
+                  ? NetworkImage(controller.profileImageUrl!) // Use the URL from the response
+                  : const AssetImage('') as ImageProvider, // Default image if no URL
+            ),
+                    const SizedBox(width: 10),
+                     Text(
+                      "Hello, ${controller.profileName}👋",
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ),
@@ -266,7 +271,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Term_Sheets(),
+                              builder: (context) =>  Term_Sheets(widget.plans),
                             ));
                       },
                     ),

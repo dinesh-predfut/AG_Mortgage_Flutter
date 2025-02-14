@@ -128,18 +128,14 @@ class Profile_Controller extends ChangeNotifier {
     final dir = await Directory.systemTemp.createTemp();
     final targetPath = '${dir.path}/temp.jpg';
 
-    // Compress the image to reduce the file size
     Uint8List? compressedData = await FlutterImageCompress.compressWithFile(
       image.path,
-      minWidth: 800, // Optional: adjust the width
-      minHeight: 800, // Optional: adjust the height
-      quality: 80, // Optional: adjust the quality (0-100)
-      rotate: 0,
+      minWidth: 800, 
+      quality: 80, 
       format: CompressFormat.jpeg,
     );
 
     if (compressedData != null) {
-      // Save the compressed data to a file
       final compressedFile = File(targetPath)..writeAsBytesSync(compressedData);
       return compressedFile;
     } else {
@@ -150,7 +146,6 @@ class Profile_Controller extends ChangeNotifier {
 
   Future<void> uploadImage(File image) async {
     try {
-      // Check if the image file is null or empty
       if (image == null || !image.existsSync()) {
         Fluttertoast.showToast(
           msg: "No image selected",
@@ -159,47 +154,40 @@ class Profile_Controller extends ChangeNotifier {
         return;
       }
 
-      // Create a MultipartRequest to handle multi-part form data
       var request = http.MultipartRequest(
-          'PUT', // Use POST instead of PUT (if that's the method required by your backend)
+          'PUT', 
           Uri.parse('${Urls.profile}?id=${Params.userId}'));
 
-      // Adding headers for authentication (optional)
       request.headers.addAll({
         'Authorization':
-            'Bearer ${Params.userToken ?? ''}', // Ensure the token is valid
+            'Bearer ${Params.userToken ?? ''}', 
       });
 
-      // Add the image file to the request
+     
       request.files.add(
         await http.MultipartFile.fromPath(
-          'profileImage', // Key expected by the backend
+          'profileImage', 
           image.path,
           contentType: MediaType(
-              'image', 'jpeg'), // You can change 'jpeg' based on the image type
+              'image', 'jpeg'), 
         ),
       );
 
-      // Send the request and get the response
       var streamedResponse = await request.send();
       var decodedResponse = await http.Response.fromStream(streamedResponse);
 
-      // Check if the request was successful
       if (decodedResponse.statusCode == 200) {
-        // Handle success
         Fluttertoast.showToast(
           msg: "Profile image updated successfully",
           toastLength: Toast.LENGTH_SHORT,
         );
       } else {
-        // Handle error response
         Fluttertoast.showToast(
           msg: "Failed to update profile image: ${decodedResponse.body}",
           toastLength: Toast.LENGTH_SHORT,
         );
       }
     } catch (error) {
-      // Catch any errors during the request
       print('Error Occurred: $error');
       Fluttertoast.showToast(
         msg: "An error occurred: $error",
@@ -240,7 +228,6 @@ class Profile_Controller extends ChangeNotifier {
       print('Response Body: ${decodedResponse.body}');
 
       if (decodedResponse.statusCode == 200) {
-        // ignore: use_build_context_synchronously
 
         Fluttertoast.showToast(
           msg: "Employment Updated Successfully",

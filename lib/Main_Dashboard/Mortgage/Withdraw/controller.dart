@@ -21,13 +21,14 @@ class Main_Dashboard_controller extends ChangeNotifier {
   TextEditingController account = TextEditingController();
   TextEditingController amount = TextEditingController();
   final TextEditingController repaymentDate = TextEditingController();
-  // DateTime repaymentDate = DateTime.now();
-//  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+  var planOptions = <String>[].obs; // Observable list to store plan options
+  var isLoading = false.obs;
+  var profileName = "";
+  String? profileImageUrl;
 
   Future<bool> getwithdrawDetails(BuildContext context) async {
     try {
       var request = http.Request('GET', Uri.parse(Urls.withdraw));
-      
 
       request.headers.addAll({
         'Content-Type': 'application/json',
@@ -67,6 +68,47 @@ class Main_Dashboard_controller extends ChangeNotifier {
         toastLength: Toast.LENGTH_SHORT,
       );
       return false;
+    }
+  }
+
+  Future<void> fetchPlanOptions() async {
+    try {
+      isLoading.value = true;
+      var url = Uri.parse('${Urls.getEmployeeDetailsID}?id=${Params.userId}');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
+
+      var response = await http.get(url, headers: headers);
+
+      print('Response Code: ${response.statusCode}');
+      print('Responsesss Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+
+        if (data['firstName'] != null) {
+          profileName = data['firstName'];
+        }
+        // Adjust this to match your API response
+        var profileImage = data['profileImage']; // Get profileImage URL
+
+        print("WWWWWWWW$profileName");
+
+        if (data['planOption'] != null) {
+          planOptions.value = List<String>.from(data['planOption']);
+        }
+
+        // Assuming you want to store the image URL for use in your UI
+        profileImageUrl = profileImage; // Store the image URL
+      } else {
+        print("Error: ${response.body}");
+      }
+    } catch (e) {
+      print("API Call Error: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 

@@ -23,6 +23,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
+  var profileName = "";
   @override
   void initState() {
     super.initState();
@@ -41,11 +42,15 @@ class _DashboardPageState extends State<DashboardPage> {
       var response = await http.get(url, headers: headers);
 
       print('Response Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('Responsesss Body: ${response.body}');
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
+        setState(() {
+          profileName = data['firstName']; // Adjust this to match your API response
+        });
+        print("@@@@@@$profileName");
         if (data['planOption'] != null) {
           planOptions.value = List<String>.from(data['planOption']);
         }
@@ -70,9 +75,9 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const Text(
-              'Hello, Pelumi 👋',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              'Hello, $profileName 👋',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -89,14 +94,20 @@ class _DashboardPageState extends State<DashboardPage> {
                     onTap: () {
                       if (planOptions.contains("Mortgage")) {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DashboardPageS("Mortgage"),
-                        ),
-                      );
-                      
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DashboardPageS("Mortgage"),
+                          ),
+                        );
+                      } else if (planOptions.contains("Rent-to-Own")) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DashboardPageS("Rent-to-Own"),
+                          ),
+                        );
                       } else {
-                         Navigator.pushNamed(context, "/dashBoardPage/mortgage");
+                        Navigator.pushNamed(context, "/dashBoardPage/mortgage");
                       }
                     },
                   ),
@@ -104,11 +115,16 @@ class _DashboardPageState extends State<DashboardPage> {
                     title: 'Rent to Own',
                     icon: Icons.key,
                     onTap: () {
-                      Navigator.push(
+                      if (planOptions.contains("Rent-to-Own")) {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const Rent_To_Own(),
-                          ));
+                            builder: (_) => const DashboardPageS("Rent-to-Own"),
+                          ),
+                        );
+                      } else {
+                        Navigator.pushNamed(context, "/rent-to-own");
+                      }
                     },
                   ),
                   MenuButton(

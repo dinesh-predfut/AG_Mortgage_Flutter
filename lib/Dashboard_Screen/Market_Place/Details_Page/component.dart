@@ -1,12 +1,13 @@
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../Mortgage/MortgageHome.dart';
-import 'controller.dart'; 
-import 'models.dart'; 
-import '../../Mortgage/MortgagePage.dart'; 
+import 'controller.dart';
+import 'models.dart';
+import '../../Mortgage/MortgagePage.dart';
 import '../../../const/colors.dart';
 import '../../../const/Image.dart';
 
@@ -53,7 +54,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
           }
 
           final house = snapshot.data!;
-          
+
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +104,9 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                           Row(
                             children: List.generate(5, (index) {
                               return Icon(
-                                index < house.rating ? Icons.star : Icons.star_border,
+                                index < house.rating
+                                    ? Icons.star
+                                    : Icons.star_border,
                                 color: Colors.orange,
                               );
                             }),
@@ -176,7 +179,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Image.asset(Images.logo, fit: BoxFit.cover, width: 100),
+                        child: Image.asset(Images.logo,
+                            fit: BoxFit.cover, width: 100),
                       ),
                       const SizedBox(height: 10),
                       Text(
@@ -216,8 +220,10 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                       DropdownButtonFormField<String>(
                         value: _selectedPlan,
                         items: const [
-                          DropdownMenuItem(value: 'mortgage', child: Text('Mortgage')),
-                          DropdownMenuItem(value: 'rentToOwn', child: Text('Rent-To-Own')),
+                          DropdownMenuItem(
+                              value: 'mortgage', child: Text('Mortgage')),
+                          DropdownMenuItem(
+                              value: 'rentToOwn', child: Text('Rent-To-Own')),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -236,15 +242,23 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                         onPressed: _selectedPlan == null
                             ? null
                             : () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        _selectedPlan == "mortgage"
-                                            ? MortgageFormPage(viewBtn: false, house: house)
-                                            : const MortgagePageHome(startIndex: 1),
-                                  ),
-                                );
+                                Navigator.pushReplacement(context,
+                                    MaterialPageRoute(
+                                  builder: (context) {
+                                    if (_selectedPlan == "mortgage") {
+                                      return MortgageFormPage(
+                                          viewBtn: false, house: house);
+                                    } else if (_selectedPlan == "rentToOwn") {
+                                      return RentToOwnForm( 
+                                          house: house,
+                                          viewBtn:
+                                              false); // Ensure RentToOwnPage exists
+                                    } else {
+                                      return const MortgagePageHome(
+                                          startIndex: 1); // Default case
+                                    }
+                                  },
+                                ));
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: baseColor,
@@ -265,6 +279,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
       ),
     );
   }
+
   Widget sectionCard({required String title, required Widget content}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -295,56 +310,55 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
     );
   }
 
-Widget amenitiesGrid(List<String> amenities) {
-  // Define a map of amenities to icons
-  final Map<String, IconData> amenitiesIcons = {
-    "garden":Icons.park,
-    "Swimming Pool": Icons.pool,
-    "gym": Icons.fitness_center,
-    "Parking": Icons.local_parking,
-    "WiFi": Icons.wifi,
-    "Restaurant": Icons.restaurant,
-    "Spa": Icons.spa,
-    "Bar": Icons.local_bar,
-    "TV": Icons.tv,
-    "Air Conditioning": Icons.ac_unit,
-    "Laundry": Icons.local_laundry_service,
-    "backYard":Icons.grass_outlined,
-    "totalArea": Icons.square_foot,
-    "Area": Icons.map,
-  };
+  Widget amenitiesGrid(List<String> amenities) {
+    // Define a map of amenities to icons
+    final Map<String, IconData> amenitiesIcons = {
+      "garden": Icons.park,
+      "Swimming Pool": Icons.pool,
+      "gym": Icons.fitness_center,
+      "Parking": Icons.local_parking,
+      "WiFi": Icons.wifi,
+      "Restaurant": Icons.restaurant,
+      "Spa": Icons.spa,
+      "Bar": Icons.local_bar,
+      "TV": Icons.tv,
+      "Air Conditioning": Icons.ac_unit,
+      "Laundry": Icons.local_laundry_service,
+      "backYard": Icons.grass_outlined,
+      "totalArea": Icons.square_foot,
+      "Area": Icons.map,
+    };
 
-  return GridView.builder(
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: amenities.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 3,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1.5,
-    ),
-    itemBuilder: (context, index) {
-      final item = amenities[index];
-      final icon = amenitiesIcons[item] ?? Icons.check; // Default icon if not found
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: amenities.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 1.5,
+      ),
+      itemBuilder: (context, index) {
+        final item = amenities[index];
+        final icon =
+            amenitiesIcons[item] ?? Icons.check; // Default icon if not found
 
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: Colors.blue), // Show mapped icon
-          const SizedBox(height: 5),
-          Text(
-            item,  // Display the amenity name
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.blue), // Show mapped icon
+            const SizedBox(height: 5),
+            Text(
+              item, // Display the amenity name
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void showReadMorePopup(
     BuildContext context,

@@ -26,6 +26,10 @@ class SignInModel {
     roles = json['roles'].cast<String>();
   }
 
+  get firstName => null;
+
+  get lastName => null;
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['token'] = token;
