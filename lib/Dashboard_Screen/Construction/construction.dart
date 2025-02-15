@@ -1,12 +1,22 @@
+import 'dart:math';
+
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Construction/controller.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
+
 class ConstructionPage extends StatefulWidget {
   final int startIndex;
   const ConstructionPage({super.key, this.startIndex = 0});
@@ -32,7 +42,7 @@ class _ConstructionPageState extends State<ConstructionPage> {
     const Get_All_Cards(),
     const PaymentPage(),
     const Success(),
-     const Construction_CalendarPage(),
+    const Construction_CalendarPage(),
     const TermSheetPage(),
     const BankTransferPage()
   ];
@@ -259,266 +269,652 @@ class Construction_Landing extends StatelessWidget {
 }
 
 class ConstuctionFormPage extends StatefulWidget {
-  const ConstuctionFormPage({super.key});
+  // final Houseview? house;
+  final bool? viewBtn;
+
+  const ConstuctionFormPage({
+    Key? key,
+    // this.house,
+    this.viewBtn,
+  }) : super(key: key);
 
   @override
   _ConstuctionFormPageState createState() => _ConstuctionFormPageState();
 }
 
 class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _propertyValueController =
-      TextEditingController();
-  // ignore: unused_field
-  final TextEditingController _initialDepositController =
-      TextEditingController();
-  final TextEditingController _monthlyRepaymentController =
-      TextEditingController();
-  final TextEditingController _estimatedAmount = TextEditingController();
-  final TextEditingController _completionAmount = TextEditingController();
+  final controller = Get.put(ContructionController());
+  ContructionController controllerFeild = ContructionController();
 
-  String? _selectedApartmentType;
-  String? _selectedCity;
-  String? _selectedArea;
-  String? _stageDevelopment;
-  double _sliderValue = 10; // Default value for slider
-  String? _selectedTypeofConstruction;
+  @override
+  void initState() {
+    super.initState();
+    calculateEMI();
+    // calculateMonthlyRental();
+    calculateEMIAmountValue();
+  }
+
+  final _formKey = GlobalKey<FormState>();
+// Default value for slider
+  double interestRate = 18; // Annual interest rate in percentage
+  String formattedEMI(double amount) {
+    // Format the number with international commas (thousands separators)
+    final numberFormatter = NumberFormat(
+        '#,###.##', 'en_US'); // en_US for international comma formatting
+    return numberFormatter.format(amount);
+  }
+
+  // void calculateMonthlyRental() {
+  //   if (controller.selectedLoan.value == null) {
+  //     print("No loan selected");
+  //     return;
+  //   }
+
+  //   final loan = controller.selectedLoan.value;
+
+  //   final double initialDeposit =
+  //       (double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0);
+  //   final double loanAmount = (double.tryParse(
+  //               controller.propertyValueController.text.replaceAll(',', '')) ??
+  //           0) -
+  //       (double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0);
+  //   print("Nosloan selected${loanAmount.toString()}");
+
+  //   final double financeInterestPercentage = loan!.financeInterest / 100;
+  //   final double depositScreeningInterestPercentage =
+  //       loan.depositScreeningInterest / 100;
+  //   final int screeningPeriod = loan.screeningPeriod;
+  //   final double profitPercentage = loan.profit / 100;
+
+  //   final double interestOnSecurityDeposit =
+  //       (initialDeposit * depositScreeningInterestPercentage) / screeningPeriod;
+
+  //   final double interestOnFinanceAmount =
+  //       (loanAmount * financeInterestPercentage) / screeningPeriod;
+
+  //   final double profit =
+  //       (interestOnFinanceAmount + interestOnSecurityDeposit) *
+  //           profitPercentage;
+
+  //   final double monthlyRental =
+  //       interestOnSecurityDeposit + interestOnFinanceAmount + profit;
+  //   // Update formData with the calculated monthly rent
+  //   controller.monthlyRendal.text = formattedEMI(monthlyRental);
+
+  //   print("Interest on Security Deposit: $interestOnSecurityDeposit");
+  //   print("Interest on Finance Amount: $interestOnFinanceAmount");
+  //   print("Profit: $profit");
+  //   print("Monthly Rent: $monthlyRental");
+  // }
+
+  void calculateEMIAmountValue() {
+    double loanAmount =
+        double.tryParse(controller.estimatedAmount.text.replaceAll(',', '')) ?? 0.0;
+    int emiTenureInMonth = (controller.sliderValue * 12).toInt();
+    // ignore: non_constant_identifier_names
+    final FinalEMi = calculateEMIAmount(loanAmount, emiTenureInMonth);
+    controller.monthlyRepaymentController.text = formattedEMI(FinalEMi);
+  }
+
+  // void handleInputChange(String name, String value) {
+  //   double numericValue = double.tryParse(value.replaceAll(',', '')) ?? 0.0;
+
+  //   if (name == 'estimatedPropertyValue') {
+  //     num calculatedInitialDeposit = (0.40 * numericValue)
+  //         .clamp(controller.downPayment.text as num, double.infinity);
+
+  //     double loanAmount = numericValue - calculatedInitialDeposit;
+
+  //     if (!numericValue.isNaN) {
+  //       controller.propertyValueController.text = numericValue.toString();
+  //       controller.downPayment.text = calculatedInitialDeposit.toString();
+  //       controller.loanAmount.value = loanAmount as TextEditingValue;
+  //     } else {
+  //       controller.propertyValueController.text = 0.0.toString();
+  //       controller.downPayment.text = 0.0.toString();
+  //       controller.monthlyRepaymentController.text = 0.0.toString();
+  //     }
+  //   } else if (name == 'initialDeposit') {
+  //     double estimatedValue = controller.propertyValueController.text as double;
+  //     double fourtyPercent = estimatedValue * 0.40;
+
+  //     double newLoanAmount =
+  //         (numericValue > estimatedValue) ? 0.0 : estimatedValue - numericValue;
+
+  //     controller.downPayment.text = numericValue.toString();
+  //     controller.loanAmount.value = newLoanAmount as TextEditingValue;
+  //   } else {
+  //     controller.updateField(name, value);
+  //   }
+  // }
+
+  void calculateEMI() {
+    // calculateMonthlyRental();
+    calculateEMIAmountValue();
+    double propertyValue = double.tryParse(
+            controller.propertyValueController.text.replaceAll(',', '')) ??
+        0;
+    double initialDeposit =
+        double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0;
+    // ignore: non_constant_identifier_names
+    double TotalinitialDeposit = propertyValue * 0.4;
+    controller.downPayment.text = formattedEMI(TotalinitialDeposit);
+    // ignore: non_constant_identifier_names
+    double LoanCalculationAmount = propertyValue * 0.6;
+    controller.estimatedAmount.text = formattedEMI(LoanCalculationAmount);
+    if (initialDeposit > 0) {
+      var calculateTotalamount = TotalinitialDeposit - initialDeposit;
+      var monthlyRepayment = (calculateTotalamount) / 18;
+      print('Response body: ${monthlyRepayment}');
+      controller.monthlyRepaymentController.text =
+          formattedEMI(monthlyRepayment);
+      controller.downPayment.text = formattedEMI(initialDeposit);
+      controller.propertyValueController.text = formattedEMI(propertyValue);
+    } else {
+      var withoutuInitialAmount = (TotalinitialDeposit) / 18;
+      controller.monthlyRepaymentController.text =
+          formattedEMI(withoutuInitialAmount);
+      controller.propertyValueController.text = formattedEMI(propertyValue);
+      ;
+    }
+  }
+
+  double calculateEMIAmount(double loanAmount, int tenureMonths) {
+    const double yearlyInterest = 25;
+    const double monthlyRate = yearlyInterest / 12 / 100;
+
+    if (monthlyRate == 0) {
+      return loanAmount / tenureMonths;
+    }
+
+    final double emi =
+        (loanAmount * monthlyRate * (pow(1 + monthlyRate, tenureMonths))) /
+            (pow(1 + monthlyRate, tenureMonths) - 1);
+
+    return double.parse(
+        emi.toStringAsFixed(2)); // Round off to 2 decimal places
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Rent-to-Own'),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Construction Finance',
-          style:
-              TextStyle(color: Color(0xFF633095), fontWeight: FontWeight.w800),
-        ),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            key: _formKey,
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Center(
                 child: Text(
                   'Let us know your preference',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
-              const SizedBox(height: 10),
+
+              const SizedBox(height: 20),
 
               // City Dropdown
-              const Text('City'),
-              DropdownButtonFormField<String>(
-                value: _selectedCity,
-                items: const [
-                  DropdownMenuItem(value: 'City 1', child: Text('City 1')),
-                  DropdownMenuItem(value: 'City 2', child: Text('City 2')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCity = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('City'),
+                  FutureBuilder<List<PostsModel>>(
+                    future: controller.getALLCityApi(),
+                    builder: (context, citySnapshot) {
+                      // Ensure data is not null
+                      List<PostsModel> cityData = citySnapshot.data ?? [];
 
-              // Area Dropdown
-              const Text('Area'),
-              DropdownButtonFormField<String>(
-                value: _selectedArea,
-                items: const [
-                  DropdownMenuItem(value: 'Area 1', child: Text('Area 1')),
-                  DropdownMenuItem(value: 'Area 2', child: Text('Area 2')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedArea = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
+                      return DropdownButtonFormField<int>(
+                        value: controller.selectedCity,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                        isExpanded: true,
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        items: cityData.isNotEmpty
+                            ? cityData.map((item) {
+                                return DropdownMenuItem<int>(
+                                  value: item.id,
+                                  child: Text(item.name ?? 'Unknown Name'),
+                                );
+                              }).toList()
+                            : [], // Prevents mapping on null
 
-              // Estimated Property Value
-              const Text('Type of Construction'),
-              DropdownButtonFormField<String>(
-                value: _selectedTypeofConstruction,
-                items: const [
-                  DropdownMenuItem(value: '1 BHK', child: Text('1 BHK')),
-                  DropdownMenuItem(value: '2 BHK', child: Text('2 BHK')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedTypeofConstruction = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              controller.selectedCity = value;
+                              controller.fetchAreasByCity();
+                              controller.selectedArea = null;
+                            });
+                            controller.findAndSetCity();
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a city';
+                          }
+                          return null;
+                        },
+                      );
+                    },
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
 
-              // Initial Deposit
-              const Text('Stage of Development'),
-              DropdownButtonFormField<String>(
-                value: _stageDevelopment,
-                items: const [
-                  DropdownMenuItem(
-                      value: 'Foundation', child: Text('Foundation')),
-                  DropdownMenuItem(value: 'Lackup', child: Text('Lackup')),
-                  DropdownMenuItem(value: 'Framing', child: Text('Framing')),
-                  DropdownMenuItem(
-                      value: 'Exterior Finishes',
-                      child: Text('Exterior Finishes')),
-                  DropdownMenuItem(
-                      value: 'Electrical and Plumbing',
-                      child: Text('Electrical and Plumbing')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _stageDevelopment = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text('Estimated Amount spent So Far'),
-              TextFormField(
-                controller: _estimatedAmount,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Text('Estimated Completion Amount'),
-              TextFormField(
-                controller: _completionAmount,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              // Loan Repayment Period Slider
-              const Text('Select Loan Repayment Period'),
-              Slider(
-                value: _sliderValue,
-                min: 1,
-                max: 20,
-                divisions: 19,
-                label: '${_sliderValue.toInt()} Years',
-                onChanged: (value) {
-                  setState(() {
-                    _sliderValue = value; // Update slider value
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  const Text('Area'),
+// Area Dropdown
+                  FutureBuilder<List<SeletArea>>(
+                    future: controller.selectedCity != null
+                        ? controller.fetchAreasByCity()
+                        : Future.value(
+                            []), // Provide an empty list if city is not selected
+                    builder: (context, areaSnapshot) {
+                      // Ensure data is never null
+                      List<SeletArea> areaData = areaSnapshot.data ?? [];
 
-              // Repayment Period
-              const Text(
-                'Repayment Period',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(252, 251, 255, 1),
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                      return DropdownButtonFormField<int>(
+                        value: controller.selectedArea,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                        isExpanded: true,
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        items: areaData.map((item) {
+                          return DropdownMenuItem<int>(
+                            value: item.id,
+                            child: Text(item.name ?? 'Unknown Area'),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              controller.selectedArea = value;
+                            });
+                            controller.findAndSetArea();
+                          }
+                        },
+                        validator: (value) =>
+                            value == null ? 'Please select an area' : null,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Estimated Property Value
+                  // const Text('Estimated Property Value'),
+                  // TextFormField(
+                  //   controller: controller.propertyValueController,
+                  //   keyboardType: TextInputType.number,
+                  //   decoration: InputDecoration(
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(100),
+                  //     ),
+                  //     prefix: const Padding(
+                  //       padding: EdgeInsets.only(
+                  //           right: 8), // Adds spacing between NGN and input
+                  //       child: Text(
+                  //         'NGN',
+                  //         style: TextStyle(fontWeight: FontWeight.bold),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   onChanged: (value) {
+                  //     calculateEMI();
+                  //   },
+                  //   validator: (value) {
+                  //     if (value == null || value.trim().isEmpty) {
+                  //       return 'Please enter the estimated property value';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+
+                  // const SizedBox(height: 10),
+
+                  // // Initial Deposit
+                  // const Text('Down Payment'),
+                  // TextFormField(
+                  //   controller: controller.downPayment,
+                  //   onChanged: (value) {
+                  //     calculateEMI();
+                  //   },
+                  //   keyboardType: TextInputType.number,
+                  //   decoration: InputDecoration(
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(100),
+                  //     ),
+                  //     prefix: const Padding(
+                  //       padding: EdgeInsets.only(
+                  //           right: 8), // Adds spacing between NGN and input
+                  //       child: Text(
+                  //         'NGN',
+                  //         style: TextStyle(fontWeight: FontWeight.bold),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 10),r
+
+                  const Text('Type of Construction'),
+                  FutureBuilder<List<LoanModel>>(
+                    future: controller.getScreeningPeriodsApi(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text("Error: ${snapshot.error}");
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text("No screening periods available");
+                      }
+
+                      List<LoanModel> loanData = snapshot.data ?? [];
+
+                      if (controller.selectedLoan.value == null &&
+                          loanData.isNotEmpty) {
+                        controller.selectedLoan.value = loanData.first;
+                      }
+
+                      return DropdownButtonFormField<LoanModel>(
+                        value: loanData.firstWhere(
+                          (loan) =>
+                              loan.id == controller.selectedLoan.value?.id,
+                          orElse: () =>
+                              loanData.first, // Ensure valid selection
+                        ),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                        isExpanded: true,
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        items: loanData.map((LoanModel loan) {
+                          return DropdownMenuItem<LoanModel>(
+                            value: loan,
+                            child: Text(loan.typeName),
+                          );
+                        }).toList(),
+                        onChanged: (LoanModel? value) {
+                          if (value != null) {
+                            controller.selectedLoan.value = value;
+                            // calculateMonthlyRental();
+                            print("Selected Loan: ${value.typeName}");
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a screening period';
+                          }
+                          return null;
+                        },
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+                  const Text('Stage of Development'),
+                  DropdownButtonFormField<int>(
+                    value: controller.selectedStage, // Selected value
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            50), // Rounded-full equivalent
+                      ),
+                    ),
+                    isExpanded: true,
+                    items: const [
+                      DropdownMenuItem<int>(
+                        value: 1,
+                        child: Text("Foundation"),
+                      ),
+                      DropdownMenuItem<int>(
+                        value: 2,
+                        child: Text("Lockup"),
+                      ),
+                      DropdownMenuItem<int>(
+                        value: 3,
+                        child: Text("Framing"),
+                      ),
+                      DropdownMenuItem<int>(
+                        value: 4,
+                        child: Text("Exterior Finishes"),
+                      ),
+                      DropdownMenuItem<int>(
+                        value: 5,
+                        child: Text("Electrical and Plumbing"),
+                      ),
+                    ],
+                    onChanged: (int? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          controller.selectedStage = newValue;
+                        });
+                      }
+                    },
+                    validator: (value) =>
+                        value == null ? "Please select a stage" : null,
+                  ),
+
+                  const SizedBox(height: 10),
+                  const Text('Estimated Amount Spent So Far'),
+                  TextFormField(
+                    controller: controller.estimatedAmount,
+                    
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      prefix: const Padding(
+                        padding: EdgeInsets.only(
+                            right: 8), // Adds spacing between NGN and input
+                        child: Text(
+                          'NGN',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      calculateEMIAmountValue();
+                    },
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter the estimated Amount value';
+                      }
+                      return null;
+                    },
+                  ),
+                   const Text('Estimated Completion Amount'),
+                  TextFormField(
+                    controller: controller.completionAmount,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      prefix: const Padding(
+                        padding: EdgeInsets.only(
+                            right: 8), // Adds spacing between NGN and input
+                        child: Text(
+                          'NGN',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      calculateEMIAmountValue();
+                    },
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please Estimated Completion Amount value';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Initial Deposit
+
+                  const Text('Select Loan Repayment Period'),
+                  Slider(
+                    value: controller.sliderValue,
+                    min: 1,
+                    max: 20,
+                    divisions: 19,
+                    label: '${controller.sliderValue.toInt()} Years',
+                    onChanged: (value) {
+                      setState(() {
+                        controller.sliderValue = value; // Update slider value
+                        // calculateEMIAmountValue();
+                        controller.updateEMI();
+                      });
+                    },
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '0',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '10',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '20',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
-                  child: Text(
-                    '${_sliderValue.toInt()} Years', // Dynamically update the text
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-              // Monthly Repayment
-              const Text('Monthly Repayment'),
-              TextFormField(
-                controller: _monthlyRepaymentController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
+                  // Repayment Period
+                  const Text(
+                    'Repayment Period',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Proceed Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Perform form submission
-                      Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ConstructionPage(
-                          startIndex: 2), // Start with MortgagePage
+                  SizedBox(
+                    width: double.infinity,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(252, 251, 255, 1),
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '${controller.sliderValue.toInt()} Years', // Dynamically update the text
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
-                  );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text(
-                    'Proceed',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  const SizedBox(height: 10),
+
+                  // Monthly Repayment
+                  const Text('Monthly Repayment'),
+                  TextFormField(
+                    controller: controller.monthlyRepaymentController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      prefix: const Padding(
+                        padding: EdgeInsets.only(
+                            right: 8), // Adds spacing between NGN and input
+                        child: Text(
+                          'NGN',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      // Add comma formatting
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        final newText = newValue.text.replaceAll(
+                            RegExp(r'\D'), ''); // remove non-digit characters
+                        final formattedText = controller.formatNumber(newText);
+                        return newValue.copyWith(text: formattedText);
+                      }),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter the monthly repayment amount';
+                      }
+                      return null;
+                    },
                   ),
-                ),
+                  const SizedBox(height: 30),
+
+                  // Proceed Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Form is valid, proceed with the submission
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const Rent_To_Own(startIndex: 2)),
+                          );
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Please fill in all mandatory fields",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Proceed',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ])),
       ),
     );
   }
@@ -528,7 +924,8 @@ class Construction_CalendarPage extends StatefulWidget {
   const Construction_CalendarPage({super.key});
 
   @override
-  _Construction_CalendarPageState createState() => _Construction_CalendarPageState();
+  _Construction_CalendarPageState createState() =>
+      _Construction_CalendarPageState();
 }
 
 class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
@@ -608,11 +1005,11 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ConstructionPage(startIndex: 9),
+                        builder: (context) =>
+                            const ConstructionPage(startIndex: 9),
                       ),
                     );
                   },
@@ -831,8 +1228,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          const ConstructionPage(startIndex: 10), // Default case
+                      builder: (context) => const ConstructionPage(
+                          startIndex: 10), // Default case
                     ),
                   );
                 }
@@ -941,7 +1338,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         backgroundColor: Colors.white,
                         child: Icon(Icons.circle, color: Colors.green),
                       ),
-                      const Spacer(), 
+                      const Spacer(),
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -1145,10 +1542,9 @@ class TermSheetPage extends StatelessWidget {
             _buildSection(
               "House Details",
               [
-              
                 _buildRow("City", "Lagos"),
                 _buildRow("Area", "Ogunlana Area"),
-                  _buildRow("Construction Type", "Bungalow"),
+                _buildRow("Construction Type", "Bungalow"),
                 _buildRow("Estimated Budget", "NGN 40,000,000"),
               ],
               buttonAction: () {},
@@ -1183,11 +1579,9 @@ class TermSheetPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: const Column(
-                
-                
                 children: [
                   Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Amount to Deposit",
@@ -1196,24 +1590,23 @@ class TermSheetPage extends StatelessWidget {
                       Text("NGN 0.00"),
                     ],
                   )
-                 
                 ],
               ),
             ),
             Center(
-              
-              child: Row(
-                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                   const Text("Over/Under Estimated? "),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text("Recalculate" ,style: TextStyle(color: Color.fromARGB(255, 10, 72, 143)),),
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Over/Under Estimated? "),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Recalculate",
+                    style: TextStyle(color: Color.fromARGB(255, 10, 72, 143)),
                   ),
-                 
-              ],)
-             
-            ),
+                ),
+              ],
+            )),
             const SizedBox(height: 24.0),
             Center(
               child: ElevatedButton(
@@ -1440,13 +1833,11 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Align(
-              alignment:Alignment.center,
-              child: Text(
-              "Let's know about your housing project",
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
-            )
-            ),
-            
+                alignment: Alignment.center,
+                child: Text(
+                  "Let's know about your housing project",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+                )),
             const SizedBox(height: 20.0),
             _buildSwitchTile(
                 'Have you started Construction?', startedConstruction, (value) {
@@ -1478,11 +1869,11 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
             }),
             _buildSwitchTile(
                 'Do you have approved electrical and mechanical drawing?',
-                  hasElectricalDrawing, (value) {
-                setState(() {
-                  hasElectricalDrawing = value;
-                });
-              }),
+                hasElectricalDrawing, (value) {
+              setState(() {
+                hasElectricalDrawing = value;
+              });
+            }),
             _buildSwitchTile(
                 'Do you have current bill of quantities and material by certified quantity surveyor?',
                 hasBillOfQuantities, (value) {
@@ -1546,7 +1937,6 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: Colors.white,
-        
         borderRadius: BorderRadius.circular(8.0),
         boxShadow: const [
           BoxShadow(
@@ -1561,7 +1951,10 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
         activeTrackColor: Colors.orange,
         inactiveTrackColor: baseColor,
         inactiveThumbColor: Colors.white,
-        title: Text(title,style: const TextStyle(fontSize: 15),),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15),
+        ),
         value: value,
         onChanged: onChanged,
       ),

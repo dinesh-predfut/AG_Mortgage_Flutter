@@ -30,9 +30,12 @@ class Urls {
   static const String homeAddress = "$baseUrl/api/customer/addressDetails";
   static const String helpDisk = "$baseUrl/api/settings/helpDesk";
   static const String plan = "$baseUrl/api/settings/helpDesk";
-   static const String getMortgageDetails = "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer";
-      static const String getRentToOwnDetails = "$baseUrl/api/rentToOwn/getAllRentToOwnDetailsByCustomer";
+  static const String getMortgageDetails =
+      "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer";
+  static const String getRentToOwnDetails =
+      "$baseUrl/api/rentToOwn/getAllRentToOwnDetailsByCustomer";
 
-     static const String getsettingsData  = "$baseUrl/api/settings/rentToOwn";
+  static const String getsettingsData = "$baseUrl/api/settings/rentToOwn";
+    static const String constructionFinance = "$baseUrl/api/settings/constructionFinance";
 
 }
