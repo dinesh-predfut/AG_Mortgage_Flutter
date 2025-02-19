@@ -73,11 +73,12 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
   Future<void> fetchPlanOptions() async {
     try {
+      print('Response Code: ${Params.userId}');
       isLoading.value = true;
       var url = Uri.parse('${Urls.getEmployeeDetailsID}?id=${Params.userId}');
       var headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+        'Authorization': 'Bearer ${Params.userToken}',
       };
 
       var response = await http.get(url, headers: headers);

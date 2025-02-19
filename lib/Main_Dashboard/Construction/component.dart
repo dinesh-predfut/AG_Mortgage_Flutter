@@ -33,11 +33,11 @@ class Constuction_StatementPage extends StatelessWidget {
                 title: const Text("Statement of Account"),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StatementOfAccount(),
-                      ));
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => const StatementOfAccount(),
+                  //     ));
                 },
               ),
             ),

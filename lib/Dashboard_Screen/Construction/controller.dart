@@ -29,7 +29,21 @@ class ContructionController extends GetxController {
   TextEditingController monthlyRendal = TextEditingController();
   TextEditingController completionAmount = TextEditingController();
   TextEditingController estimatedAmount = TextEditingController();
-  TextEditingController cvv = TextEditingController();
+  TextEditingController voluntaryAmount = TextEditingController();
+  TextEditingController architechName = TextEditingController();
+  TextEditingController architechNumner = TextEditingController();
+  TextEditingController engineerName = TextEditingController();
+  TextEditingController engineerNumner = TextEditingController();
+  TextEditingController surveyorName = TextEditingController();
+  TextEditingController surveyorNumner = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool hasValuationReport = false;
+  bool hasArchitecturalDrawing = false;
+  bool hasBillOfQuantities = false;
+  bool hasApprovedDrawings = false;
+  bool hasElectricalAndMechanicalDrawings = false;
+  bool hasLandTitleCertificate = false;
+  bool hasRegisteredDeed = false;
   Map<String, dynamic> data = {};
   List allApartments = [];
   List allCity = [];
@@ -38,9 +52,13 @@ class ContructionController extends GetxController {
   DateTime selectedDay = DateTime.now();
 //  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
   int? selectedApartmentType = 1;
+  int? totalMonthlySaving;
+  int? totalExpectedSaving;
   int? selectedCity;
   int? selectedArea;
+  double? interestRate;
   int? selectedStage;
+  num? screenPeriod;
   double sliderValue = 1;
   int? apartmentOrMarketplace;
   String cityName = "";
@@ -60,6 +78,23 @@ class ContructionController extends GetxController {
     return double.parse(emi.toStringAsFixed(2));
   }
 
+  String getConstructionStageName(int? stageId) {
+    switch (stageId) {
+      case 1:
+        return "Foundation";
+      case 2:
+        return "Lockup";
+      case 3:
+        return "Framing";
+      case 4:
+        return "Exterior Finishes";
+      case 5:
+        return "Electrical and Plumbing";
+      default:
+        return "Unknown"; // Fallback value
+    }
+  }
+
   void updateEMI() {
     double loanAmount = double.tryParse(completionAmount.text) ?? 0;
 
@@ -73,7 +108,6 @@ class ContructionController extends GetxController {
       print("emi$emiTenureInMonths");
       print("emi$loanAmount");
       print("emi$sliderValue");
-
     }
   }
 
@@ -143,38 +177,43 @@ class ContructionController extends GetxController {
     return int.tryParse(amountString) ?? 0;
   }
 
-  Future<void> addRentoOwn(BuildContext context) async {
+  Future<void> constructionFinance(BuildContext context) async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
 
     try {
       print('Preparing API request...');
-      final monthlyRendalCalculation = {
-        (cleanNumbers(propertyValueController.text) * 0.8 -
-                cleanNumbers(downPayment.text)) /
-            25
-      };
+    
       // Prepare the request
-      var request = http.Request('POST', Uri.parse(Urls.rentToOwn));
+      var request = http.Request('POST', Uri.parse(Urls.construction));
       request.body = json.encode({
-        "typeOfApartment": selectedApartmentType ?? '',
+        "typeOfConstruction": selectedApartmentType ?? '',
         "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
         "city": selectedCity ?? '',
         "area": selectedArea ?? '',
-        // "loanRepaymentPeriod": selectedLoan.value?.screeningPeriod,
-        "estimatedPropertyValue":
-            double.tryParse(propertyValueController.text.replaceAll(',', '')) ??
-                0.0,
-        "initialDeposit":
-            double.tryParse(downPayment.text.replaceAll(',', '').trim()) ?? 0.0,
-        "rentalRepaymentPeriod": sliderValue,
-        "monthlyRepaymentAmount": double.tryParse(
-                monthlyRepaymentController.text.replaceAll(',', '').trim()) ??
-            0.0,
-        "monthlyLoanAmount":
-            double.tryParse(estimatedAmount.text.replaceAll(",", "").trim()) ??
-                0.0,
-        "anniversary": formattedDate,
-        "monthlyRentalAmount": monthlyRendalCalculation,
+        "stageOfDevelopment": selectedStage ?? '',
+        "screeningPeriod": screenPeriod ?? '',
+        "repaymentPeriod": sliderValue,
+        "estimatedAmountSpent": estimatedAmount.text.toString().replaceAll(',', ''),
+        "totalMonthlySaving": totalMonthlySaving ?? '',
+        "totalExpectedSaving": totalExpectedSaving ?? '',
+        "estimatedCompletionAmount": completionAmount.text,
+        "loanRepaymentPeriod": sliderValue,
+        "monthlyRepaymentAmount": monthlyRepaymentController.text.toString().replaceAll(',', ''),
+        "valuationAmount": voluntaryAmount.text.toString().replaceAll(',', ''),
+        "hasLandTitleCertificate": hasLandTitleCertificate,
+        "hasRegisteredDeed": hasRegisteredDeed,
+        "hasValuationReport": hasValuationReport,
+        "hasApprovedDrawings": hasApprovedDrawings,
+        "hasElectricalAndMechanicalDrawings":
+            hasElectricalAndMechanicalDrawings,
+        "hasBillOfQuantities": hasBillOfQuantities,
+        "architectName": architechName.text,
+        "architectRegistrationNumber": architechNumner.text,
+        "engineerName": engineerName.text,
+        "engineerRegistrationNumber": engineerNumner.text,
+        "quantitySurveyorName": surveyorName.text,
+        "quantitySurveyorRegistrationNumber": surveyorNumner.text,
+        "anniversary": formattedDate
       });
       request.headers.addAll({
         'Content-Type': 'application/json ',
@@ -188,7 +227,6 @@ class ContructionController extends GetxController {
       http.StreamedResponse streamedResponse = await request.send();
       var decodedResponse = await http.Response.fromStream(streamedResponse);
 
-      // Log response
       print('Response Status Code: ${decodedResponse.statusCode}');
       print('Response Body: ${decodedResponse.body}');
 

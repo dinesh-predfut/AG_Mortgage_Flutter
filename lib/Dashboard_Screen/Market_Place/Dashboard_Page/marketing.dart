@@ -112,10 +112,10 @@ class _MarketplacePageState extends State<MarketplacePage>
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return const Center(
+                return  const Center(
                     child: Text('Error loading sponsored data'));
               } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-                return buildSection(
+                return buildSection(  
                     snapshot.data!.items); // Pass the sponsored items
               } else {
                 return const SizedBox(); // Show nothing if no data

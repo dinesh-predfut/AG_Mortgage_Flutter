@@ -23,38 +23,43 @@ class CardPaymentPage extends StatefulWidget {
 }
 
 class _CardPaymentPageState extends State<CardPaymentPage> {
-  final TextEditingController _amountController = TextEditingController();
+  // final TextEditingController _amountController = TextEditingController();
 
   late Future<CardModel?> cardDetails;
   final controller = Get.put(CardControllerSelectAmount());
   final paymentcontroller = Get.put(MortgagController());
+
   @override
   void initState() {
     super.initState();
     controller.fetchCardDetails(widget.selectedID!);
-      double initialDeposit = double.tryParse(
+
+    double initialDeposit = double.tryParse(
           paymentcontroller.initialDepositController.text.replaceAll(',', ''),
         ) ??
         0;
-          double monthlyRepayment = double.tryParse(
+    double monthlyRepayment = double.tryParse(
           paymentcontroller.monthlyRepaymentController.text.replaceAll(',', ''),
         ) ??
         0;
-   _amountController.text = formattedEMI((initialDeposit + monthlyRepayment)).toString() ;
-  print("object12${ double.tryParse(
+    controller.amountController.text =
+        formattedEMI((initialDeposit + monthlyRepayment)).toString();
+    print("object12${double.tryParse(
           paymentcontroller.initialDepositController.text.replaceAll(',', ''),
-        ) ??
-        0}");
+        ) ?? 0}");
+    controller.fetchMortgageDetails();
   }
- String formattedEMI(double amount) {
+
+  String formattedEMI(double amount) {
     // Format the number with international commas (thousands separators)
     final numberFormatter = NumberFormat(
         '#,###.##', 'en_US'); // en_US for international comma formatting
     return numberFormatter.format(amount);
   }
+
   void _setAmount(int amount) {
     setState(() {
-      _amountController.text = " $amount";
+      controller.amountController.text = " $amount";
     });
   }
 
@@ -192,7 +197,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             ),
             const SizedBox(height: 20),
             TextFormField(
-              controller: _amountController,
+              controller: controller.amountController,
               decoration: InputDecoration(
                 prefixText: "NGN ",
                 contentPadding:
@@ -224,7 +229,25 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                paymentcontroller.addMortgageForm(context);
+                double monthlyRepayment = double.tryParse(
+                      paymentcontroller.monthlyRepaymentController.text
+                          .replaceAll(',', ''),
+                    ) ??
+                    0;
+                double initialDeposit = double.tryParse(
+                      paymentcontroller.initialDepositController.text
+                          .replaceAll(',', ''),
+                    ) ??
+                    0;
+                if (monthlyRepayment != 0) {
+                  controller.monthlyContribution(
+                      context, monthlyRepayment, widget.selectedID!);
+                  controller.voluntoryPayment(
+                      initialDeposit, widget.selectedID!);
+                } else {
+                  print("amountController");
+                  controller.calculation(context,widget.selectedID!);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,

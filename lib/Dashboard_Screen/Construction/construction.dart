@@ -4,8 +4,9 @@ import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Construction/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
-import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
@@ -37,10 +38,9 @@ class _ConstructionPageState extends State<ConstructionPage> {
     const Construction_Landing(),
     const ConstuctionFormPage(),
     const ConstructionFinancePage(),
+    const Construction_CalendarPage(),
+    const TermSheetPage(),
     const PaymentMethodPage(),
-    const CardDetailsPage(),
-    const Get_All_Cards(),
-    const PaymentPage(),
     const Success(),
     const Construction_CalendarPage(),
     const TermSheetPage(),
@@ -349,7 +349,8 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
 
   void calculateEMIAmountValue() {
     double loanAmount =
-        double.tryParse(controller.estimatedAmount.text.replaceAll(',', '')) ?? 0.0;
+        double.tryParse(controller.estimatedAmount.text.replaceAll(',', '')) ??
+            0.0;
     int emiTenureInMonth = (controller.sliderValue * 12).toInt();
     // ignore: non_constant_identifier_names
     final FinalEMi = calculateEMIAmount(loanAmount, emiTenureInMonth);
@@ -614,27 +615,18 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   FutureBuilder<List<LoanModel>>(
                     future: controller.getScreeningPeriodsApi(),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      if (snapshot.hasError) {
-                        return Text("Error: ${snapshot.error}");
-                      }
-
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Text("No screening periods available");
-                      }
+                   
 
                       List<LoanModel> loanData = snapshot.data ?? [];
 
-                      if (controller.selectedLoan.value == null &&
-                          loanData.isNotEmpty) {
-                        controller.selectedLoan.value = loanData.first;
-                      }
+                      // if (controller.selectedLoan.value == null &&
+                      //     loanData.isNotEmpty) {
+                      //   controller.selectedLoan.value = loanData.first;
+                      // }
 
                       return DropdownButtonFormField<LoanModel>(
-                        value: loanData.firstWhere(
+                        value: 
+                        loanData.firstWhere(
                           (loan) =>
                               loan.id == controller.selectedLoan.value?.id,
                           orElse: () =>
@@ -656,8 +648,11 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         onChanged: (LoanModel? value) {
                           if (value != null) {
                             controller.selectedLoan.value = value;
+                            controller.interestRate = value.mortgageInterest;
+                            controller.screenPeriod = value.profilingPeriod;
+                            
                             // calculateMonthlyRental();
-                            print("Selected Loan: ${value.typeName}");
+                            print("Selected Loan: ${controller.interestRate}");
                           }
                         },
                         validator: (value) {
@@ -718,7 +713,6 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   const Text('Estimated Amount Spent So Far'),
                   TextFormField(
                     controller: controller.estimatedAmount,
-                    
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -743,7 +737,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                       return null;
                     },
                   ),
-                   const Text('Estimated Completion Amount'),
+                  const Text('Estimated Completion Amount'),
                   TextFormField(
                     controller: controller.completionAmount,
                     keyboardType: TextInputType.number,
@@ -890,7 +884,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    const Rent_To_Own(startIndex: 2)),
+                                    const ConstructionPage(startIndex: 2)),
                           );
                         } else {
                           Fluttertoast.showToast(
@@ -1009,7 +1003,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const ConstructionPage(startIndex: 9),
+                            const ConstructionPage(startIndex: 4),
                       ),
                     );
                   },
@@ -1034,120 +1028,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
   }
 }
 
-class CardDetailsPage extends StatelessWidget {
-  const CardDetailsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Card"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-                child: Text(
-              'Enter Card Details',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            )),
-            Card(
-              color: Colors.red,
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "iPay",
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 28, height: 3),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      "0000 0000 0000 0000",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "CVV: 000",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          "EXP: 00/00",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const TextField(
-              decoration: InputDecoration(labelText: "Card Name"),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(labelText: "Card Number"),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(labelText: "Exp. Date"),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(labelText: "CVV"),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Checkbox(value: false, onChanged: (value) {}),
-                const Text("Save Card"),
-              ],
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ConstructionPage(
-                        startIndex: 5), // Start with ConstructionPage
-                  ),
-                );
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
-              ),
-              child: const Text("Save Card",
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class PaymentMethodPage extends StatefulWidget {
   const PaymentMethodPage({super.key});
@@ -1176,19 +1057,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.credit_card),
-              title: const Text("Card"),
-              trailing: Radio<String>(
-                value: "Card",
-                groupValue: selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
-            ),
+        
             ListTile(
               leading: const Icon(Icons.account_balance),
               title: const Text("Bank Transfer"),
@@ -1211,28 +1080,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ConstructionPage(
-                          startIndex: 10), // Example for Bank Transfer
+                          startIndex: 6), // Example for Bank Transfer
                     ),
                   );
-                } else if (selectedPaymentMethod == "Card") {
-                  // Navigate to a page for Card payment
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ConstructionPage(
-                          startIndex: 4), // Example for Card payment
-                    ),
-                  );
-                } else {
-                  // Default case: navigate to ConstructionPage with startIndex as 3 (fallback case)
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ConstructionPage(
-                          startIndex: 10), // Default case
-                    ),
-                  );
-                }
+                } 
               },
               //
               style: ElevatedButton.styleFrom(
@@ -1249,195 +1100,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   }
 }
 
-class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
-
-  @override
-  _PaymentPageState createState() => _PaymentPageState();
-}
-
-class _PaymentPageState extends State<PaymentPage> {
-  // Create a TextEditingController to manage the TextFormField
-  final TextEditingController _amountController = TextEditingController();
-
-  // Function to handle amount button clicks
-  void _setAmount(int amount) {
-    setState(() {
-      _amountController.text = " $amount";
-    });
-  }
-
-  Widget _amountButton(BuildContext context, String displayText, int amount) {
-    // ignore: unrelated_type_equality_checks
-
-    return ElevatedButton(
-      onPressed: () => _setAmount(amount),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-
-        // Set the button's background color
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-
-          side: const BorderSide(
-            color:
-                Colors.orange, // Set the border color to match the button color
-            width: 1, // Adjust border width if needed
-          ),
-          // Rounded corners
-        ),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 20, vertical: 10), // Button padding
-      ),
-      child: Text(
-        displayText,
-        style: const TextStyle(color: Colors.black), // Text color
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Card"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-                child: Text(
-              'Select Card and Proceed to make payment',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            )),
-            const SizedBox(height: 10),
-            // Card Section
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 51, 170, 55),
-                    Color.fromARGB(209, 45, 245, 51)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.circle, color: Colors.green),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Adeyemi Pelumi",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "3098 9576 1876 6521",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "CVV: 010",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "EXP: 12/29",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _amountController,
-              decoration: InputDecoration(
-                prefixText: "NGN ",
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.deepPurple),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _amountButton(context, "#100,000", 100000),
-                _amountButton(context, "#200,000", 200000),
-                _amountButton(context, "#300,000", 300000),
-                _amountButton(context, "#400,000", 400000),
-                _amountButton(context, "#500,000", 500000),
-                _amountButton(context, "#600,000", 600000),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ConstructionPage(
-                        startIndex: 7), // Start with ConstructionPage
-                  ),
-                );
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                backgroundColor: baseColor,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text(
-                "Processd",
-                style: TextStyle(color: Colors.white, letterSpacing: 2),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Success extends StatelessWidget {
   const Success({super.key});
@@ -1470,13 +1132,12 @@ class Success extends StatelessWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ConstructionPage(
-                            startIndex: 8), // Start with ConstructionPage
-                      ),
-                    );
+                   Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DashboardPageS("Construction"),
+                          ),
+                        );
                   },
                   //
                   style: ElevatedButton.styleFrom(
@@ -1495,146 +1156,206 @@ class Success extends StatelessWidget {
   }
 }
 
-class TermSheetPage extends StatelessWidget {
+class TermSheetPage extends StatefulWidget {
   const TermSheetPage({super.key});
 
   @override
+  State<TermSheetPage> createState() => _TermSheetPageState();
+}
+
+class _TermSheetPageState extends State<TermSheetPage>
+    with SingleTickerProviderStateMixin {
+  final controller = Get.put(ContructionController());
+
+  Map<String, dynamic> data = {};
+  Future<void> fetchData() async {
+    try {
+      final responseData =
+          await controller.getData("userId"); // Pass the actual userId
+      setState(() {
+        data = responseData;
+      });
+    } catch (error) {
+      print("Error fetching data in UI: $error");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    _fetchCityName();
+    
+    _fetchAreaName();
+    // controller.fetchCitiesAndAreas();
+  }
+
+  Future<void> _fetchCityName() async {
+    var cityName = await controller.findAndSetCity();
+    setState(() {}); // Rebuild to display the city name
+  }
+
+  Future<void> _fetchAreaName() async {
+    var areaName = await controller.findAndSetArea();
+    setState(() {}); // Rebuild to display the city name
+  }
+
+  @override
   Widget build(BuildContext context) {
+    double initialDeposit = double.tryParse(
+          controller.propertyValueController.text.replaceAll(',', ''),
+        ) ??
+        0;
+    print("44411${initialDeposit}");
+    String todayDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    String anniversary =
+        DateFormat('dd-MM-yyyy').format(controller.selectedDay);
+    String anniversaryDate = controller.selectedDay?.toString() ?? '';
+    String estimatedProfileDate =
+        controller.calculateProfileDate(anniversaryDate, 16);
+    int emiTenureInMonth = (controller.sliderValue * 12).toInt();
+    print("cleanAmount fetching data in UI: $emiTenureInMonth");
+    String cleanAmount = controller.completionAmount.text.replaceAll(',', '');
+     
+    double completionAmount = double.tryParse(cleanAmount) ?? 0.0;
+    var emi = controller.calculateEMI(completionAmount, emiTenureInMonth);
+var expectedSave = (emi ?? 0) * (controller.screenPeriod ?? 0);
+controller.totalMonthlySaving = emi.toInt();
+controller.totalExpectedSaving = expectedSave.toInt();
+
+print("expectedSave fetching data in UI: $expectedSave");
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Term Sheet'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          title: const Text('Term Sheet'),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Est pellentesque fermentum cursus curabitur pharetra, vene",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 13),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            // Align(
-            //   alignment: Alignment.bottomRight,
-            //   child: ElevatedButton(
-            //     onPressed: () {},
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: baseColor,
-            //       padding: const EdgeInsets.symmetric(
-            //           horizontal: 20.0, vertical: 10.0),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(20),
-            //       ),
-            //     ),
-            //     child: const Text("View House",
-            //         style: TextStyle(color: Colors.white, fontSize: 12)),
-            //   ),
-            // ),
-            const SizedBox(height: 0.0),
-            _buildSection(
-              "House Details",
-              [
-                _buildRow("City", "Lagos"),
-                _buildRow("Area", "Ogunlana Area"),
-                _buildRow("Construction Type", "Bungalow"),
-                _buildRow("Estimated Budget", "NGN 40,000,000"),
-              ],
-              buttonAction: () {},
-            ),
-            const SizedBox(height: 16.0),
-            _buildSection(
-              "Loan Details",
-              [
-                _buildRow("Initial Deposit", "NGN 500,000"),
-                _buildRow("Loan", "NGN 33,200,000"),
-                _buildRow("Repayment Period", "10 Years"),
-                _buildRow("Monthly Repayment", "NGN 350,000"),
-                _buildRow("Starting Date", "1 August, 2024"),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            _buildSection(
-              "Deposit & Profiling",
-              [
-                _buildRow("Screening Period", "18 Months"),
-                _buildRow("Estimated Profile Date", "30 January, 2026"),
-                _buildRow("Estimated Total Monthly Savings", "NGN 6,300,000"),
-                _buildRow("Initial Deposit", "0.00"),
-                _buildRow("Total Expected Saving", "NGN 6,800,000"),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.amber[100],
-                borderRadius: BorderRadius.circular(8.0),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Est pellentesque fermentum cursus curabitur pharetra, vene",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
-              child: const Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Amount to Deposit",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text("NGN 0.00"),
-                    ],
-                  )
+              const SizedBox(height: 0.0),
+              _buildSection(
+                "House Details",
+                [
+                  _buildRow("City", controller.cityNameValue.text),
+                  _buildRow("Area", controller.areaNameValue.text),
+                  _buildRow(
+                    "Construction Type",
+                    " ${controller.getConstructionStageName(controller.selectedStage)}",
+                  ),
+                  _buildRow(
+                    "Estimated Budget",
+                    "NGN ${controller.formatNumber(controller.completionAmount.text)} ",
+                  ),
+                ],
+                buttonAction: () {},
+              ),
+              const SizedBox(height: 16.0),
+              _buildSection(
+                "Loan Details",
+                [
+                  _buildRow("Loan",
+                      "NGN ${controller.formatNumber(controller.completionAmount.text)} "),
+                  _buildRow("Repayment Period",
+                      "${controller.sliderValue.toInt()} Years"),
+                  _buildRow("Monthly Repayment",
+                      "NGN ${controller.formatNumber(controller.monthlyRepaymentController.text)}"),
+                  _buildRow("Starting Date", todayDate),
+                  _buildRow("Next Anniversary Date", anniversary),
                 ],
               ),
-            ),
-            Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Over/Under Estimated? "),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    "Recalculate",
-                    style: TextStyle(color: Color.fromARGB(255, 10, 72, 143)),
+              const SizedBox(height: 16.0),
+              _buildSection(
+                "Saving & Profiling",
+                [
+                  _buildRow("Screening Period", "${controller.screenPeriod} Months"),
+                  _buildRow(
+                    "Estimated Profile Date",
+                    controller.formatProfileDate(estimatedProfileDate),
                   ),
-                ),
-              ],
-            )),
-            const SizedBox(height: 24.0),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const DashboardPage(), // Start with ConstructionPage
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: baseColor,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 12.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text("Proceed to Home",
-                    style: TextStyle(color: Colors.white)),
+                  _buildRow("Total Monthly Savings",
+                      "NGN ${controller.formatNumber(emi.toString())}"),
+                  _buildRow("Minimum Total Expected Saving",
+                      "NGN ${controller.formatNumber(expectedSave.toString())} "),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+              const SizedBox(height: 16.0),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.amber[100],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Total Expected Saving",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                       
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // controller.addMortgageForm(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ConstructionPage(
+                              startIndex: 5,
+                            ), // Start with MortgagePageHome
+                          ),
+                        );
+                      },
+                      child:  Text(controller.formatNumber(expectedSave.toString())),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24.0),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => {
+                    controller.constructionFinance(context),
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ConstructionPage(
+                          startIndex: 5,
+                        ), // Start with MortgagePageHome
+                      ),
+                    )
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: baseColor,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text("Proceed to Pay",
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 
   Widget _buildSection(String title, List<Widget> rows,
@@ -1761,7 +1482,7 @@ class BankTransferPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ConstructionPage(
-                          startIndex: 7), // Start with ConstructionPage
+                          startIndex: 5), // Start with ConstructionPage
                     ),
                   );
                 },
@@ -1806,12 +1527,7 @@ class ConstructionFinancePage extends StatefulWidget {
 
 class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
   // State variables
-  bool startedConstruction = false;
-  bool hasTitleDeed = true;
-  bool hasValuationReport = false;
-  bool hasArchitecturalDrawing = false;
-  bool hasElectricalDrawing = false;
-  bool hasBillOfQuantities = false;
+  final controller = Get.put(ContructionController());
 
   @override
   Widget build(BuildContext context) {
@@ -1823,7 +1539,7 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, "/construction");
           },
         ),
       ),
@@ -1840,45 +1556,88 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
                 )),
             const SizedBox(height: 20.0),
             _buildSwitchTile(
-                'Have you started Construction?', startedConstruction, (value) {
+                'Have you started Construction?', controller.hasRegisteredDeed,
+                (value) {
               setState(() {
-                startedConstruction = value;
+                controller.hasRegisteredDeed = value;
               });
             }),
-            _buildSwitchTile(
-                'Do you have title deed on the plot?', hasTitleDeed, (value) {
+            _buildSwitchTile('Do you have title deed on the plot?',
+                controller.hasLandTitleCertificate, (value) {
               setState(() {
-                hasTitleDeed = value;
+                controller.hasLandTitleCertificate = value;
               });
             }),
             _buildSwitchTile(
                 'Do you have current valuation report of the asset?',
-                hasValuationReport, (value) {
+                controller.hasValuationReport, (value) {
               setState(() {
-                hasValuationReport = value;
+                controller.hasValuationReport = value;
               });
             }),
             const SizedBox(height: 16.0),
-            _buildTextInputField('Valuation Amount', 'NGN'),
+            TextFormField(
+              controller: controller.voluntaryAmount,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                prefix: const Padding(
+                  padding: EdgeInsets.only(
+                      right: 8), // Adds spacing between NGN and input
+                  child: Text(
+                    'NGN',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                TextInputFormatter.withFunction((oldValue, newValue) {
+                  final newText = newValue.text.replaceAll(
+                      RegExp(r'\D'), ''); // Remove non-digit characters
+                  final formattedText = controller.formatNumber(newText);
+                  return newValue.copyWith(text: formattedText);
+                }),
+              ],
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a valuation amount';
+                }
+                final int enteredAmount =
+                    int.tryParse(value.replaceAll(',', '')) ?? 0;
+                final int estimatedAmount = controller.estimatedAmount as int;
+
+                if (enteredAmount < estimatedAmount) {
+                  return 'Valuation amount must be greater than or equal to estimated completion amount.';
+                }
+                return null; // No error message when valid
+              },
+              onChanged: (value) {
+                // Hide validation message dynamically
+                controller.formKey.currentState?.validate();
+              },
+            ),
             _buildSwitchTile(
                 'Do you have approved architectural & structural drawing?',
-                hasArchitecturalDrawing, (value) {
+                controller.hasArchitecturalDrawing, (value) {
               setState(() {
-                hasArchitecturalDrawing = value;
+                controller.hasArchitecturalDrawing = value;
               });
             }),
             _buildSwitchTile(
                 'Do you have approved electrical and mechanical drawing?',
-                hasElectricalDrawing, (value) {
+                controller.hasElectricalAndMechanicalDrawings, (value) {
               setState(() {
-                hasElectricalDrawing = value;
+                controller.hasElectricalAndMechanicalDrawings = value;
               });
             }),
             _buildSwitchTile(
                 'Do you have current bill of quantities and material by certified quantity surveyor?',
-                hasBillOfQuantities, (value) {
+                controller.hasBillOfQuantities, (value) {
               setState(() {
-                hasBillOfQuantities = value;
+                controller.hasBillOfQuantities = value;
               });
             }),
             const SizedBox(height: 20.0),
@@ -1887,9 +1646,12 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
               style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16.0),
-            _buildProfessionalDetails('Architect'),
-            _buildProfessionalDetails('Engineer'),
-            _buildProfessionalDetails('Quantity Surveyor'),
+            _buildProfessionalDetails('Architect', controller.architechName,
+                controller.architechNumner),
+            engineer(
+                'Engineer', controller.engineerName, controller.engineerNumner),
+            quantity('Quantity Surveyor', controller.surveyorName,
+                controller.surveyorNumner),
             const SizedBox(height: 16.0),
             Container(
               padding: const EdgeInsets.all(12.0),
@@ -1961,10 +1723,12 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
     );
   }
 
-  Widget _buildTextInputField(String label, String placeholder) {
+  Widget _buildTextInputField(
+      String label, String placeholder, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           hintText: placeholder,
@@ -1975,7 +1739,10 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
     );
   }
 
-  Widget _buildProfessionalDetails(String role) {
+  Widget _buildProfessionalDetails(
+      String role,
+      TextEditingController architechName,
+      TextEditingController architechNumner) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1983,8 +1750,41 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
             style:
                 const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8.0),
-        _buildTextInputField('Input Name', ''),
-        _buildTextInputField('Input Professional Registration Number', ''),
+        _buildTextInputField('Input Name', '', architechName),
+        _buildTextInputField(
+            'Input Professional Registration Number', '', architechNumner),
+      ],
+    );
+  }
+
+  Widget engineer(String role, TextEditingController engineerName,
+      TextEditingController engineerNumner) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$role',
+            style:
+                const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8.0),
+        _buildTextInputField('Input Name', '', engineerName),
+        _buildTextInputField(
+            'Input Professional Registration Number', '', engineerNumner),
+      ],
+    );
+  }
+
+  Widget quantity(String role, TextEditingController surveyorName,
+      TextEditingController surveyorNumner) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$role',
+            style:
+                const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8.0),
+        _buildTextInputField('Input Name', '', surveyorName),
+        _buildTextInputField(
+            'Input Professional Registration Number', '', surveyorNumner),
       ],
     );
   }

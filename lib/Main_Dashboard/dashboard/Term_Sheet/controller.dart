@@ -228,7 +228,7 @@ Future<List<CustomerModel>> fetchMortgageDetails() async {
   } catch (e) {
     print('Error: $e');
     throw Exception('Failed to fetch mortgage details');
-  }
+  }  
 }
 
 Future<List<CustomerModel>> fetchRentToOwnDetails() async {

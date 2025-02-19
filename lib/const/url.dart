@@ -9,6 +9,7 @@ class Urls {
   static const String allCity = "$baseUrl/api/location/getAllAreas";
   static const String allArea = "$baseUrl/api/location/area?cityId=";
   static const String mortagaform = "$baseUrl/api/mortgage";
+  static const String depositAmont = "$baseUrl/api/deposit";
   static const String rentToOwn = "$baseUrl/api/rentToOwn";
   static const String withdraw = "$baseUrl/api/withdraw";
   static const String getAllTransactions = "$baseUrl/api/getAllTransactions";
@@ -36,6 +37,8 @@ class Urls {
       "$baseUrl/api/rentToOwn/getAllRentToOwnDetailsByCustomer";
 
   static const String getsettingsData = "$baseUrl/api/settings/rentToOwn";
-    static const String constructionFinance = "$baseUrl/api/settings/constructionFinance";
-
+  static const String constructionFinance =
+      "$baseUrl/api/settings/constructionFinance";
+       static const String construction =
+      "$baseUrl/api/constructionFinance";
 }

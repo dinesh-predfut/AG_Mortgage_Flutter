@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class StatementOfAccount extends StatefulWidget {
-  const StatementOfAccount({Key? key}) : super(key: key);
+  final String plans;
+  const StatementOfAccount(String this.plans, {Key? key}) : super(key: key);
 
   @override
   _StatementOfAccountState createState() => _StatementOfAccountState();
@@ -166,6 +167,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                   )
                                 ],
                               ),
+                              if (widget.plans == "Mortgage")
                               ElevatedButton(
                                 onPressed: () => {
                                   Navigator.pushReplacement(
@@ -185,7 +187,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                       left: 15, right: 15, top: 5, bottom: 5),
                                 ),
                                 child: const Text(
-                                  "Pay Rent",
+                                  "Deposit",
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.white),
                                 ),

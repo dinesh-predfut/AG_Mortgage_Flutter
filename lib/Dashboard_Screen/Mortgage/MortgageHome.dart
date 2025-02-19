@@ -176,29 +176,29 @@ class Landing_Mortgage extends StatelessWidget {
   }
 }
 
-  class MortgageFormPage extends StatefulWidget {
-    // ignore: prefer_typing_uninitialized_variables
-    final Houseview? house;
-    final bool? viewBtn;
-    const MortgageFormPage({
-      Key? key,
-      this.viewBtn,
-      this.house,
-    }) : super(key: key);
-    @override
-    _MortgageFormPageState createState() => _MortgageFormPageState();
-  }
+class MortgageFormPage extends StatefulWidget {
+  // ignore: prefer_typing_uninitialized_variables
+  final Houseview? house;
+  final bool? viewBtn;
+  const MortgageFormPage({
+    Key? key,
+    this.viewBtn,
+    this.house,
+  }) : super(key: key);
+  @override
+  _MortgageFormPageState createState() => _MortgageFormPageState();
+}
 
-  class _MortgageFormPageState extends State<MortgageFormPage> {
+class _MortgageFormPageState extends State<MortgageFormPage> {
   final controller = Get.put(MortgagController());
   MortgagController controllerFeild = MortgagController();
 
- @override
+  @override
   void initState() {
     super.initState();
     calculateEMI();
     final initialAmount = controller.monthlyRepaymentController.text;
-  controller.initialDepositController.text = '0';
+    controller.initialDepositController.text = '0';
     if (widget.house != null) {
       controller.propertyValueController.text =
           formattedEMI(widget.house!.price);
@@ -212,6 +212,7 @@ class Landing_Mortgage extends StatelessWidget {
       calculateEMI();
     }
   }
+
   final _formKey = GlobalKey<FormState>();
 // Default value for slider
   double interestRate = 18; // Annual interest rate in percentage
@@ -227,8 +228,7 @@ class Landing_Mortgage extends StatelessWidget {
             controller.propertyValueController.text.replaceAll(',', '')) ??
         0;
     double initialDeposit = double.tryParse(
-          controller.initialDepositController.text.replaceAll(',', '')
-        ) ??
+            controller.initialDepositController.text.replaceAll(',', '')) ??
         0;
     // Calculate initial deposit and loan amount
     // ignore: non_constant_identifier_names
@@ -254,8 +254,6 @@ class Landing_Mortgage extends StatelessWidget {
     // Update UI
     setState(() {});
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -350,10 +348,6 @@ class Landing_Mortgage extends StatelessWidget {
                   FutureBuilder<List<PostsModel>>(
                     future: controller.getALLCityApi(),
                     builder: (context, citySnapshot) {
-                   
-
-                     
-
                       // Ensure data is not null
                       List<PostsModel> cityData = citySnapshot.data ?? [];
 
@@ -403,8 +397,6 @@ class Landing_Mortgage extends StatelessWidget {
                         : Future.value(
                             []), // If selectedCity is null, return an empty list
                     builder: (context, areaSnapshot) {
-                   
-
                       List<SeletArea> areaData =
                           areaSnapshot.data ?? []; // Prevent null errors
 
@@ -464,7 +456,9 @@ class Landing_Mortgage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onChanged: (value) { calculateEMI();},
+                    onChanged: (value) {
+                      calculateEMI();
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter the estimated property value';
@@ -522,12 +516,12 @@ class Landing_Mortgage extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                       Text(
+                      Text(
                         '10',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                       Text(
+                      Text(
                         '20',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
@@ -898,11 +892,16 @@ class _TermSheetPageState extends State<TermSheetPage>
     super.initState();
     fetchData();
     _fetchCityName();
-    
+    _fetchAreaName();
+    controller.fetchCitiesAndAreas();
   }
 
   Future<void> _fetchCityName() async {
     var cityName = await controller.findAndSetCity();
+    setState(() {}); // Rebuild to display the city name
+  }
+    Future<void> _fetchAreaName() async {
+    var areaName = await controller.findAndSetArea();
     setState(() {}); // Rebuild to display the city name
   }
 
@@ -964,7 +963,9 @@ class _TermSheetPageState extends State<TermSheetPage>
                 [
                   _buildRow("Apartment Type",
                       controller.selectedApartmentType.toString()),
-                  _buildRow("City", controller.findAndSetArea(controller.selectedArea as int)),
+                  // _buildRow("City", controller.findAndSetArea(controller.selectedArea)),
+                  _buildRow("City", controller.cityNameValue.text),
+
                   _buildRow("Area", controller.areaNameValue.text),
                   _buildRow("Selling Price",
                       "NGN ${controller.propertyValueController.text} "),
@@ -1028,6 +1029,7 @@ class _TermSheetPageState extends State<TermSheetPage>
                     ),
                     TextButton(
                       onPressed: () {
+                       
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -1045,15 +1047,16 @@ class _TermSheetPageState extends State<TermSheetPage>
               const SizedBox(height: 24.0),
               Center(
                 child: ElevatedButton(
-                  onPressed: () => {
-                     Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MortgagePageHome(
-                              startIndex: 5,
-                            ), // Start with MortgagePageHome
-                          ),
-                        )
+                  onPressed: () {
+                     controller.addMortgageForm(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MortgagePageHome(
+                          startIndex: 5,
+                        ), // Start with MortgagePageHome
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,

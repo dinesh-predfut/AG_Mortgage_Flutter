@@ -1,5 +1,6 @@
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/Authentication/Login/login.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Profile/Dashboard/FAQs/components.dart';
 import 'package:ag_mortgage/Profile/Dashboard/Help_desk/compontent.dart';
 import 'package:ag_mortgage/Profile/Dashboard/How_We_Work/component.dart';
@@ -7,12 +8,26 @@ import 'package:ag_mortgage/Profile/Dashboard/Logout/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/My_Cards/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/Terms_Condition/component.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  final controller = Get.put(Main_Dashboard_controller());
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchPlanOptions();
+    // controller.fetchCustomerDetails();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +55,18 @@ class AccountPage extends StatelessWidget {
             // Profile Section
             Column(
               children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(
-                      'https://t3.ftcdn.net/jpg/03/83/47/52/360_F_383475271_3G2vXVOVCBVUEPgO5T4jnGSZx09rCgx5.jpg'), // Replace with your image URL
+                CircleAvatar(
+                  radius: 45,
+                  backgroundImage: controller.profileImageUrl != null
+                      ? NetworkImage(controller
+                          .profileImageUrl!) // Use the URL from the response
+                      : const AssetImage('')
+                          as ImageProvider, // Default image if no URL
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Adeyemi Pelumi',
-                  style: TextStyle(
+                Text(
+                  controller.profileName,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),

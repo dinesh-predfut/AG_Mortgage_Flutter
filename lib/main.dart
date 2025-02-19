@@ -1,6 +1,7 @@
 import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
@@ -74,6 +75,10 @@ class MyApp extends StatelessWidget {
           case '/rent-to-own':
             return MaterialPageRoute(
               builder: (context) => const Rent_To_Own(),
+            );
+          case '/construction':
+            return MaterialPageRoute(
+              builder: (context) => const ConstructionPage(),
             );
 
           default:

@@ -2,9 +2,8 @@ import 'dart:convert';
 
 class House {
   final String houseType;
-
+  final int id;
   final double price;
-
   final String totalArea;
   final String rooms;
   final String houseAmenities;
@@ -18,6 +17,7 @@ class House {
 
   House({
     required this.houseType,
+    required this.id,
     required this.price,
     required this.totalArea,
     required this.rooms,
@@ -35,6 +35,7 @@ class House {
   factory House.fromJson(Map<String, dynamic> json) {
     return House(
       houseType: json['houseType'],
+      id: json['id'],
       price: json['price'],
       totalArea: json['totalArea'],
       rooms: json['rooms'],
@@ -91,7 +92,7 @@ class Mostview {
 
   Mostview({
     required this.houseType,
-      required this.id,
+    required this.id,
     required this.price,
     required this.totalArea,
     required this.rooms,
@@ -109,7 +110,7 @@ class Mostview {
   factory Mostview.fromJson(Map<String, dynamic> json) {
     return Mostview(
       houseType: json['houseType'],
-       id: json['id'],
+      id: json['id'],
       price: json['price'],
       totalArea: json['totalArea'],
       rooms: json['rooms'],

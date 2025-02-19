@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_cast
+
 import 'dart:io';
 import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:ag_mortgage/Profile/profile_All_controller.dart';
@@ -30,8 +32,6 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
   void initState() {
     super.initState();
     controller.fetchCustomerDetails();
-    controller.image!;
-    print("@@@2${controller.image!}");
   }
 
   Future<void> _pickImage() async {
@@ -71,13 +71,15 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                       CircleAvatar(
                         radius: 60,
                         backgroundImage: controller.image != null
-                            ? FileImage(controller.image!)
-                            : null,
-                        child: controller.image == null
+                            ? FileImage(controller.image!) as ImageProvider<
+                                Object> // Show local file if available
+                            : NetworkImage(controller.showImage!)
+                                as ImageProvider,
+                        child: (controller.image == null &&
+                                (controller.showImage == null ||
+                                    controller.showImage!.isEmpty))
                             ? const Icon(Icons.person,
-                                size: 60,
-                                color:
-                                    Colors.grey) // Placeholder icon if no image
+                                size: 60, color: Colors.grey)
                             : null,
                       ),
                       IconButton(
@@ -249,7 +251,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
         _buildEditableField('Relationship', value: controller.relationShip),
         _buildEditableField('Phone Number', value: controller.phoneNumber),
         _buildEditableField('Email (Optional)', value: controller.email),
-        _buildEditableField('Address', value: controller.fullName),
+        _buildEditableField('Address', value: controller.address),
         controller.isDocumentUploadedPD2
             ? _buildDocumentViewSection(
                 'Passport ID', controller.passportIdPathPd)

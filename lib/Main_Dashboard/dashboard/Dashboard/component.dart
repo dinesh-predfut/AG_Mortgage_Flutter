@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
 import 'package:ag_mortgage/Main_Dashboard/Construction/component.dart';
 import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
@@ -24,9 +27,13 @@ class DashboardPageS extends StatefulWidget {
 
 class _DashboardPageSState extends State<DashboardPageS> {
   final controller = Get.put(Main_Dashboard_controller());
-void initState() {
+@override
+  void initState() {
     super.initState();
-    controller.fetchPlanOptions();
+   
+      controller.fetchPlanOptions();
+
+    
   }
   late final String plans;
   @override
@@ -201,7 +208,7 @@ void initState() {
                                       fontSize: 14, color: Colors.white),
                                 ),
                               ),
-                            if (widget.plans == "Rent-To-Own") const Text(""),
+                            if (widget.plans == "Rent-To-Own")
                             ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
@@ -214,6 +221,31 @@ void initState() {
                               ),
                               child: const Text(
                                 "Pay Rent",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ),
+                             if (widget.plans == "Mortgage")
+                            ElevatedButton(
+                              onPressed: () {
+                                   Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const Get_All_Cards(),
+                                    ),
+                                  );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, top: 5, bottom: 5),
+                              ),
+                              child: const Text(
+                                "Deposit",
                                 style: TextStyle(
                                     fontSize: 14, color: Colors.white),
                               ),
@@ -240,7 +272,7 @@ void initState() {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const StatementOfAccount(),
+                                     StatementOfAccount(widget.plans),
                               ));
                         }
                         if (widget.plans == "Construction Finance") {

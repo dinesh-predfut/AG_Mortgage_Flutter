@@ -57,6 +57,7 @@ class Profile_Controller extends ChangeNotifier {
   String? HelpDiskEmail;
   String? HelpDiskWhatapp;
   File? image;
+  String? showImage;
   final ImagePicker picker = ImagePicker();
 
   String? selectedCity;
@@ -89,26 +90,32 @@ class Profile_Controller extends ChangeNotifier {
             CustomerDetailsModel.fromJson(jsonData);
 
         // selectedCity = jsonData.employmentType;
-        employerController.text = customerDetails.employer;
-        jobTitleController.text = customerDetails.jobTitle;
-        netSalaryController.text = customerDetails.netSalary.toString();
-        netWorthController.text = customerDetails.netWorth.toString();
-        industryController.text = customerDetails.industry;
-        professionController.text = customerDetails.profession;
-        monthlyIncomeController.text = customerDetails.monthlyIncome.toString();
-        gender.text = customerDetails.gender;
-        dob = DateTime.tryParse(customerDetails.dateOfBirth);
-        nin.text = customerDetails.nin;
-        fullName.text = customerDetails.nextOfKinDetails!.name;
-        relationShip.text = customerDetails.nextOfKinDetails!.relationship;
-        phoneNumber.text = customerDetails.nextOfKinDetails!.phoneNumber;
-        email.text = customerDetails.nextOfKinDetails!.email;
-        address.text = customerDetails.nextOfKinDetails!.address;
-        image = File(customerDetails.profileImage);
-        kinID = customerDetails.nextOfKinDetails!.id;
-        selectedCityHome = customerDetails.city.toString();
+        employerController.text = customerDetails?.employer ?? '';
+        jobTitleController.text = customerDetails?.jobTitle ?? '';
+        netSalaryController.text =
+            customerDetails?.netSalary?.toString() ?? '0';
+        netWorthController.text = customerDetails?.netWorth?.toString() ?? '0';
+        industryController.text = customerDetails?.industry ?? '';
+        professionController.text = customerDetails?.profession ?? '';
+        monthlyIncomeController.text =
+            customerDetails?.monthlyIncome?.toString() ?? '0';
+        gender.text = customerDetails?.gender ?? '';
+        dob = DateTime.tryParse(customerDetails?.dateOfBirth ?? '');
+        nin.text = customerDetails?.nin ?? '';
+
+// Handle nextOfKinDetails safely
+        fullName.text = customerDetails.nextOfKinDetails?.name ?? '';
+        relationShip.text =
+            customerDetails.nextOfKinDetails?.relationship ?? '';
+        phoneNumber.text = customerDetails.nextOfKinDetails?.phoneNumber ?? '';
+        email.text = customerDetails.nextOfKinDetails?.email ?? '';
+        address.text = customerDetails.nextOfKinDetails?.address ?? '';
+        kinID = customerDetails.nextOfKinDetails?.id ?? 0;
+
+        showImage = customerDetails.profileImage ?? '';
+        selectedCityHome = customerDetails.city.toString() ?? '';
         selectedarea = customerDetails.area.toString();
-        selectedState = customerDetails.state.toString();
+        selectedState = customerDetails.state.toString() ?? '';
       } else {
         Fluttertoast.showToast(
           msg: "Error: ${response.body}",
@@ -130,8 +137,8 @@ class Profile_Controller extends ChangeNotifier {
 
     Uint8List? compressedData = await FlutterImageCompress.compressWithFile(
       image.path,
-      minWidth: 800, 
-      quality: 80, 
+      minWidth: 800,
+      quality: 80,
       format: CompressFormat.jpeg,
     );
 
@@ -155,21 +162,17 @@ class Profile_Controller extends ChangeNotifier {
       }
 
       var request = http.MultipartRequest(
-          'PUT', 
-          Uri.parse('${Urls.profile}?id=${Params.userId}'));
+          'PUT', Uri.parse('${Urls.profile}?id=${Params.userId}'));
 
       request.headers.addAll({
-        'Authorization':
-            'Bearer ${Params.userToken ?? ''}', 
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
       });
 
-     
       request.files.add(
         await http.MultipartFile.fromPath(
-          'profileImage', 
+          'profileImage',
           image.path,
-          contentType: MediaType(
-              'image', 'jpeg'), 
+          contentType: MediaType('image', 'jpeg'),
         ),
       );
 
@@ -177,6 +180,7 @@ class Profile_Controller extends ChangeNotifier {
       var decodedResponse = await http.Response.fromStream(streamedResponse);
 
       if (decodedResponse.statusCode == 200) {
+        fetchCustomerDetails();
         Fluttertoast.showToast(
           msg: "Profile image updated successfully",
           toastLength: Toast.LENGTH_SHORT,
@@ -228,7 +232,6 @@ class Profile_Controller extends ChangeNotifier {
       print('Response Body: ${decodedResponse.body}');
 
       if (decodedResponse.statusCode == 200) {
-
         Fluttertoast.showToast(
           msg: "Employment Updated Successfully",
           toastLength: Toast.LENGTH_SHORT,

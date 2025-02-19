@@ -39,6 +39,40 @@ class MortgagController extends ChangeNotifier {
   int? apartmentOrMarketplace;
   String cityName = "";
 
+  Future<void> fetchCitiesAndAreas() async {
+    try {
+      allArea = await fetchAreasByCity();
+      allCity = await getALLCityApi();
+
+      int? formDataArea = selectedArea;
+      int? formDataCity = selectedCity;
+      // int formDataApartment = 3;
+
+      var defaultArea = allArea.firstWhere(
+        (area) => area.id == formDataArea,
+        orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+      );
+
+      var defaultCity = allCity.firstWhere(
+        (city) => city.id == formDataCity,
+        orElse: () => PostsModel(id: -1, name: "Unknown City"),
+      );
+
+      // // Find selected apartment type
+      // var defaultApartment = allApartments.firstWhere(
+      //   (apartment) => apartment.id == formDataApartment,
+      //   orElse: () => ApartmentModel(id: -1, apartmentType: "Unknown Apartment"),
+      // );
+      print("areaNameValue data: ${defaultArea.name}");
+      areaNameValue.text = defaultArea.name;
+      cityNameValue.text = defaultCity.name;
+
+      // areaNameValue.text = defaultArea.name;
+    } catch (error) {
+      print("Error fetching data: $error");
+    }
+  }
+
   Future<List<PostsModel>> getALLCityApi() async {
     try {
       final response = await http.get(Uri.parse(Urls.allCity));
@@ -100,7 +134,7 @@ class MortgagController extends ChangeNotifier {
     String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
 
     try {
-      print('Preparing API request...');
+      print('addMortgageForm Preparing API request...');
 
       // Prepare the request
       var request = http.Request('POST', Uri.parse(Urls.mortagaform));
@@ -151,13 +185,6 @@ class MortgagController extends ChangeNotifier {
 
         // Navigate to MortgagePage
         // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const DashboardPageS("Mortgage"), // Start with MortgagePage
-          ),
-        );
       } else {
         print('API Error: HTTP ${decodedResponse.statusCode}');
         final errorResult = jsonDecode(decodedResponse.body);
@@ -200,7 +227,7 @@ class MortgagController extends ChangeNotifier {
         final responseData = json.decode(response.body);
         if (responseData is List && responseData.isNotEmpty) {
           data = responseData[0];
-      
+
           findAndSetCity();
           // Store the first item of the response
         } else {
@@ -237,26 +264,20 @@ class MortgagController extends ChangeNotifier {
     );
 
     cityNameValue.text = matchCity.name.toString();
-
+    findAndSetArea();
     print('Updated City Name: $cityName');
   }
 
-Future<String?> findAndSetArea(int id) async {
-  List<SeletArea> allArea = await fetchAreasByCity();
+  Future<void> findAndSetArea() async {
+    List<SeletArea> allArea = await fetchAreasByCity();
 
-  if (allArea.isEmpty) {
-    areaNameValue.text = "No areas found";
-    return "No areas found";
+
+    var matchArea = allArea.firstWhere(
+      (item) => item.id == selectedArea,
+      orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+    );
+areaNameValue.text = matchArea.name.toString();
   }
-
-  var matchArea = allArea.firstWhere(
-    (item) => item.id == id,
-    orElse: () => SeletArea(id: -1, name: "Unknown Area"),
-  );
-
-  return matchArea.name;  // Return the matched area name
-}
-
 
   String calculateProfileDate(String anniversaryDate, int remainingMonths) {
     DateTime startDate = DateTime.parse(anniversaryDate);

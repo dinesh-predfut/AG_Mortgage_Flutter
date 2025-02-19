@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
@@ -6,6 +7,8 @@ import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
+import 'package:ag_mortgage/const/Image.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +27,14 @@ class _DashboardPageState extends State<DashboardPage> {
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
+  var profileImage = "";
   @override
   void initState() {
     super.initState();
-    fetchPlanOptions();
+    print('Params.userId Code: ${Params.userId}');
+    Timer(const Duration(seconds: 2), () {
+      fetchPlanOptions();
+    });
   }
 
   Future<void> fetchPlanOptions() async {
@@ -48,9 +55,10 @@ class _DashboardPageState extends State<DashboardPage> {
         var data = json.decode(response.body);
 
         setState(() {
-          profileName = data['firstName']; // Adjust this to match your API response
+          profileName = data['firstName'];
+          profileImage = data['profileImage'];
         });
-        print("@@@@@@$profileName");
+
         if (data['planOption'] != null) {
           planOptions.value = List<String>.from(data['planOption']);
         }
@@ -67,129 +75,193 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AG Mortgage'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              'Hello, $profileName 👋',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'What brings you to AG Mortgage Bank Plc today?',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+
                 children: [
-                  MenuButton(
-                    title: 'Mortgage',
-                    icon: Icons.home,
-                    onTap: () {
-                      if (planOptions.contains("Mortgage")) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DashboardPageS("Mortgage"),
-                          ),
-                        );
-                      } else if (planOptions.contains("Rent-to-Own")) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DashboardPageS("Rent-to-Own"),
-                          ),
-                        );
-                      } else {
-                        Navigator.pushNamed(context, "/dashBoardPage/mortgage");
-                      }
-                    },
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundImage: profileImage != ""
+                        ? NetworkImage(
+                            profileImage) // Use the URL from the response
+                        : const AssetImage('')
+                            as ImageProvider, // Default image if no URL
                   ),
-                  MenuButton(
-                    title: 'Rent to Own',
-                    icon: Icons.key,
-                    onTap: () {
-                      if (planOptions.contains("Rent-to-Own")) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DashboardPageS("Rent-to-Own"),
-                          ),
-                        );
-                      } else {
-                        Navigator.pushNamed(context, "/rent-to-own");
-                      }
-                    },
-                  ),
-                  MenuButton(
-                      title: 'Construction Finance',
-                      icon: Icons.construction,
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ConstructionPage(),
-                            ));
-                      }),
-                  MenuButton(
-                    title: 'Investment',
-                    icon: Icons.trending_up,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const Investment(),
-                        ),
-                      );
-                    },
-                  ),
-                  MenuButton(
-                    title: 'Marketplace',
-                    icon: Icons.shopping_cart,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MarketMain(),
-                        ),
-                      );
-                    },
-                  ),
-                  MenuButton(
-                    title: 'Rent-to-own DashBoard',
-                    icon: Icons.shopping_cart,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DashboardPageS("Rent-To-Own"),
-                        ),
-                      );
-                    },
-                  ),
-                  MenuButton(
-                    title: 'Construction DashBoard',
-                    icon: Icons.shopping_cart,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              const DashboardPageS("Construction Finance"),
-                        ),
-                      );
-                    },
+                  const SizedBox(width: 16),
+                  Text(
+                    'Hello, $profileName 👋',
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              const Text(
+                'What brings you to AG Mortgage Bank Plc today?',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 46),
+              Expanded(
+                child: ListView(
+                  children: [
+                    MenuButton(
+                      title: 'Mortgage',
+                      icon: Image.asset(
+                        Images.keyIcon,
+                        width: 24,
+                        height: 24,
+                        color: Colors.white,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                      onTap: () {
+                        if (planOptions.contains("Mortgage")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardPageS("Mortgage"),
+                            ),
+                          );
+                        } else if (planOptions.contains("Rent-to-Own")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const DashboardPageS("Rent-to-Own"),
+                            ),
+                          );
+                        } else if (planOptions
+                            .contains("Construction Finance")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const DashboardPageS("Construction Finance"),
+                            ),
+                          );
+                        } else {
+                          Navigator.pushNamed(
+                              context, "/dashBoardPage/mortgage");
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    MenuButton(
+                      title: 'Rent to Own',
+                      icon: Image.asset(
+                        Images.rendtoHome,
+                        width: 24,
+                        height: 24,
+                        color: Colors.white,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                      onTap: () {
+                        if (planOptions.contains("Rent-to-Own")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const DashboardPageS("Rent-to-Own"),
+                            ),
+                          );
+                        } else if (planOptions
+                            .contains("Construction Finance")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const DashboardPageS("Construction Finance"),
+                            ),
+                          );
+                        } else {
+                          Navigator.pushNamed(context, "/rent-to-own");
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    MenuButton(
+                        title: 'Construction Finance',
+                        icon: Image.asset(
+                          Images.constraction,
+                          width: 24,
+                          height: 24,
+                          color: Colors.white,
+                          colorBlendMode: BlendMode.srcIn,
+                        ),
+                        onTap: () {
+                          if (planOptions.contains("Mortgage")) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const DashboardPageS("Mortgage"),
+                              ),
+                            );
+                          } else if (planOptions.contains("Rent-to-Own")) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const DashboardPageS("Rent-to-Own"),
+                              ),
+                            );
+                          } else if (planOptions
+                              .contains("Construction Finance")) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const DashboardPageS(
+                                    "Construction Finance"),
+                              ),
+                            );
+                          } else {
+                            Navigator.pushNamed(context, "/construction");
+                          }
+                        }),
+                    const SizedBox(height: 16),
+                    MenuButton(
+                      title: 'Investment',
+                      icon: Image.asset(
+                        Images.investment,
+                        width: 24,
+                        height: 24,
+                        color: Colors.white,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const Investment(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    MenuButton(
+                      title: 'Marketplace',
+                      icon: Image.asset(
+                        Images.market,
+                        width: 24,
+                        height: 24,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MarketMain(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -198,7 +270,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
 class MenuButton extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onTap;
 
   const MenuButton({
@@ -216,12 +288,12 @@ class MenuButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.deepPurple,
+          color: baseColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white),
+            icon,
             const SizedBox(width: 16),
             Text(
               title,
