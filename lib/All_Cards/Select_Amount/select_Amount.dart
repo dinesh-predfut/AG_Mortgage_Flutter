@@ -32,22 +32,31 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
   @override
   void initState() {
     super.initState();
-    controller.fetchCardDetails(widget.selectedID!);
 
-    double initialDeposit = double.tryParse(
-          paymentcontroller.initialDepositController.text.replaceAll(',', ''),
-        ) ??
-        0;
-    double monthlyRepayment = double.tryParse(
-          paymentcontroller.monthlyRepaymentController.text.replaceAll(',', ''),
-        ) ??
-        0;
-    controller.amountController.text =
-        formattedEMI((initialDeposit + monthlyRepayment)).toString();
-    print("object12${double.tryParse(
-          paymentcontroller.initialDepositController.text.replaceAll(',', ''),
-        ) ?? 0}");
-    controller.fetchMortgageDetails();
+    // Ensure paymentcontroller is initialized before accessing its controllers
+    if (paymentcontroller.initialDepositController.text.isNotEmpty &&
+        paymentcontroller.monthlyRepaymentController.text.isNotEmpty) {
+      double initialDeposit = double.tryParse(
+            paymentcontroller.initialDepositController.text.replaceAll(',', ''),
+          ) ??
+          0;
+
+      double monthlyRepayment = double.tryParse(
+            paymentcontroller.monthlyRepaymentController.text
+                .replaceAll(',', ''),
+          ) ??
+          0;
+
+      // Only update amountController if values are valid
+      if (initialDeposit > 0 || monthlyRepayment > 0) {
+        controller.amountController.text =
+            formattedEMI((initialDeposit + monthlyRepayment)).toString();
+      }
+      controller.fetchMortgageDetails();
+      print("Valid Initial Deposit: $initialDeposit");
+    }
+
+    // Fetch mortgage details regardless
   }
 
   String formattedEMI(double amount) {
@@ -239,14 +248,21 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
                           .replaceAll(',', ''),
                     ) ??
                     0;
+                double amountPay = double.tryParse(
+                      controller.amountController.text.replaceAll(',', ''),
+                    ) ??
+                    0;
                 if (monthlyRepayment != 0) {
                   controller.monthlyContribution(
                       context, monthlyRepayment, widget.selectedID!);
                   controller.voluntoryPayment(
                       initialDeposit, widget.selectedID!);
+                } else if (monthlyRepayment == 0) {
+                  controller.voluntoryPayment(amountPay, widget.selectedID!);
+                  Navigator.pushNamed(context, "/dashBoardPage");
                 } else {
                   print("amountController");
-                  controller.calculation(context,widget.selectedID!);
+                  controller.calculation(context, widget.selectedID!);
                 }
               },
               style: ElevatedButton.styleFrom(

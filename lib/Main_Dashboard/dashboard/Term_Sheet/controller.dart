@@ -256,5 +256,30 @@ Future<List<CustomerModel>> fetchRentToOwnDetails() async {
     throw Exception('Failed to fetch mortgage details');
   }
 }
+Future<List<ConstructionProject>> fetchConstructionFinance() async {
+  try {
+    print('userId: ${Params.userId}');
+
+    final url = Uri.parse('${Urls.getAllConstructionFinanceDetailsByCustomer}?id=${Params.userId}');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${Params.userToken ?? ''}',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+     List<dynamic> data = json.decode(response.body);
+     
+      return data.map((json) => ConstructionProject.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Failed to fetch mortgage details');
+  }
+}
 
 }

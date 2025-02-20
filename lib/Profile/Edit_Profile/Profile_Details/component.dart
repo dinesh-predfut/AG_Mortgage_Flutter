@@ -144,8 +144,8 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
           ), // Display selected date
           readOnly: true, // Prevent manual text editing
           decoration: InputDecoration(
-            labelText: 'Date of Birthsss',
-            suffixIcon: Icon(Icons.calendar_today), // Calendar icon
+            labelText: 'Date of Birth',
+            suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
             ),

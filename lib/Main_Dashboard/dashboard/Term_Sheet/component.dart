@@ -37,7 +37,7 @@ class _Term_SheetsState extends State<Term_Sheets>
   @override
   void initState() {
     super.initState();
-    print(widget.plans);
+    print("check${widget.plans.toLowerCase()}");
     //  controller.findAndSetArea(controller.selectedArea!.toInt());
     //  controller.findAndSetCity(controller.selectedCity!.toInt());
   }
@@ -317,11 +317,11 @@ class _Term_SheetsState extends State<Term_Sheets>
                               customer.rentalRepaymentPeriod != null
                                   ? "${customer.rentalRepaymentPeriod} Years"
                                   : "N/A"),
-                                  _buildRow(
+                          _buildRow(
                               "Screening Monthly Rental",
                               customer.monthlyLoanAmount != null
                                   ? "NGN ${customer.monthlyLoanAmount.toString()}"
-                                  : "N/A"), 
+                                  : "N/A"),
                           _buildRow(
                               "Monthly Repayment",
                               customer.monthlyRentalAmount != null
@@ -345,8 +345,8 @@ class _Term_SheetsState extends State<Term_Sheets>
                               "${customer.loanRepaymentPeriod} Months"),
                           _buildRow(
                             "Estimated Profile Date",
-                              controller.formatProfileDate(
-                                  customer.anniversary ?? 'N/A'),
+                            controller.formatProfileDate(
+                                customer.anniversary ?? 'N/A'),
                           ),
                           _buildRow("Total Monthly Rental",
                               "NGN ${(((customer.estimatedPropertyValue ?? 0) * 0.8) - (customer.initialDeposit ?? 0)) / 25}"),
@@ -375,9 +375,166 @@ class _Term_SheetsState extends State<Term_Sheets>
                               ],
                             ),
                             TextButton(
-                              onPressed: () {
-                            
-                              },
+                              onPressed: () {},
+                              child: Text(
+                                controller.formatProfileDateName(
+                                    customer.anniversary.toString()),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24.0),
+                    ],
+                  ),
+                );
+              }
+            },
+          );
+        } else if (widget.plans == "Construction Finance") {
+          return FutureBuilder<List<ConstructionProject>>(
+            future: controller.fetchConstructionFinance(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('No data available.'));
+              } else {
+                final customer = snapshot
+                    .data![0]; // Assuming we're displaying the first customer
+                String anniversaryDate = customer.anniversary?.toString() ?? '';
+                String estimatedProfileDate =
+                    controller.calculateProfileDate(anniversaryDate, 16);
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Est pellentesque fermentum cursus curabitur pharetra, vene",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                      const SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, "login/propertyView",
+                                arguments: customer.typeOfConstruction);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue, // baseColor
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 10.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text("View House",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12)),
+                        ),
+                      ),
+                      const SizedBox(height: 0.0),
+                      _buildSection(
+                        "House Details",
+                        [
+                          _buildRow(
+                              "City",
+                              customer.city != null
+                                  ? customer.city.toString()
+                                  : "N/A"),
+                          _buildRow(
+                              "Area",
+                              customer.area != null
+                                  ? customer.area.toString()
+                                  : "N/A"),
+                          _buildRow(
+                              "Type of Construction",
+                              // ignore: unnecessary_null_comparison
+                              "NGN ${customer.typeOfConstruction != null ? customer.typeOfConstruction.toString() : 'N/A'}"),
+                          _buildRow(
+                              "Estimated Budget",
+                              // ignore: unnecessary_null_comparison
+                              "NGN ${ controller.formatNumber(customer.estimatedAmountSpent.toStringAsFixed(2))}"),
+                        ],
+                        buttonAction: () {},
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildSection(
+                        "Loan Details",
+                        [
+                          _buildRow(
+                              "Loan",
+                              customer.estimatedAmountSpent != null
+                                  ? "NGN ${customer.estimatedAmountSpent.toString()}"
+                                  : 'N/A'),
+                         
+                          _buildRow(
+                              "Repayment Period",
+                              customer.repaymentPeriod != null
+                                  ? "${customer.repaymentPeriod} Years"
+                                  : "N/A"),
+                          _buildRow(
+                              "Monthly Repayment",
+                              // ignore: unnecessary_null_comparison
+                              customer.totalMonthlySaving != null
+                                  ? "NGN ${controller.formatNumber(customer.totalExpectedSaving.toString())}"
+                                  : "N/A"),
+                        
+                          _buildRow(
+                              "Starting Date",
+                              controller.formatProfileDate(
+                                  customer.startDate ?? 'N/A')),
+                          _buildRow(
+                              "Next Anniversary Date",
+                              controller.formatProfileDate(
+                                  customer.anniversary ?? 'N/A')),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildSection(
+                        "Deposit & Profiling",
+                        [
+                          _buildRow("Screening Period",
+                              "${customer.screeningPeriod} Months"),
+                          _buildRow(
+                            "Estimated Profile Date",
+                            controller.formatProfileDate(
+                                customer.anniversary ?? 'N/A'),
+                          ),
+                          _buildRow("Total Monthly Rental",
+                              "NGN ${controller.formatNumber(customer.totalMonthlySaving.toString())}"),
+                         
+                          _buildRow("Total Expected Deposit",
+                              "NGN ${controller.formatNumber(customer.totalExpectedSaving.toString())}"),
+                        ],
+                      ),
+                       const SizedBox(height: 16.0),
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[100],
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Amount to Deposit",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            TextButton(
+                              onPressed: () {},
                               child: Text(
                                 controller.formatProfileDateName(
                                     customer.anniversary.toString()),

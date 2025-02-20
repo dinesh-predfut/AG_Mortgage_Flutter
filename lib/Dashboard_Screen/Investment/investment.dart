@@ -1,9 +1,14 @@
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Investment/controller.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Investment/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
@@ -29,9 +34,10 @@ class __InvestmenStateState extends State<Investment> {
 
   final List<Widget> _steps = [
     const InvestmentFormPage(),
-     const CardPaymentPage(),
-   const ADD_CardDetailsPage(),
-     const Get_All_Cards(),
+    const PaymentMethodPage(),
+    const Get_All_Cards(),
+    const CardPaymentPage(),
+    const ADD_CardDetailsPage(),
     const CardPaymentPage(),
     const Success(),
     const CalendarPage(),
@@ -60,31 +66,9 @@ class InvestmentFormPage extends StatefulWidget {
 }
 
 class InvestmentFormPageState extends State<InvestmentFormPage> {
+  final controller = Get.put(InvestmentController());
   final _formKey = GlobalKey<FormState>();
   // ignore: non_constant_identifier_names
-  final TextEditingController _interest = TextEditingController();
-  final TextEditingController _maturityDate = TextEditingController();
-  final TextEditingController _yield = TextEditingController();
-
-  final TextEditingController _amount = TextEditingController();
-
-  String? _selectedApartmentType;
-
-  DateTime? _selectedStartDate; // Holds the selected start date
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedStartDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null && pickedDate != _selectedStartDate) {
-      setState(() {
-        _selectedStartDate = pickedDate;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +105,84 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               const SizedBox(height: 10),
               const Text('Amount (<NGN 500,000)'),
               TextFormField(
-                controller: _amount,
+                controller: controller.amount ,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(
+                        right: 8), // Adds spacing between NGN and input
+                    child: Text(
+                      'NGN',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                onChanged: (value) {
+                  // calculateEMI();
+                  controller.calculateYield();
+                },
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter the estimated property value';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              const Text('Type of Investment'),
+              FutureBuilder<List<LoanTypeInvestment>>(
+                future: controller.getScreeningPeriodsApi(),
+                builder: (context, snapshot) {
+                  List<LoanTypeInvestment> loanData = snapshot.data ?? [];
+
+                  // Ensure valid selection logic
+                  LoanTypeInvestment? selectedLoan =
+                      controller.selectedLoan.value;
+
+                  return DropdownButtonFormField<LoanTypeInvestment>(
+                    value:
+                        loanData.contains(selectedLoan) ? selectedLoan : null,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    isExpanded: true,
+                    hint: const Text(
+                        "Select an Plan"), // Display hint when no value is selected
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: loanData.map((LoanTypeInvestment loan) {
+                      return DropdownMenuItem<LoanTypeInvestment>(
+                        value: loan,
+                        child: Text(loan.typeName.toString()),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        controller.selectedLoan.value = value;
+                        controller.interestRate.value = TextEditingValue(
+                            text: value.interestRate.toString());
+                        controller.tenure.value =
+                            TextEditingValue(text: value.tenure.toString());
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a screening period';
+                      }
+                      return null;
+                    },
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10),
+              const Text('Duration of Year'),
+              TextFormField(
+                controller: controller.tenure ,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -129,52 +190,41 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text('Duration'),
-              DropdownButtonFormField<String>(
-                value: _selectedApartmentType,
-                items: const [
-                  DropdownMenuItem(value: 'BANK-1', child: Text('BANK-1')),
-                  DropdownMenuItem(value: 'BANK-2', child: Text('BANK-2')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedApartmentType = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
               const Text('Start Date'),
-              GestureDetector(
-                onTap: () => _selectDate(context),
-                child: Container(
-                  width: 360,
-                  height: 60,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    _selectedStartDate == null
-                        ? ''
-                        : '${_selectedStartDate!.toLocal()}'.split(' ')[0],
-                    style: TextStyle(color: Colors.black54),
+              TextFormField(
+                controller: TextEditingController(
+                  text:DateFormat('dd-MM-yyyy')
+                          .format(controller.selectedStartDate.value)
+                      ,
+                ), // Display selected date
+                readOnly: true, // Prevent manual text editing
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: controller.selectedStartDate.value,
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                  );
+
+                  if (pickedDate != null) {
+                    setState(() {
+                      controller.selectedStartDate.value = pickedDate;
+                    });
+                  }
+                },
               ),
 
               const SizedBox(height: 10),
-              if (_selectedStartDate != null) ...[
+              if (controller.selectedStartDate != null) ...[
                 const Text('Interest (%)'),
                 TextFormField(
-                  controller: _interest,
+                  controller: controller.interestRate,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -184,19 +234,39 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text('Maturity Date'),
-                TextFormField(
-                  controller: _maturityDate,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+                             TextFormField(
+                controller: TextEditingController(
+                  text:  DateFormat('dd-MM-yyyy')
+                          .format(controller.selectedStartDateMaturityDate.value)
+                      ,
+                ), // Display selected date
+                readOnly: true, // Prevent manual text editing
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: controller.selectedStartDateMaturityDate.value,
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                  );
+
+                  if (pickedDate != null) {
+                    setState(() {
+                      controller.selectedStartDateMaturityDate.value = pickedDate;
+                    });
+                  }
+                },
+              ),
+
                 const SizedBox(height: 10),
-                const Text('Yield'),
+                const Text('yieldValue'),
                 TextFormField(
-                  controller: _yield,
+                  controller: controller.yieldValue,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -211,16 +281,17 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      controller.addInvestment(context);
                       Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Investment(
-                                startIndex: 1), // Start with MortgagePage
-                          ),
-                        );
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Investment(
+                              startIndex: 1), // Start with MortgagePage
+                        ),
+                      );
                       // Perform form submission
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Form Submitted!')));
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(content: Text('Form Submitted!')));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -239,7 +310,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
         ),
       ),
     );
-  } 
+  }
 }
 
 class CalendarPage extends StatefulWidget {
@@ -353,7 +424,6 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 }
-
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -544,9 +614,105 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 }
+class PaymentMethodPage extends StatefulWidget {
+  const PaymentMethodPage({super.key});
 
+  @override
+  _PaymentMethodPageState createState() => _PaymentMethodPageState();
+}
 
+class _PaymentMethodPageState extends State<PaymentMethodPage> {
+  String selectedPaymentMethod = "Card";
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Payment"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "How would you like to make your first deposit?",
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.credit_card),
+              title: const Text("Card"),
+              trailing: Radio<String>(
+                value: "Card",
+                groupValue: selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: const Text("Bank Transfer"),
+              trailing: Radio<String>(
+                value: "Bank Transfer",
+                groupValue: selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
+              ),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                if (selectedPaymentMethod == "Bank Transfer") {
+                  // Navigate to a page for Bank Transfer
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Investment(
+                          startIndex: 9), // Example for Bank Transfer
+                    ),
+                  );
+                } else if (selectedPaymentMethod == "Card") {
+                  // Navigate to a page for Card payment
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Investment(
+                          startIndex: 2), // Example for Card payment
+                    ),
+                  );
+                } else {
+                  // Default case: navigate to MortgagePageHome with startIndex as 3 (fallback case)
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const Investment(startIndex: 9), // Default case
+                    ),
+                  );
+                }
+              },
+              //
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text("Make Payment",
+                  style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 class TermSheetPage extends StatelessWidget {
   const TermSheetPage({super.key});
 
@@ -556,10 +722,10 @@ class TermSheetPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Term Sheet'),
         centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
