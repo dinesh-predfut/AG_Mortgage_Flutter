@@ -89,16 +89,16 @@
 //                   onPressed: () {},
 //                   style: OutlinedButton.styleFrom(
 //                     side:
-//                         const BorderSide(width: 1.0, color: Colors.deepPurple),
+//                         const BorderSide(width: 1.0, color: baseColor),
 //                   ),
 //                   child: const Text(
 //                     "Decline",
-//                     style: TextStyle(color: Colors.deepPurple),
+//                     style: TextStyle(color: baseColor),
 //                   ),
 //                 ),
 //                 ElevatedButton(
 //                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.deepPurple,
+//                     backgroundColor: baseColor,
 //                     shape: RoundedRectangleBorder(
 //                       borderRadius: BorderRadius.circular(30),
 //                     ),

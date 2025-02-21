@@ -295,7 +295,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                     padding: const EdgeInsets.symmetric(
                         vertical: 16, horizontal: 20),
                   ),
@@ -372,16 +372,16 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle: const CalendarStyle(
+                calendarStyle:  CalendarStyle(
                   selectedDecoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: baseColor,
                     shape: BoxShape.circle,
                   ),
-                  todayDecoration: BoxDecoration(
+                  todayDecoration: const BoxDecoration(
                     color: Colors.orange,
                     shape: BoxShape.circle,
                   ),
-                  markerDecoration: BoxDecoration(
+                  markerDecoration: const BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
@@ -405,7 +405,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -565,12 +565,12 @@ class _PaymentPageState extends State<PaymentPage> {
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.deepPurple),
+                  borderSide:BorderSide(color: baseColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
+                       BorderSide(color: baseColor, width: 2),
                 ),
               ),
             ),
@@ -702,7 +702,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               //
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: baseColor,
               ),
               child: const Text("Make Payment",
                   style: TextStyle(color: Colors.white)),
@@ -978,7 +978,7 @@ class BankTransferPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 24.0, vertical: 12.0),
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: baseColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),

@@ -897,7 +897,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: baseColor,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: const Text(
@@ -974,9 +974,9 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle: const CalendarStyle(
+                calendarStyle:  CalendarStyle(
                   selectedDecoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: baseColor,
                     shape: BoxShape.circle,
                   ),
                   todayDecoration: BoxDecoration(
@@ -1008,7 +1008,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -1088,7 +1088,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
               //
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: baseColor,
               ),
               child: const Text("Make Payment",
                   style: TextStyle(color: Colors.white)),
@@ -1489,7 +1489,7 @@ class BankTransferPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 24.0, vertical: 12.0),
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: baseColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),

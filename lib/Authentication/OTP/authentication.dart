@@ -1,6 +1,7 @@
 import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/PIN_Creation/pin.dart';
 import 'package:ag_mortgage/const/Image.dart'; // Update this with the correct path to your image.dart file.
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -70,12 +71,12 @@ class _AuthenticationState extends State<Authentication> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Authentication",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -106,7 +107,7 @@ class _AuthenticationState extends State<Authentication> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide:
-                                  const BorderSide(color: Colors.deepPurple),
+                                 BorderSide(color: baseColor),
                             ),
                           ),
                           onChanged: (value) {
@@ -139,7 +140,7 @@ class _AuthenticationState extends State<Authentication> {
                       // Add your API call or verification logic here.
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -172,10 +173,10 @@ class _AuthenticationState extends State<Authentication> {
                                 _startCountdown();
                                 // Add your resend OTP logic here.
                               },
-                              child: const Text(
+                              child:  Text(
                                 "Resend OTP",
                                 style: TextStyle(
-                                  color: Colors.deepPurple,
+                                  color: baseColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

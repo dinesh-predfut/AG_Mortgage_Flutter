@@ -1,3 +1,4 @@
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -63,16 +64,16 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle: const CalendarStyle(
+                calendarStyle:  CalendarStyle(
                   selectedDecoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: baseColor,
                     shape: BoxShape.circle,
                   ),
-                  todayDecoration: BoxDecoration(
+                  todayDecoration: const BoxDecoration(
                     color: Colors.orange,
                     shape: BoxShape.circle,
                   ),
-                  markerDecoration: BoxDecoration(
+                  markerDecoration: const BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
@@ -96,7 +97,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     // );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

@@ -2,6 +2,8 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:flutter/material.dart';
+
+import '../../const/colors.dart';
 class SetupPasswordScreen extends StatefulWidget {
   const SetupPasswordScreen({Key? key}) : super(key: key);
 
@@ -69,12 +71,12 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Change Password",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -96,7 +98,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                       labelText: "New Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:  BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -109,7 +111,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                       labelText: "Confirm Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:  BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -162,7 +164,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

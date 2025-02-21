@@ -1,6 +1,7 @@
 import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/Image.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -78,12 +79,12 @@ class _PIN_CreationState extends State<PIN_Creation> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Setup Password",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -105,7 +106,7 @@ class _PIN_CreationState extends State<PIN_Creation> {
                       labelText: "New Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -129,7 +130,7 @@ class _PIN_CreationState extends State<PIN_Creation> {
                       labelText: "Confirm Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -197,7 +198,7 @@ class _PIN_CreationState extends State<PIN_Creation> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

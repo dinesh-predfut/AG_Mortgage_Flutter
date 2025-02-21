@@ -1,5 +1,6 @@
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:ag_mortgage/Authentication/OTP_Reset/otp_reset.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart'; 
 class Rest_Password extends StatelessWidget {
@@ -46,12 +47,12 @@ class RegisterScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Forget Password",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -73,7 +74,7 @@ class RegisterScreen extends StatelessWidget {
                       
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -92,7 +93,7 @@ class RegisterScreen extends StatelessWidget {
                     },
                     
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

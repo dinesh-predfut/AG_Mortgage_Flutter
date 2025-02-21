@@ -4,7 +4,9 @@ import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart'; // Update this with the correct path to your image.dart file.
+import 'package:get/get_core/src/get_main.dart';
+
+import '../../../const/colors.dart'; // Update this with the correct path to your image.dart file.
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -59,12 +61,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Register",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -85,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "First Name",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -97,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Last Name",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -111,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -125,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Email",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -137,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Promo Code (Optional)",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -148,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       signupController.nextFuncation(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -179,9 +181,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                               //  Navigator.of(context).pushNamed('/login');
                                Navigator.pushNamed(context, "/login");
                         },
-                        child: const Text(
+                        child:  Text(
                           "Login",
-                          style: TextStyle(color: Colors.deepPurple),
+                          style: TextStyle(color: baseColor),
                         ),
                       ),
                     ],

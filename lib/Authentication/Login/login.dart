@@ -9,6 +9,8 @@ import 'package:ag_mortgage/const/Image.dart';
 import 'package:get/get.dart'; // Update this with the correct path to your image.dart file.
 import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../../const/colors.dart';
+
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -47,12 +49,12 @@ class _LoginState extends State<Login> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                   Text(
                     "Login",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: baseColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -74,7 +76,7 @@ class _LoginState extends State<Login> {
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:  BorderSide(color: baseColor),
                       ),
                     ),
                     initialCountryCode: 'NG', // Nigeria as default
@@ -93,7 +95,7 @@ class _LoginState extends State<Login> {
                       labelText: "Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderSide:  BorderSide(color: baseColor),
                       ),
                       suffixIcon: IconButton(
                         iconSize: 20,
@@ -117,7 +119,7 @@ class _LoginState extends State<Login> {
                       signupController.signIn(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -145,9 +147,9 @@ class _LoginState extends State<Login> {
                                 builder: (context) => const Rest_Password(),
                               ));
                         },
-                        child: const Text(
+                        child:  Text(
                           "Reset Password",
-                          style: TextStyle(color: Colors.deepPurple),
+                          style: TextStyle(color: baseColor),
                         ),
                       ),
                     ],

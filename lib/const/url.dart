@@ -18,6 +18,7 @@ class Urls {
   static const String upDateTermsheet =
       "$baseUrl/api/mortgage/getAllMortgageDetailsByCustomer?id=9";
   static const String amountPay = "$baseUrl/api/cards/getCardsById";
+    static const String apartment = "$baseUrl/api/settings/getAllApartmentTypes";
   static const String employeRegister =
       "$baseUrl/api/customer/employmentDetails";
   static const String getEmployeeDetailsID = "$baseUrl/api/customer";

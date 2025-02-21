@@ -1,4 +1,7 @@
+import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,7 +14,7 @@ class FilterHousePage extends StatefulWidget {
 
 class _FilterHousePageState extends State<FilterHousePage>
     with SingleTickerProviderStateMixin {
-        final controller = Get.put(Market_Place_controller());
+  final controller = Get.put(Market_Place_controller());
   late TabController _tabController;
   List<String> amenities = [
     'Parking Lot',
@@ -24,7 +27,6 @@ class _FilterHousePageState extends State<FilterHousePage>
     'Field',
     'Fence'
   ];
-  List<String> selectedAmenities = [];
   void initState() {
     super.initState();
 
@@ -64,121 +66,161 @@ class _FilterHousePageState extends State<FilterHousePage>
                 ),
               ),
               const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true, // Makes the tabs scrollable
-                  labelColor: Colors.white, // Active tab text color
-                  // unselectedLabelColor:
-                  //     Colors.orange, // Inactive tab text color
-                  // indicator: BoxDecoration(
-                  //   borderRadius: BorderRadius.circular(
-                  //       40), // Rounded corners for active tab
-                  //   color: Colors.orange// Active tab background color
-                  // ),
-                  indicator: const BoxDecoration(),
-                  splashFactory:
-                      NoSplash.splashFactory, // Removes ripple effect
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  tabs: _tabs.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String tab = entry.value;
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: TabBar(
+              //     controller: _tabController,
+              //     isScrollable: true, // Makes the tabs scrollable
+              //     labelColor: Colors.white, // Active tab text color
+              //     // unselectedLabelColor:
+              //     //     Colors.orange, // Inactive tab text color
+              //     // indicator: BoxDecoration(
+              //     //   borderRadius: BorderRadius.circular(
+              //     //       40), // Rounded corners for active tab
+              //     //   color: Colors.orange// Active tab background color
+              //     // ),
+              //     indicator: const BoxDecoration(),
+              //     splashFactory:
+              //         NoSplash.splashFactory, // Removes ripple effect
+              //     overlayColor: MaterialStateProperty.all(Colors.transparent),
+              //     tabs: _tabs.asMap().entries.map((entry) {
+              //       int index = entry.key;
+              //       String tab = entry.value;
 
-                    bool isActive = _tabController.index ==
-                        index; // Check if the tab is active
+              //       bool isActive = _tabController.index ==
+              //           index; // Check if the tab is active
 
-                    return Tab(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 60,
-                            padding: const EdgeInsets.symmetric(horizontal: 3),
-                            height: isActive
-                                ? 40
-                                : 40, // Increased height for active tab
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isActive
-                                    ? Colors.white
-                                    : Colors.orange, // Border color
-                              ),
-                              borderRadius:
-                                  BorderRadius.circular(40), // Rounded corners
-                              color: isActive
-                                  ? Colors.orange // Active background
-                                  : Colors
-                                      .transparent, // Inactive tab background color
-                            ),
-                            child: Center(
-                              child: Text(
-                                tab, // Tab text
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isActive
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color:
-                                      isActive ? Colors.white : Colors.orange,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
+              //       return Tab(
+              //         child: Column(
+              //           children: [
+              //             Container(
+              //               width: 60,
+              //               padding: const EdgeInsets.symmetric(horizontal: 3),
+              //               height: isActive
+              //                   ? 40
+              //                   : 40, // Increased height for active tab
+              //               decoration: BoxDecoration(
+              //                 border: Border.all(
+              //                   color: isActive
+              //                       ? Colors.white
+              //                       : Colors.orange, // Border color
+              //                 ),
+              //                 borderRadius:
+              //                     BorderRadius.circular(40), // Rounded corners
+              //                 color: isActive
+              //                     ? Colors.orange // Active background
+              //                     : Colors
+              //                         .transparent, // Inactive tab background color
+              //               ),
+              //               child: Center(
+              //                 child: Text(
+              //                   tab, // Tab text
+              //                   style: TextStyle(
+              //                     fontSize: 12,
+              //                     fontWeight: isActive
+              //                         ? FontWeight.bold
+              //                         : FontWeight.normal,
+              //                     color:
+              //                         isActive ? Colors.white : Colors.orange,
+              //                   ),
+              //                 ),
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       );
+              //     }).toList(),
+              //   ),
+              // ),
               const SizedBox(height: 16),
               const Text(
                 "Choose Location",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              DropdownButtonFormField<String>(
-                hint: const Text("Select Preferred Location"),
-                value: controller.selectedLocation,
-                items: ["Lagos", "Ogun", "Anambra", "Abuja"]
-                    .map((location) => DropdownMenuItem<String>(
-                          value: location,
-                          child: Text(location),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    controller.selectedLocation = value;
-                  });
+              FutureBuilder<List<PostsModel>>(
+                future: controller.getALLCityApi(),
+                builder: (context, citySnapshot) {
+                  // Ensure data is not null
+                  List<PostsModel> cityData = citySnapshot.data ?? [];
+
+                  return DropdownButtonFormField<int>(
+                    value: controller.selectedCity,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: cityData.isNotEmpty
+                        ? cityData.map((item) {
+                            return DropdownMenuItem<int>(
+                              value: item.id,
+                              child: Text(item.name ?? 'Unknown Name'),
+                            );
+                          }).toList()
+                        : [], // Prevents mapping on null
+
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          controller.selectedCity = value;
+                        });
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a city';
+                      }
+                      return null;
+                    },
+                  );
                 },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
               const Text(
                 "House Type",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              DropdownButtonFormField<String>(
-                hint: const Text("Select Preferred House Type"),
-                value: controller.selectedHouseType,
-                items: ["Apartment", "NewHouse"]
-                    .map((type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    controller.selectedHouseType = value;
-                  });
+              FutureBuilder<List<Apartment>>(
+                future: controller.getApartment(),
+                builder: (context, citySnapshot) {
+                  // Ensure data is not null
+                  List<Apartment> apartmenttype = citySnapshot.data ?? [];
+
+                  return DropdownButtonFormField<int>(
+                    value: controller.selectedHouseType,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: apartmenttype.isNotEmpty
+                        ? apartmenttype.map((item) {
+                            return DropdownMenuItem<int>(
+                              value: item.id,
+                              child: Text(item.apartmentType),
+                            );
+                          }).toList()
+                        : [], // Prevents mapping on null
+
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          controller.selectedHouseType = value;
+                        });
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a city';
+                      }
+                      return null;
+                    },
+                  );
                 },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -213,7 +255,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                 ),
                 onChanged: (value) {
                   setState(() {
-                    controller.budget = double.tryParse(value);
+                    controller.budget = double.tryParse(value) as int?;
                   });
                 },
               ),
@@ -225,16 +267,17 @@ class _FilterHousePageState extends State<FilterHousePage>
               Wrap(
                 spacing: 8.0,
                 children: amenities.map((amenity) {
-                  bool isSelected = selectedAmenities.contains(amenity);
+                  bool isSelected =
+                      controller.selectedAmenities.contains(amenity);
                   return ChoiceChip(
                     label: Text(amenity),
                     selected: isSelected,
                     onSelected: (selected) {
                       setState(() {
                         if (selected) {
-                          selectedAmenities.add(amenity);
+                          controller.selectedAmenities.add(amenity);
                         } else {
-                          selectedAmenities.remove(amenity);
+                          controller.selectedAmenities.remove(amenity);
                         }
                       });
                     },
@@ -247,25 +290,53 @@ class _FilterHousePageState extends State<FilterHousePage>
                 }).toList(),
               ),
               const SizedBox(height: 24),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(
-                        context); // Navigates back to the previous screen
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                    textStyle: const TextStyle(fontSize: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                       controller.clearFields();
+                        Navigator.pushNamed(context,
+                            "/marketMain"); // Navigates back to the previous screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
+                      child: const Text(
+                        "Clear filter",
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
-                  child: const Text(
-                    "Apply Filter",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w600),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                         controller.fetchnewtViewedHouses();
+                        controller.fetchTodayDeals();
+                        controller.fetchHouses();
+                        controller.fetchmostViewedHouses();
+                        Navigator.pushNamed(context,
+                            "/marketMain"); // Navigates back to the previous screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: baseColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
+                      child: const Text(
+                        "Apply Filter",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                ],
+              )
             ],
           ),
         ),

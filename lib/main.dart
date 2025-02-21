@@ -80,7 +80,26 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => const ConstructionPage(),
             );
-
+          case '/seemoretodaydeals':
+            return MaterialPageRoute(
+              builder: (context) => const MarketMain(startIndex: 2),
+            );
+               case '/seemoremostview':
+            return MaterialPageRoute(
+              builder: (context) => const MarketMain(startIndex: 1),
+            );
+                case '/seemorenewhouse':
+            return MaterialPageRoute(
+              builder: (context) => const MarketMain(startIndex: 3),
+            );
+                case '/filterPage':
+            return MaterialPageRoute(
+              builder: (context) => const MarketMain(startIndex: 5),
+            );
+             case '/marketMain':
+            return MaterialPageRoute(
+              builder: (context) => const LandingPage(startIndex: 2),
+            );
           default:
             return MaterialPageRoute(
                 builder: (context) =>
@@ -125,16 +144,28 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showBottomNavBar = _currentIndex != 0; // H
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: showBottomNavBar
-          ? BottomNavBar(
-              currentIndex: _currentIndex - 1,
-              onTap: (index) => _onItemTapped(index + 1),
-              items: const [], // Adjust for LandingPage
-            )
-          : null,
+    final bool showBottomNavBar = _currentIndex != 0;
+
+    return WillPopScope(
+      onWillPop: () async {
+        if (_currentIndex != 0) {
+          setState(() {
+            _currentIndex = 0;
+          });
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: _pages[_currentIndex],
+        bottomNavigationBar: showBottomNavBar
+            ? BottomNavBar(
+                currentIndex: _currentIndex - 1,
+                onTap: (index) => _onItemTapped(index + 1),
+                items: const [], // Adjust for LandingPage
+              )
+            : null,
+      ),
     );
   }
 }

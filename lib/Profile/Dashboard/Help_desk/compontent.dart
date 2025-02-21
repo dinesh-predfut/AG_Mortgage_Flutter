@@ -6,6 +6,8 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../const/colors.dart';
+
 class HeplDeskPage extends StatefulWidget {
   const HeplDeskPage({super.key});
 
@@ -244,7 +246,7 @@ class _HeplDeskPageState extends State<HeplDeskPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.deepPurple),
+            Icon(icon, color: baseColor),
             const SizedBox(height: 8.0),
             Text(
               label,

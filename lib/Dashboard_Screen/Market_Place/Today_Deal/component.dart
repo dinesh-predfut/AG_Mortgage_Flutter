@@ -30,7 +30,7 @@ class _TodayDealsState extends State<TodayDeals>
   void initState() {
     super.initState();
     futureTodayDeals = controller.fetchTodayDeals();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       setState(() {}); // Refresh UI when tab changes
     });
@@ -51,272 +51,282 @@ class _TodayDealsState extends State<TodayDeals>
     "oyo",
     "Kaduna",
     "Kano"
-  ];  
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Today Deal', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const MarketMain(startIndex: 6),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.favorite_border)),
-          IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const MarketMain(startIndex: 5),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.tune)),
-        ],
-      ),
-      body: FutureBuilder<ApiTodayDeals>(
-        future: futureTodayDeals,
-        builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading today\'s deals'));
-        } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-          return todayDeals (snapshot.data!.items); // Pass today's deal items
-        } else {
-      
-
-            return ListView(
-              children: [
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TabBar(
-                    controller: _tabController,
-                    isScrollable: true, // Makes the tabs scrollable
-                    labelColor: Colors.white, // Active tab text color
-                    // unselectedLabelColor:
-                    //     Colors.orange, // Inactive tab text color
-                    // indicator: BoxDecoration(
-                    //   borderRadius: BorderRadius.circular(
-                    //       40), // Rounded corners for active tab
-                    //   color: Colors.orange// Active tab background color
-                    // ),
-                    indicator: const BoxDecoration(),
-                    splashFactory:
-                        NoSplash.splashFactory, // Removes ripple effect
-                    overlayColor: MaterialStateProperty.all(Colors.transparent),
-                    tabs: _tabs.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      String tab = entry.value;
-
-                      bool isActive = _tabController.index ==
-                          index; // Check if the tab is active
-
-                      return Tab(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 3),
-                              height: isActive
-                                  ? 40
-                                  : 40, // Increased height for active tab
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isActive
-                                      ? Colors.white
-                                      : Colors.orange, // Border color
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    40), // Rounded corners
-                                color: isActive
-                                    ? Colors.orange // Active background
-                                    : Colors
-                                        .transparent, // Inactive tab background color
-                              ),
-                              child: Center(
-                                child: Text(
-                                  tab, // Tab text
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: isActive
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color:
-                                        isActive ? Colors.white : Colors.orange,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // todayDeals(mostView),
-              ],
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  Widget todayDeals(List<dynamic> section) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      Wrap(
-        spacing: 8.0, // Horizontal spacing between cards
-        runSpacing: 8.0,
-        children: section.map((home) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            width: 340,
-            height: 400, // Adjust as needed for card width
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                image: AssetImage(home.image),
-                colorFilter: const ColorFilter.mode(
-                  Color.fromARGB(101, 0, 0, 0), // Semi-transparent overlay
-                  BlendMode.darken,
-                ),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.6),
-                        Colors.transparent,
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: const Text(
-                      'View',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+    return DefaultTabController(
+        length: _tabs.length,
+        child: Scaffold(
+          appBar: AppBar(
+            title:
+                const Text('Today Deal', style: TextStyle(color: Colors.black)),
+            backgroundColor: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.black),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MarketMain(startIndex: 6),
                       ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isFavorite = !isFavorite; // Toggle favorite state
-                      });
-                    },
-                    child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                    );
+                  },
+                  icon: const Icon(Icons.favorite_border)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MarketMain(startIndex: 5),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.tune)),
+            ],
+            bottom: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              dividerHeight: 0,
+              indicator: const BoxDecoration(),
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              tabs: _tabs.asMap().entries.map((entry) {
+                int index = entry.key;
+                String tab = entry.value;
+                bool isActive = _tabController.index == index;
+                ; // Check if the tab is active
+
+                return Tab(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        home.price,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Container(
+                        width: 60,
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        height: isActive
+                            ? 40
+                            : 40, // Increased height for active tab
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: isActive
+                                ? Colors.white
+                                : Colors.orange, // Border color
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(40), // Rounded corners
+                          color: isActive
+                              ? Colors.orange // Active background
+                              : Colors
+                                  .transparent, // Inactive tab background color
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        home.houseType,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
+                        child: Center(
+                          child: Text(
+                            tab, // Tab text
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isActive
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isActive ? Colors.white : Colors.orange,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on,
-                              size: 14, color: Colors.white),
-                          const SizedBox(width: 6),
-                          Text(
-                            home.location,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.white),
-                          ),
-                          const SizedBox(width: 16),
-                          const Icon(Icons.bed, size: 14, color: Colors.white),
-                          const SizedBox(width: 3),
-                          Text(
-                            home.type.length > 10
-                                ? home.type.substring(0, 10)
-                                : home.type,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.white),
-                          ),
-                          const SizedBox(width: 16),
-                          const Icon(Icons.square_foot,
-                              size: 14, color: Colors.white),
-                          const SizedBox(width: 3),
-                          const Text(
-                            "2900 Sqft",
-                            style: TextStyle(fontSize: 12, color: Colors.white),
-                          ),
-                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
+                );
+              }).toList(),
             ),
-          );
-        }).toList(),
-      ),
-    ]);
+          ),
+          body: FutureBuilder<ApiTodayDeals>(
+            future: futureTodayDeals,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(
+                    child: Text('Error loading today\'s deals'));
+              } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
+                return todayDeals(
+                    snapshot.data!.items); // Pass today's deal items
+              } else {
+                return const Text("No data Available");
+              }
+            },
+          ),
+        ));
+  }
+
+  Widget todayDeals(List<dynamic> section) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      
+        SizedBox(
+          height: 650,
+          child: ListView.builder(
+            scrollDirection: Axis.vertical, // Vertical scrolling
+            itemCount: section.length,
+            itemBuilder: (context, index) {
+              final home = section[index];
+              final imageUrl =
+                  home.housePictures.isNotEmpty ? home.housePictures[0] : '';
+
+              return Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                height: 300, // Adjust height as needed
+                width: double.infinity, // Full width
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    colorFilter: const ColorFilter.mode(
+                      Color.fromARGB(101, 0, 0, 0),
+                      BlendMode.darken,
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    // Dark Overlay
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withOpacity(0.6),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                        ),
+                      ),
+                    ),
+                    // Favorite Button (Top-left)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                        },
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    // "View" Button (Bottom-right)
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MarketMain(startIndex: 4, id: home.id),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            'View',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // House Details (Bottom-left)
+                    Positioned(
+                      bottom: 10,
+                      left: 10,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            home.price.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            home.houseType,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on,
+                                  size: 12, color: Colors.white70),
+                              const SizedBox(width: 6),
+                              Text(
+                                home.street as String,
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.white70),
+                              ),
+                              const SizedBox(width: 16),
+                              const Icon(Icons.bed,
+                                  size: 12, color: Colors.white70),
+                              const SizedBox(width: 3),
+                              Text(
+                                home.houseType.length > 10
+                                    ? home.houseType.substring(0, 10)
+                                    : home.houseType,
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.grey),
+                              ),
+                              const SizedBox(width: 16),
+                              const Icon(Icons.square_foot,
+                                  size: 12, color: Colors.white70),
+                              const SizedBox(width: 3),
+                              const Text(
+                                "2312",
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.white70),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

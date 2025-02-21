@@ -6,6 +6,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Investment/investment.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
@@ -24,6 +25,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final controller = Get.put(Main_Dashboard_controller());
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
@@ -34,6 +36,8 @@ class _DashboardPageState extends State<DashboardPage> {
     print('Params.userId Code: ${Params.userId}');
     Timer(const Duration(seconds: 2), () {
       fetchPlanOptions();
+      controller.fetchPlanOptions();
+  
     });
   }
 
@@ -84,16 +88,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
                 children: [
                   CircleAvatar(
-                    radius: 25,
-                    backgroundImage: profileImage != ""
-                        ? NetworkImage(
-                            profileImage) // Use the URL from the response
-                        : const AssetImage('')
-                            as ImageProvider, // Default image if no URL
-                  ),
+                  radius: 35,
+                  backgroundImage: controller.profileImageUrl != null
+                      ? NetworkImage(controller
+                          .profileImageUrl!) // Use the URL from the response
+                      : const AssetImage('')
+                          as ImageProvider, // Default image if no URL
+                ),
                   const SizedBox(width: 16),
                   Text(
-                    'Hello, $profileName 👋',
+                    'Hello, ${controller.profileName} 👋',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),

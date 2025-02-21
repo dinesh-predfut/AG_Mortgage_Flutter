@@ -160,7 +160,7 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
               //
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: baseColor,
               ),
               child: const Text("Save Card",
                   style: TextStyle(color: Colors.white)),

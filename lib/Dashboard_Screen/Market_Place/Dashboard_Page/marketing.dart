@@ -31,8 +31,8 @@ class _MarketplacePageState extends State<MarketplacePage>
     fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
     fetchmostViewedHouses = controller.fetchmostViewedHouses();
     futureTodayDeals = controller.fetchTodayDeals();
-    _tabController = TabController(length: 12, vsync: this);
-    _tabs;
+    _tabController = TabController(length:controller.posts.length, vsync: this);
+   
   }
 
   @override
@@ -41,23 +41,14 @@ class _MarketplacePageState extends State<MarketplacePage>
     _tabController.dispose();
   }
 
-  List<String> _tabs = [
-    "All",
-    "Lagos",
-    "Ogun",
-    "Anambra",
-    "Abuja",
-    "oyo",
-    "Kaduna",
-    "Kano"
-  ];
 
   Future<void> fetchTabs() async {
     try {
-      List<String> tabs = await controller.tabFetch();
+      
       setState(() {
-        _tabs = tabs;
-        _tabController = TabController(length: _tabs.length, vsync: this);
+      
+        _tabController =
+            TabController(length: controller.posts.length, vsync: this);
         // _isLoading = false;
       });
     } catch (e) {
@@ -89,12 +80,7 @@ class _MarketplacePageState extends State<MarketplacePage>
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MarketMain(startIndex: 4),
-                ),
-              );
+              Navigator.pushNamed(context, "/filterPage");
             },
             icon: const Icon(Icons.tune),
           ),
@@ -112,13 +98,14 @@ class _MarketplacePageState extends State<MarketplacePage>
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return  const Center(
+                return const Center(
                     child: Text('Error loading sponsored data'));
               } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-                return buildSection(  
+                return buildSection(
                     snapshot.data!.items); // Pass the sponsored items
               } else {
-                return const SizedBox(); // Show nothing if no data
+                return const Text(
+                    "Data Not Available in Sponsoreds"); // Show nothing if no data
               }
             },
           ),
@@ -138,22 +125,41 @@ class _MarketplacePageState extends State<MarketplacePage>
                 borderRadius: BorderRadius.circular(40),
                 color: Colors.orange,
               ),
-              tabs: _tabs.map((tab) {
-                return Tab(
+              tabs: [
+                // Add "All" tab manually
+                Tab(
                   child: Container(
-                    width: 60,
+                    width: 80,
                     height: 30,
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.orange),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Center(
-                      child: Text(tab, style: const TextStyle(fontSize: 14)),
+                    child: const Center(
+                      child: Text("All", style: TextStyle(fontSize: 14)),
                     ),
                   ),
-                );
-              }).toList(),
+                ),
+                // Dynamically add posts from controller
+                ...controller.posts.map((post) {
+                  return Tab(
+                    child: Container(
+                      width: 80,
+                      height: 30,
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.orange),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(post.name.toString(),
+                            style: const TextStyle(fontSize: 14)),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ],
             ),
           ),
 
@@ -173,7 +179,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                 return newHouses(context,
                     snapshot.data!.items); // Pass the most viewed items
               } else {
-                return const SizedBox(); // Show nothing if no data
+                return const Text("Data Not Available in New House");
               }
             },
           ),
@@ -195,7 +201,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                 return buildSectionmostview(
                     snapshot.data!.items); // Pass today's deal items
               } else {
-                return const SizedBox(); // Show nothing if no data
+                return const Text("Data Not Available in Most viewe");
               }
             },
           ),
@@ -214,7 +220,7 @@ class _MarketplacePageState extends State<MarketplacePage>
               } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
                 return todayDeals(snapshot.data!.items); // Pass new house items
               } else {
-                return const SizedBox(); // Show nothing if no data
+                return const Text("Data Not Available Today Deals");
               }
             },
           ),
@@ -324,7 +330,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                   MarketMain(startIndex: 4,id: home.id),
+                                  MarketMain(startIndex: 4, id: home.id),
                             ),
                           );
                         },
@@ -428,12 +434,7 @@ class _MarketplacePageState extends State<MarketplacePage>
             ),
             TextButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MarketMain(startIndex: 1),
-                  ),
-                );
+                Navigator.pushNamed(context, "/seemoremostview");
               },
               child: const Text(
                 "See all",
@@ -605,12 +606,7 @@ class _MarketplacePageState extends State<MarketplacePage>
             ),
             TextButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MarketMain(startIndex: 2),
-                  ),
-                );
+                Navigator.pushNamed(context, "/seemoretodaydeals");
               },
               child: const Text(
                 "See all",
@@ -812,12 +808,7 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MarketMain(startIndex: 3),
-                ),
-              );
+              Navigator.pushNamed(context, "/seemorenewhouse");
             },
             child: const Text(
               "See all",

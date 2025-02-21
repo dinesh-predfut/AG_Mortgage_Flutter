@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../const/colors.dart';
+
 class Investment_Forms extends StatelessWidget {
   const Investment_Forms({super.key});
 
@@ -128,9 +130,9 @@ class Investment_Forms extends StatelessWidget {
                             // );
                           },
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
+                            padding:  EdgeInsets.symmetric(
                                 horizontal: 140.0, vertical: 17.0),
-                            backgroundColor: Colors.deepPurple,
+                            backgroundColor: baseColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),

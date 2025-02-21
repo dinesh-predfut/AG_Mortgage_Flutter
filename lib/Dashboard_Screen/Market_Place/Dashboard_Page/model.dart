@@ -265,3 +265,32 @@ class Location {
     };
   }
 }
+class Apartment {
+  final int id;
+  final String apartmentType;
+  final String description;
+
+  Apartment({
+    required this.id,
+    required this.apartmentType,
+    required this.description,
+  });
+
+  // Factory method to create an instance from JSON
+  factory Apartment.fromJson(Map<String, dynamic> json) {
+    return Apartment(
+      id: json['id'],
+      apartmentType: json['apartmentType'],
+      description: json['description'],
+    );
+  }
+
+  // Method to convert an instance to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'apartmentType': apartmentType,
+      'description': description,
+    };
+  }
+}

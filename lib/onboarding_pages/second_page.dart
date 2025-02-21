@@ -1,4 +1,5 @@
 import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/image.dart'; // Import Images class.
 import 'package:ag_mortgage/onboarding_pages/termsandcondition.dart';
@@ -83,18 +84,18 @@ class _LandingScreenState extends State<LandingScreen> {
                     _pageController.jumpToPage(_pages.length - 1);
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(width: 1.0, color: Colors.deepPurple),
+                    side:  BorderSide(width: 1.0, color: baseColor),
                   ),
-                  child: const Text(
+                  child:  Text(
                     "Skip",
-                    style: TextStyle(color: Colors.deepPurple),
+                    style: TextStyle(color: baseColor),
                   ),
                 ),
                 ElevatedButton(
                 
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                   
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -141,10 +142,10 @@ class OnboardingPage extends StatelessWidget {
           const SizedBox(height: 30),
           Text(
             title,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
+              color: baseColor,
             ),
           ),
           const SizedBox(height: 20),

@@ -1,5 +1,6 @@
 import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/const/Image.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 
 class FinalPageAuth extends StatelessWidget {
@@ -54,7 +55,7 @@ class FinalPageAuth extends StatelessWidget {
                   ),
                   ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: baseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

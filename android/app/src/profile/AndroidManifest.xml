@@ -4,12 +4,14 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <application
-        android:enableOnBackInvokedCallback="true"></application>
+ <application
+    android:enableOnBackInvokedCallback="true">
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="tel" />
         </intent>
     </queries>
+ </application>
 </manifest>

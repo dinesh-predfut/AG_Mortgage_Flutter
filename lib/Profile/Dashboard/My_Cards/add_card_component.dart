@@ -1,5 +1,7 @@
 import 'package:ag_mortgage/Profile/Dashboard/My_Cards/Success_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../../../const/colors.dart';
 class AddCardDetailsPage extends StatelessWidget {
   const AddCardDetailsPage({super.key});
 
@@ -108,7 +110,7 @@ class AddCardDetailsPage extends StatelessWidget {
               //
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: baseColor,
               ),
               child: const Text("Save Card",
                   style: TextStyle(color: Colors.white)),

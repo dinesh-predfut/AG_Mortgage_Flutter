@@ -179,7 +179,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                   ),
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.deepPurple,
+                                  backgroundColor: baseColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -408,12 +408,12 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.deepPurple),
+                    borderSide:BorderSide(color: baseColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide:
-                        const BorderSide(color: Colors.deepPurple, width: 2),
+                         BorderSide(color: baseColor, width: 2),
                   ),
                 ),
               ),

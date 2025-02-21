@@ -1,6 +1,8 @@
 import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../const/colors.dart';
+
 // ignore: camel_case_types
 class Refer_Bonus extends StatefulWidget {
   const Refer_Bonus({super.key});
@@ -265,7 +267,7 @@ class _Refer_BonusState extends State<Refer_Bonus>
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 12.0),
-                            backgroundColor: Colors.deepPurple,
+                            backgroundColor: baseColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
