@@ -14,6 +14,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
+import '../../dashboard/Dashboard/component.dart';
+
 class Main_Dashboard_controller extends ChangeNotifier {
   TextEditingController accountNumber = TextEditingController();
   TextEditingController bvn = TextEditingController();
@@ -25,38 +27,60 @@ class Main_Dashboard_controller extends ChangeNotifier {
   var isLoading = false.obs;
   var profileName = "";
   String? profileImageUrl;
-
-  Future<bool> getwithdrawDetails(BuildContext context) async {
+ Future<InvestmentModels?> fetchInvestmentDetails() async {
     try {
-      var request = http.Request('GET', Uri.parse(Urls.withdraw));
+      var url = Uri.parse(Urls.investment);
 
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${Params.userToken ?? ''}',
-      });
+      var response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${Params.userToken ?? ''}',
+        },
+      );
 
-      print('Request: ${request.body}');
+      if (response.statusCode == 200) {
+         final data = jsonDecode(response.body);
 
-      // Send request
-      http.StreamedResponse streamedResponse = await request.send();
-      var decodedResponse = await http.Response.fromStream(streamedResponse);
+        return InvestmentModels.fromJson(data);
+      } else {
+        print("Failed to fetch investment details: ${response.body}");
+        return null;
+      }
+    } catch (error) {
+      print("Error fetching investment: $error");
+      return null;
+    }
+  }
+  static Future<bool> updateInvestment(InvestmentModels investment) async {
+    try {
+      var url = Uri.parse(Urls.investment);
 
-      print('Response Code: ${decodedResponse.statusCode}');
-      print('Response Bodyyyyyy: ${decodedResponse.body}');
+      var response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${Params.userToken ?? ''}', 
+        },
+       
+      );
 
-      if (decodedResponse.statusCode == 200) {
-        // Fluttertoast.showToast(
-        //   msg: "Withdrawal Successful",
-        //   toastLength: Toast.LENGTH_SHORT,
-        //   gravity: ToastGravity.BOTTOM,
-        //   backgroundColor: Colors.grey,
-        //   textColor: Colors.white,
-        // );
+      print('Response Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: "Investment Updated Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
         return true;
       } else {
-        print('Error: ${decodedResponse.body}');
+        print('Error: ${response.body}');
         Fluttertoast.showToast(
-          msg: "Error: ${decodedResponse.body}",
+          msg: "Error: ${response.body}",
           toastLength: Toast.LENGTH_SHORT,
         );
         return false;
@@ -70,7 +94,6 @@ class Main_Dashboard_controller extends ChangeNotifier {
       return false;
     }
   }
-
   Future<void> fetchPlanOptions() async {
     try {
       print('Response Code: ${Params.userId}');
@@ -140,7 +163,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
       if (decodedResponse.statusCode == 200) {
         // ignore: use_build_context_synchronously
-        getwithdrawDetails(context);
+      
         Fluttertoast.showToast(
           msg: "Withdrawal Successful",
           toastLength: Toast.LENGTH_SHORT,

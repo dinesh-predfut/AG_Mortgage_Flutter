@@ -246,10 +246,11 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                     MaterialPageRoute(
                                   builder: (context) {
                                     if (_selectedPlan == "mortgage") {
-                                      return MortgageFormPage(
+                                      print("house${house.houseNumber}");
+                                      return TermsAndConditionsDialog(
                                           viewBtn: false, house: house);
                                     } else if (_selectedPlan == "rentToOwn") {
-                                      return RentToOwnForm( 
+                                      return TermsAndConditionsDialogRentown(
                                           house: house,
                                           viewBtn:
                                               false); // Ensure RentToOwnPage exists

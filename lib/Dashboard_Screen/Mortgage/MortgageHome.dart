@@ -50,7 +50,7 @@ class _MortgagePageHomeState extends State<MortgagePageHome> {
     const CardPaymentPage(),
     const TermSheetPage(),
     const BankTransferPage(),
-    const TermsHomePage(),
+    const TermsAndConditionsDialog(),
     const Success()
   ];
 
@@ -149,7 +149,7 @@ class Landing_Mortgage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const MortgagePageHome(
-                                startIndex: 1), // Start with MortgagePageHome
+                                startIndex: 10), // Start with MortgagePageHome
                           ),
                         );
                       },
@@ -773,6 +773,7 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   String selectedPaymentMethod = "Card";
+final controller = Get.put(MortgagController());
 
   @override
   Widget build(BuildContext context) {
@@ -819,7 +820,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ),
             const Spacer(),
             ElevatedButton(
+             
               onPressed: () {
+                 controller.addMortgageForm(context);
                 if (selectedPaymentMethod == "Bank Transfer") {
                   // Navigate to a page for Bank Transfer
                   Navigator.pushReplacement(
@@ -1049,7 +1052,7 @@ class _TermSheetPageState extends State<TermSheetPage>
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    controller.addMortgageForm(context);
+                    
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -1203,6 +1206,7 @@ class _BankTransferPageState extends State<BankTransferPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
+                  
                   controller.bankTransfer(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -1235,37 +1239,37 @@ class _BankTransferPageState extends State<BankTransferPage> {
 }
 
 class TermsHomePage extends StatefulWidget {
-  const TermsHomePage({super.key});
+  final bool show; // Parameter to determine whether to show the dialog
+
+  const TermsHomePage({super.key, required this.show});
 
   @override
   _TermsHomePageState createState() => _TermsHomePageState();
 }
 
 class _TermsHomePageState extends State<TermsHomePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Show the dialog only if 'show' is true
+    if (widget.show) {
+      Future.delayed(Duration.zero, () {
+        _showTermsAndConditionsDialog(context);
+      });
+    } else {
+      Future.delayed(Duration.zero, () {
+        Navigator.pop(context);
+      });
+    }
+  }
+
   // Function to show the Terms and Conditions dialog
   void _showTermsAndConditionsDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => TermsAndConditionsDialog(
-        onAccept: () {
-          Navigator.pop(context); // Close dialog and proceed
-          // Handle the accept logic (e.g., navigate to the next screen)
-        },
-        onDecline: () {
-          Navigator.pop(context); // Close dialog
-          // Handle the decline logic (e.g., show a message or exit)
-        },
-      ),
+      builder: (context) => const TermsAndConditionsDialog(),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Show the Terms and Conditions dialog as soon as the app starts
-    Future.delayed(Duration.zero, () {
-      _showTermsAndConditionsDialog(context);
-    });
   }
 
   @override
@@ -1304,12 +1308,12 @@ class Success extends StatelessWidget {
                     style: TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
+                 
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            const DashboardPageS("Mortgage"),
+                        builder: (_) => const DashboardPageS("Mortgage"),
                       ),
                     );
                   },
@@ -1331,13 +1335,12 @@ class Success extends StatelessWidget {
 }
 
 class TermsAndConditionsDialog extends StatelessWidget {
-  final VoidCallback onAccept;
-  final VoidCallback onDecline;
-
+  final Houseview? house;
+  final bool? viewBtn;
   const TermsAndConditionsDialog({
     Key? key,
-    required this.onAccept,
-    required this.onDecline,
+    this.house,
+    this.viewBtn,
   }) : super(key: key);
 
   @override
@@ -1759,30 +1762,47 @@ class TermsAndConditionsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                   ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Decline',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                  ),
+                ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: baseColor,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MortgagePageHome(
-                            startIndex: 1), // Start with MortgagePageHome
+                        builder: (context) => MortgageFormPage(
+                          viewBtn: viewBtn, // Pass viewBtn
+                          house: house, // Pass house
+                        ),
                       ),
                     );
                   },
-                  child: const Text('Accept'),
+                  child: const Text(
+                    'Accept',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MortgagePageHome(
-                            startIndex: 0), // Start with MortgagePageHome
-                      ),
-                    );
-                  },
-                  child: const Text('Decline'),
-                ),
+             
               ],
             ),
           ],

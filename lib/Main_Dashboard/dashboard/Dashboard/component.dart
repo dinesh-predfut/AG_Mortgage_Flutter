@@ -15,8 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-
-
 class DashboardPageS extends StatefulWidget {
   final String plans;
   const DashboardPageS(this.plans, {Key? key}) : super(key: key);
@@ -27,14 +25,13 @@ class DashboardPageS extends StatefulWidget {
 
 class _DashboardPageSState extends State<DashboardPageS> {
   final controller = Get.put(Main_Dashboard_controller());
-@override
+  @override
   void initState() {
     super.initState();
-   
-      controller.fetchPlanOptions();
 
-    
+    controller.fetchPlanOptions();
   }
+
   late final String plans;
   @override
   Widget build(BuildContext context) {
@@ -48,18 +45,20 @@ class _DashboardPageSState extends State<DashboardPageS> {
             children: [
               const SizedBox(height: 40), // For safe area padding
               // Greeting Section
-                Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                 CircleAvatar(
-              radius: 25,
-              backgroundImage:controller.profileImageUrl != null
-                  ? NetworkImage(controller.profileImageUrl!) // Use the URL from the response
-                  : const AssetImage('') as ImageProvider, // Default image if no URL
-            ),
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: controller.profileImageUrl != null
+                          ? NetworkImage(controller
+                              .profileImageUrl!) // Use the URL from the response
+                          : const AssetImage('')
+                              as ImageProvider, // Default image if no URL
+                    ),
                     const SizedBox(width: 10),
-                     Text(
+                    Text(
                       "Hello, ${controller.profileName}👋",
                       style: const TextStyle(
                         fontSize: 18,
@@ -209,47 +208,47 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                 ),
                               ),
                             if (widget.plans == "Rent-To-Own")
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                              ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.only(
+                                      left: 15, right: 15, top: 5, bottom: 5),
                                 ),
-                                padding: const EdgeInsets.only(
-                                    left: 15, right: 15, top: 5, bottom: 5),
+                                child: const Text(
+                                  "Pay Rent",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.white),
+                                ),
                               ),
-                              child: const Text(
-                                "Pay Rent",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
-                            ),
-                             if (widget.plans == "Mortgage")
-                            ElevatedButton(
-                              onPressed: () {
-                                   Navigator.pushReplacement(
+                            if (widget.plans == "Mortgage")
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           const Get_All_Cards(),
                                     ),
                                   );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.only(
+                                      left: 15, right: 15, top: 5, bottom: 5),
                                 ),
-                                padding: const EdgeInsets.only(
-                                    left: 15, right: 15, top: 5, bottom: 5),
+                                child: const Text(
+                                  "Deposit",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.white),
+                                ),
                               ),
-                              child: const Text(
-                                "Deposit",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
-                            ),
                           ])
                     ],
                   ),
@@ -272,7 +271,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                     StatementOfAccount(widget.plans),
+                                    StatementOfAccount(widget.plans),
                               ));
                         }
                         if (widget.plans == "Construction Finance") {
@@ -303,7 +302,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>  Term_Sheets(widget.plans),
+                              builder: (context) => Term_Sheets(widget.plans),
                             ));
                       },
                     ),
@@ -316,13 +315,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const Investment_Forms(), // Start with MortgagePage
-                      ),
-                    );
+                    controller.fetchInvestmentDetails();
+                  Navigator.pushNamed(context, "/investmentmore");
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -511,7 +505,6 @@ class _DashboardPageSState extends State<DashboardPageS> {
                               }
                             },
                             decoration: InputDecoration(
-                              
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
                               ),
@@ -537,7 +530,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                       .then((isSuccess) {
                                     if (isSuccess) {
                                       showWithdrawDetailsPopup(context);
-                                      
+
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -613,21 +606,21 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             ],
                           ),
                           padding: const EdgeInsets.all(16),
-                          child: const Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Account Name",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "Adeyemi Pelumi",
-                                    style: TextStyle(
+                                    controller.profileName,
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
@@ -638,14 +631,14 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Account Number",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "0214567891",
-                                    style: TextStyle(
+                                    controller.accountNumber.text,
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
@@ -656,14 +649,14 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Bank Name",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "Best Bank",
-                                    style: TextStyle(
+                                    controller.bankName.text,
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
@@ -699,28 +692,28 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             ],
                           ),
                           padding: const EdgeInsets.all(16),
-                          child: const Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Withdrawal Amount",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "NGN 76,000",
-                                    style: TextStyle(
+                                    "NGN ${controller.amount.text}",
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
                                   )
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -738,7 +731,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   )
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -756,7 +749,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   )
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -774,7 +767,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   ),
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -855,8 +848,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const DashboardPageS(''), // Start with MortgagePage
+                                builder: (context) => DashboardPageS(
+                                    widget.plans), // Start with MortgagePage
                               ),
                             );
                           },
@@ -1116,8 +1109,8 @@ class GaugeChartWidget extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const DashboardPageS(''), // Start with MortgagePage
+                                builder: (context) => const DashboardPageS(
+                                    ''), // Start with MortgagePage
                               ),
                             );
                           },
@@ -1136,5 +1129,77 @@ class GaugeChartWidget extends StatelessWidget {
                     ),
                   )),
             ));
+  }
+}
+
+class InvestmentModels {
+  final int totalItems;
+  final int totalPages;
+  final int currentPage;
+  final List<InvestmentPlan> items;
+
+  InvestmentModels({
+    required this.totalItems,
+    required this.totalPages,
+    required this.currentPage,
+    required this.items,
+  });
+
+  factory InvestmentModels.fromJson(Map<String, dynamic> json) {
+    return InvestmentModels(
+      totalItems: json['totalItems'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
+      currentPage: json['currentPage'] ?? 0,
+      items: (json['items'] as List<dynamic>?)
+              ?.map((item) => InvestmentPlan.fromJson(item))
+              .toList() ??
+          [], // ✅ Handles null items list safely
+    );
+  }
+}
+
+class InvestmentPlan {
+  final int id;
+  final int customerId;
+  final String customerName;
+  final int amountInvested;
+  final String duration;
+  final String startDate;
+  final int interestPercentage;
+  final String maturityDate;
+  final int maturityAmount;
+  final String status;
+
+  InvestmentPlan({
+    required this.id,
+    required this.customerId,
+    required this.customerName,
+    required this.amountInvested,
+    required this.duration,
+    required this.startDate,
+    required this.interestPercentage,
+    required this.maturityDate,
+    required this.maturityAmount,
+    required this.status,
+  });
+
+  factory InvestmentPlan.fromJson(Map<String, dynamic> json) {
+    return InvestmentPlan(
+      id: json['id'] ?? 0,
+      customerId: json['customerId'] ?? 0,
+      customerName: json['customerName'] ?? "N/A",
+      amountInvested: _toInt(json['amountInvested']),
+      duration: json['duration'] ?? "N/A",
+      startDate: json['startDate'] ?? "N/A",
+      interestPercentage: _toInt(json['interestPercentage']),
+      maturityDate: json['maturityDate'] ?? "N/A",
+      maturityAmount: _toInt(json['maturityAmount']),
+      status: json['status'] ?? "Unknown",
+    );
+  }
+  static int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.toInt(); // Convert double to int
+    return 0; // Default fallback
   }
 }

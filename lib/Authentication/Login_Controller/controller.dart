@@ -6,6 +6,7 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Login/signin_model.dart';
 import 'package:ag_mortgage/Authentication/Login_Models.dart/profile_model.dart';
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
+import 'package:ag_mortgage/Authentication/PIN_Creation/pin.dart';
 import 'package:ag_mortgage/Authentication/Profile/profile.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
@@ -28,6 +29,7 @@ class ProfileController extends GetxController {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lasttNameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
+  TextEditingController registerPhoneNumber= TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController otpController = TextEditingController();
@@ -57,7 +59,7 @@ class ProfileController extends GetxController {
       Fluttertoast.showToast(msg: "enter_first_name_msg");
     } else if (lasttNameController.text.isEmpty) {
       Fluttertoast.showToast(msg: "enter_last_name_msg");
-    } else if (numberController.text.isEmpty) {
+    } else if (registerPhoneNumber.text.isEmpty) {
       Fluttertoast.showToast(msg: "enter_number_msg");
     } else if (numberController.text.length < 9) {
       Fluttertoast.showToast(msg: "enter_valid_number_msg");
@@ -71,7 +73,8 @@ class ProfileController extends GetxController {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const Authentication(),
+            builder: (context) =>const PIN_Creation()
+            // const Authentication(),
           ));
     }
   }
@@ -85,7 +88,7 @@ class ProfileController extends GetxController {
         "firstName": firstNameController.text,
         "lastName": lasttNameController.text,
         "dateOfBirth": dobController.text,
-        "phoneNumber": numberController.text,
+        "phoneNumber": countryCodeController.text.trim() + registerPhoneNumber.text,
         "email": emailController.text,
         "gender": selectedGender.toString(),
         "password": newPasswordController.text,
@@ -150,7 +153,7 @@ class ProfileController extends GetxController {
 
       var request = http.Request('POST', Uri.parse(Urls.sendOTP));
       request.body = json.encode({
-        "email": countryCodeController.text.trim() + numberController.text.trim(),
+        "email": countryCodeController.text.trim() + registerPhoneNumber.text.trim(),
         "userType": "customer",
         "resendType": "emailVerification"
       });
@@ -196,10 +199,10 @@ class ProfileController extends GetxController {
     try {
       isLoading(true);
       showMsg(false);
-
+print("countryCodeController.text${countryCodeController.text}");
       var request = http.Request('POST', Uri.parse(Urls.signup));
       request.body = json.encode({
-        "username": countryCodeController.text.trim() + numberController.text.trim(),
+        "username": countryCodeController.text + numberController.text.trim(),
         "password": passwordController.text.trim(),
       });
       request.headers.addAll({'Content-Type': 'application/json'});

@@ -2,6 +2,7 @@ import 'package:ag_mortgage/Authentication/Login/login.dart';
 import 'package:ag_mortgage/Authentication/Registration/Components/rigister.dart';
 import 'package:ag_mortgage/Botam_Tab/bottam_tap.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Construction/construction.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Investment/investment.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
@@ -9,6 +10,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
+import 'package:ag_mortgage/Main_Dashboard/dashboard/Investment/compontent.dart';
 import 'package:ag_mortgage/NotificationScreen/notification.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
 
@@ -104,10 +106,18 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => const MarketMain(startIndex: 6),
             );
+            case '/investment':
+            return MaterialPageRoute(
+              builder: (context) => const Investment(),
+            );
+             case '/investmentmore':
+            return MaterialPageRoute(
+              builder: (context) => const Investment_Forms(),
+            );
           default:
             return MaterialPageRoute(
                 builder: (context) =>
-                    const LandingPage()); // Handle unknown routes
+                    const Login()); // Handle unknown routes
         }
       },
     );
@@ -150,17 +160,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final bool showBottomNavBar = _currentIndex != 0;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_currentIndex != 0) {
-          setState(() {
-            _currentIndex = 0;
-          });
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
+    return Scaffold(
         body: _pages[_currentIndex],
         bottomNavigationBar: showBottomNavBar
             ? BottomNavBar(
@@ -169,7 +169,7 @@ class _LandingPageState extends State<LandingPage> {
                 items: const [], // Adjust for LandingPage
               )
             : null,
-      ),
-    );
+      );
+    
   }
 }

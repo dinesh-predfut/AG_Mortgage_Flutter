@@ -70,7 +70,7 @@ class _LoginState extends State<Login> {
                   const SizedBox(height: 30),
                   // Phone Number Field
                   IntlPhoneField(
-                  
+                  controller:signupController.numberController ,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
@@ -78,12 +78,14 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide:  BorderSide(color: baseColor),
                       ),
+                      counterText: "",
                     ),
                     initialCountryCode: 'NG', // Nigeria as default
+                    disableLengthCheck: true,
                     onChanged: (phone) {
-                      signupController.numberController.text=phone.completeNumber;
+                      signupController.countryCodeController.text=phone.countryCode;
                       print(phone
-                          .completeNumber); // Prints full number with country code
+                          ); // Prints full number with country code
                     },
                   ),
                   const SizedBox(height: 20),

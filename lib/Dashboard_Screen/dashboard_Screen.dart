@@ -163,7 +163,15 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        if (planOptions.contains("Rent-to-Own")) {
+                         if (planOptions.contains("Mortgage")) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardPageS("Mortgage"),
+                            ),
+                          );
+                         }
+                          else if (planOptions.contains("Rent-to-Own")) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -236,12 +244,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const Investment(),
-                          ),
-                        );
+                       Navigator.pushNamed(context, "/investment");
                       },
                     ),
                     const SizedBox(height: 16),

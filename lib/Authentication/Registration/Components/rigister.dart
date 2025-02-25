@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../const/colors.dart'; // Update this with the correct path to your image.dart file.
 
@@ -61,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                   Text(
+                  Text(
                     "Register",
                     style: TextStyle(
                       fontSize: 24,
@@ -87,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "First Name",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -99,23 +100,32 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Last Name",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
-                  // Phone Number Field
-                  TextField(
-                    controller: signupController.numberController,
-                    keyboardType: TextInputType.number,
+                  IntlPhoneField(
+                    controller: signupController.registerPhoneNumber,
+                    keyboardType: TextInputType.phone,
+                    // validator: false,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
+                      counterText: "",
                     ),
+                    initialCountryCode: 'NG', // Nigeria as default
+                    disableLengthCheck: true,
+                    onChanged: (phone) {
+                      signupController.registerPhoneNumber.text =
+                          phone.completeNumber;
+                      print(phone
+                          .completeNumber); // Prints full number with country code
+                    },
                   ),
                   const SizedBox(height: 20),
 
@@ -127,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Email",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -139,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       labelText: "Promo Code (Optional)",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                     ),
                   ),
@@ -178,10 +188,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                           //       builder: (context) =>
                           //           const Login(navigation: true),
                           //     ));
-                              //  Navigator.of(context).pushNamed('/login');
-                               Navigator.pushNamed(context, "/login");
+                          //  Navigator.of(context).pushNamed('/login');
+                          Navigator.pushNamed(context, "/login");
                         },
-                        child:  Text(
+                        child: Text(
                           "Login",
                           style: TextStyle(color: baseColor),
                         ),
