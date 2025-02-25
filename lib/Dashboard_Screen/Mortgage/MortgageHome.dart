@@ -50,7 +50,8 @@ class _MortgagePageHomeState extends State<MortgagePageHome> {
     const CardPaymentPage(),
     const TermSheetPage(),
     const BankTransferPage(),
-    const TermsHomePage()
+    const TermsHomePage(),
+    const Success()
   ];
 
   void _goToNextStep() {
@@ -705,7 +706,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle:  CalendarStyle(
+                calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
                     color: baseColor,
                     shape: BoxShape.circle,
@@ -900,7 +901,8 @@ class _TermSheetPageState extends State<TermSheetPage>
     var cityName = await controller.findAndSetCity();
     setState(() {}); // Rebuild to display the city name
   }
-    Future<void> _fetchAreaName() async {
+
+  Future<void> _fetchAreaName() async {
     var areaName = await controller.findAndSetArea();
     setState(() {}); // Rebuild to display the city name
   }
@@ -1029,7 +1031,6 @@ class _TermSheetPageState extends State<TermSheetPage>
                     ),
                     TextButton(
                       onPressed: () {
-                       
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -1048,7 +1049,7 @@ class _TermSheetPageState extends State<TermSheetPage>
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                     controller.addMortgageForm(context);
+                    controller.addMortgageForm(context);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -1121,8 +1122,15 @@ Widget _buildRow(String label, value) {
   );
 }
 
-class BankTransferPage extends StatelessWidget {
+class BankTransferPage extends StatefulWidget {
   const BankTransferPage({super.key});
+
+  @override
+  State<BankTransferPage> createState() => _BankTransferPageState();
+}
+
+class _BankTransferPageState extends State<BankTransferPage> {
+  final controller = Get.put(MortgagController());
 
   @override
   Widget build(BuildContext context) {
@@ -1195,13 +1203,7 @@ class BankTransferPage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MortgagePageHome(
-                          startIndex: 7), // Start with MortgagePageHome
-                    ),
-                  );
+                  controller.bankTransfer(context);
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -1269,6 +1271,62 @@ class _TermsHomePageState extends State<TermsHomePage> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold();
+  }
+}
+
+class Success extends StatelessWidget {
+  const Success({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(""),
+        centerTitle: true,
+      ),
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  Images.success, width: 150, // Adjust size as needed
+                  height: 150,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Deposite Successful",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                const Text(
+                    "Congratulations Pelumi! You have made your first deposit",
+                    style: TextStyle(fontSize: 10)),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const DashboardPageS("Mortgage"),
+                      ),
+                    );
+                  },
+                  //
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: baseColor,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: const Text(
+                    "Processd",
+                    style: TextStyle(color: Colors.white, letterSpacing: 2),
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
   }
 }
 

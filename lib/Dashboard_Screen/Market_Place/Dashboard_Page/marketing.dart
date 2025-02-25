@@ -22,6 +22,7 @@ class _MarketplacePageState extends State<MarketplacePage>
   late Future<ApiTodayDeals> futureTodayDeals;
   bool isFavorite = false;
   late TabController _tabController;
+  late Future<FavoriteHouseList> favoriteHouses;
   final _selectedColor = const Color(0xff1a73e8);
   final _unselectedColor = const Color(0xff5f6368);
   @override
@@ -31,8 +32,26 @@ class _MarketplacePageState extends State<MarketplacePage>
     fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
     fetchmostViewedHouses = controller.fetchmostViewedHouses();
     futureTodayDeals = controller.fetchTodayDeals();
-    _tabController = TabController(length:controller.posts.length, vsync: this);
-   
+    _tabController =
+        TabController(length: controller.posts.length, vsync: this);
+    controller.getFavoriteAll();
+    fetchFavorites();
+  }
+
+  void fetchFavorites() async {
+    try {
+      List<FavoriteHouse> favoriteData = await controller.getFavoriteAll();
+      print("Fetched Favorite Houses: $favoriteData");
+
+      setState(() {
+        controller.favoriteHouseIds =
+            favoriteData.map((house) => house.id.toInt()).toList();
+      });
+
+      print("Updated favoriteHouseIds: ${controller.favoriteHouseIds}");
+    } catch (e) {
+      print("Error fetching favorite houses: $e");
+    }
   }
 
   @override
@@ -41,12 +60,9 @@ class _MarketplacePageState extends State<MarketplacePage>
     _tabController.dispose();
   }
 
-
   Future<void> fetchTabs() async {
     try {
-      
       setState(() {
-      
         _tabController =
             TabController(length: controller.posts.length, vsync: this);
         // _isLoading = false;
@@ -69,12 +85,7 @@ class _MarketplacePageState extends State<MarketplacePage>
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MarketMain(startIndex: 6),
-                ),
-              );
+              Navigator.pushNamed(context, "/favoritePage");
             },
             icon: const Icon(Icons.favorite_border),
           ),
@@ -308,17 +319,21 @@ class _MarketplacePageState extends State<MarketplacePage>
                       top: 10,
                       left: 10,
                       child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isFavorite = !isFavorite; // Toggle favorite state
-                          });
-                        },
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : Colors.white,
-                          size: 24,
-                        ),
-                      ),
+                          onTap: () {
+                            controller.toggleFavorite(home.id.toInt());
+                            fetchFavorites();
+                          },
+                          child: Icon(
+                            controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Colors.red
+                                : Colors.white,
+                            size: 24,
+                          )),
                     ),
                     Positioned(
                       bottom: 10,

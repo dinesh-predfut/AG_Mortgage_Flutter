@@ -100,6 +100,10 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => const LandingPage(startIndex: 2),
             );
+              case '/favoritePage':
+            return MaterialPageRoute(
+              builder: (context) => const MarketMain(startIndex: 6),
+            );
           default:
             return MaterialPageRoute(
                 builder: (context) =>

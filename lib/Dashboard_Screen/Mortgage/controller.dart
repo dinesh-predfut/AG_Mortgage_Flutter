@@ -38,7 +38,11 @@ class MortgagController extends ChangeNotifier {
   double sliderValue = 10;
   int? apartmentOrMarketplace;
   String cityName = "";
-
+  String accountName = "Josh Doe";
+  String accountNumber = "1234567";
+  String bankName = "First Name";
+  int amount = 2500000;
+  String typeOfTransaction = "Monthly Contribution";
   Future<void> fetchCitiesAndAreas() async {
     try {
       allArea = await fetchAreasByCity();
@@ -195,6 +199,69 @@ class MortgagController extends ChangeNotifier {
     }
   }
 
+  Future<void> bankTransfer(BuildContext context) async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+
+    try {
+      print('addMortgageForm Preparing API request...');
+
+      // Prepare the request
+      var request = http.Request('POST', Uri.parse(Urls.bankTransfer));
+      request.body = json.encode({
+        "accountName": accountName,
+        "accountNumber": accountNumber,
+        "bankName": bankName,
+        "amount": amount,
+        "typeOfTransaction": "Monthly Contributions"
+      });
+      request.headers.addAll({
+        'Content-Type': 'application/json ',
+        'Authorization': 'Bearer ${Params.userToken}',
+      });
+
+      print('Request Headers: ${request.headers}');
+      print('Request Body: ${request.body}');
+
+      // Send the request
+      http.StreamedResponse streamedResponse = await request.send();
+      var decodedResponse = await http.Response.fromStream(streamedResponse);
+
+      // Log response
+      print('Response Status Code: ${decodedResponse.statusCode}');
+      print('Response Body: ${decodedResponse.body}');
+
+      if (decodedResponse.statusCode == 200) {
+        final result = jsonDecode(decodedResponse.body);
+         // ignore: use_build_context_synchronously
+         Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MortgagePageHome(
+                startIndex: 11), // Start with MortgagePageHome
+          ),
+        );
+        Fluttertoast.showToast(
+          msg: "Amount Send Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Color.fromARGB(255, 15, 15, 15),
+        );
+        print('API Success Response: $result');
+        // ignore: use_build_context_synchronously
+       
+        // Navigate to MortgagePage
+        // ignore: use_build_context_synchronously
+      } else {
+        print('API Error: HTTP ${decodedResponse.statusCode}');
+        final errorResult = jsonDecode(decodedResponse.body);
+        print('Error Response: $errorResult');
+      }
+    } catch (error) {
+      print('Error Occurred: $error');
+    }
+  }
+
   void clearFields() {
     propertyValueController.clear();
     initialDepositController.clear();
@@ -271,12 +338,11 @@ class MortgagController extends ChangeNotifier {
   Future<void> findAndSetArea() async {
     List<SeletArea> allArea = await fetchAreasByCity();
 
-
     var matchArea = allArea.firstWhere(
       (item) => item.id == selectedArea,
       orElse: () => SeletArea(id: -1, name: "Unknown Area"),
     );
-areaNameValue.text = matchArea.name.toString();
+    areaNameValue.text = matchArea.name.toString();
   }
 
   String calculateProfileDate(String anniversaryDate, int remainingMonths) {

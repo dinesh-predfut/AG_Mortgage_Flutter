@@ -21,7 +21,7 @@ class Market_Place_controller extends ChangeNotifier {
   int? selectedCity;
   List<String> selectedAmenities = [];
   List<PostsModel> posts = [];
-
+  List<int> favoriteHouseIds = [];
   // List<PostsModel> get posts => _posts
   Future<ApinewHoseview> fetchnewtViewedHouses() async {
     const String baseUrl = "3.253.82.115"; // Use IP address directly
@@ -61,6 +61,82 @@ class Market_Place_controller extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Error fetching data: $e');
+    }
+  }
+
+  Future<void> addFavorite(int id) async {
+    final url = Uri.parse('${Urls.addFavorites}?id=$id');
+    // final response = await http.get(Uri.parse(Urls.allCity));
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${Params.userToken ?? ''}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Added to favorites successfully: ${response.body}");
+      } else {
+        print(
+            "Failed to add favorite: ${response.statusCode} - ${response.body}");
+      }
+    } catch (error) {
+      print("Error adding favorite: $error");
+    }
+  }
+
+  Future<void> removeFavorite(int houseId) async {
+    try {
+      var response = await http.delete(
+        Uri.parse('${Urls.addFavorites}?id=$houseId'),
+        headers: {
+          'Authorization': 'Bearer ${Params.userToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        favoriteHouseIds.remove(houseId);
+        getFavoriteAll();
+        // update();
+      } else {
+        print("Failed to remove favorite: ${response.body}");
+      }
+    } catch (e) {
+      print("Error removing favorite: $e");
+    }
+  }
+
+  void toggleFavorite(int houseId) {
+    if (favoriteHouseIds.contains(houseId)) {
+      removeFavorite(houseId);
+    } else {
+      addFavorite(houseId);
+    }
+  }
+
+  Future<List<FavoriteHouse>> getFavoriteAll() async {
+    var response = await http.get(
+      Uri.parse(Urls.addFavorites),
+      headers: {
+        'Authorization': 'Bearer ${Params.userToken}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      print("Raw API Response: $jsonData"); // Debugging
+
+      if (jsonData is Map<String, dynamic> && jsonData.containsKey('items')) {
+        List<dynamic> items = jsonData['items']; // Extract items list
+        return items.map((e) => FavoriteHouse.fromJson(e)).toList();
+      } else {
+        throw Exception('Unexpected API response format');
+      }
+    } else {
+      throw Exception('Failed to Get Favorite Details');
     }
   }
 

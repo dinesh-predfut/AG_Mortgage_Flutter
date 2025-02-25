@@ -265,6 +265,7 @@ class Location {
     };
   }
 }
+
 class Apartment {
   final int id;
   final String apartmentType;
@@ -292,5 +293,155 @@ class Apartment {
       'apartmentType': apartmentType,
       'description': description,
     };
+  }
+}
+
+class FavoriteHouseList {
+  final int totalItems;
+  final int totalPages;
+  final int currentPage;
+  final List<FavoriteHouse> items;
+
+  FavoriteHouseList({
+    required this.totalItems,
+    required this.totalPages,
+    required this.currentPage,
+    required this.items,
+  });
+
+  factory FavoriteHouseList.fromJson(Map<String, dynamic> json) {
+    return FavoriteHouseList(
+      totalItems: json['totalItems'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
+      currentPage: json['currentPage'] ?? 0,
+      items: (json['items'] as List<dynamic>)
+          .map((item) => FavoriteHouse.fromJson(item))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "totalItems": totalItems,
+      "totalPages": totalPages,
+      "currentPage": currentPage,
+      "items": items.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class FavoriteHouse {
+  final int id;
+  final String houseType;
+  final double price;
+  final String totalArea;
+  final String rooms;
+  final List<String> houseAmenities;
+  final String contractorNameAndDescription;
+  final String houseDescription;
+  final String street;
+  final String houseNumber;
+  final List<String> housePictures;
+  final String embedMapDirection;
+  final String houseStatus;
+  final bool sponsored;
+  final String comment;
+
+  FavoriteHouse({
+    required this.id,
+    required this.houseType,
+    required this.price,
+    required this.totalArea,
+    required this.rooms,
+    required this.houseAmenities,
+    required this.contractorNameAndDescription,
+    required this.houseDescription,
+    required this.street,
+    required this.houseNumber,
+    required this.housePictures,
+    required this.embedMapDirection,
+    required this.houseStatus,
+    required this.sponsored,
+    required this.comment,
+  });
+
+  factory FavoriteHouse.fromJson(Map<String, dynamic> json) {
+    return FavoriteHouse(
+      id: (json['id'] as num).toInt(),
+      houseType: json['houseType'] ?? "",
+      price: (json['price'] ?? 0).toDouble(),
+      totalArea: json['totalArea'] ?? "",
+      rooms: json['rooms'] ?? "",
+      houseAmenities: List<String>.from(json['houseAmenities'] ?? []),
+      contractorNameAndDescription: json['contractorNameAndDescription'] ?? "",
+      houseDescription: json['houseDescription'] ?? "",
+      street: json['street'] ?? "",
+      houseNumber: json['houseNumber'] ?? "",
+      housePictures: List<String>.from(json['housePictures'] ?? []),
+      embedMapDirection: json['embedMapDirection'] ?? "",
+      houseStatus: json['houseStatus'] ?? "",
+      sponsored: json['sponsored'].toString().toLowerCase() == "true",
+      comment: json['comment'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "houseType": houseType,
+      "price": price,
+      "totalArea": totalArea,
+      "rooms": rooms,
+      "houseAmenities": houseAmenities,
+      "contractorNameAndDescription": contractorNameAndDescription,
+      "houseDescription": houseDescription,
+      "street": street,
+      "houseNumber": houseNumber,
+      "housePictures": housePictures,
+      "embedMapDirection": embedMapDirection,
+      "houseStatus": houseStatus,
+      "sponsored": sponsored,
+      "comment": comment,
+    };
+  }
+}
+
+class FavoriteHouseIDview {
+  final int id;
+  final String image;
+  final String price;
+  final String title;
+  final String location;
+
+  FavoriteHouseIDview({
+    required this.id,
+    required this.image,
+    required this.price,
+    required this.title,
+    required this.location,
+  });
+
+  factory FavoriteHouseIDview.fromJson(Map<String, dynamic> json) {
+    return FavoriteHouseIDview(
+      id: (json['id'] is double) ? json['id'].toInt() : json['id'],
+      image: json['image'] ?? '',
+      price: json['price'] ?? '',
+      title: json['title'] ?? '',
+      location: json['location'] ?? '',
+    );
+  }
+}
+
+class FavoriteHouseID {
+  final int id; // Ensure this field exists
+  final String name; // Example additional field
+
+  FavoriteHouseID({required this.id, required this.name});
+
+  factory FavoriteHouseID.fromJson(Map<String, dynamic> json) {
+    return FavoriteHouseID(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] ?? '',
+    );
   }
 }
