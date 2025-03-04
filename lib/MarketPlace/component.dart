@@ -17,12 +17,7 @@ class _Market_PlaceRedirectPageState extends State<Market_PlaceRedirectPage> {
 
     // Redirect to the desired page after a short delay
     Future.delayed(const Duration(seconds: 0), () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const MarketMain(),
-        ),
-      );
+       Navigator.pushReplacementNamed(context, '/MarketMain');
     });
   }
 

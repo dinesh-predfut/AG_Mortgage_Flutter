@@ -157,7 +157,7 @@ class _Home_AddressState extends State<Home_Address> {
 
       if (decodedResponse.statusCode == 200) {
         // ignore: use_build_context_synchronously
-
+        Navigator.pushReplacementNamed(context, '/editProfile');
         Fluttertoast.showToast(
           msg: "Employment Updated Successfully",
           toastLength: Toast.LENGTH_SHORT,
@@ -183,12 +183,44 @@ class _Home_AddressState extends State<Home_Address> {
       return false;
     }
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+         Navigator.pushNamed(context, "/editProfile");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child:  Scaffold(
       appBar: AppBar(
-        title: const Text("Employment Details"),
+        title: const Text("Home Address Details"),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -292,10 +324,6 @@ class _Home_AddressState extends State<Home_Address> {
                   ),
                   onPressed: () {
                     homeAddres(context);
-                    //  setState(() {
-                    //           isEditingPassword = false; // Enable editing mode
-                    //           isEditingUsername = false;
-                    //         });
                   },
                   child: const Text("Save Changes"),
                 ),
@@ -304,7 +332,7 @@ class _Home_AddressState extends State<Home_Address> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildUploadBox(String text, {required Function(String) onUpload}) {

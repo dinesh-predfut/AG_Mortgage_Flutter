@@ -157,12 +157,44 @@ class _TodayDealsState extends State<TodayDeals>
           ),
         ));
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+         Navigator.pushNamed(context, "/marketMain");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   Widget todayDeals(List<dynamic> section) {
-    return Column(
+    return WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: 
+    SingleChildScrollView(
+        child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-      
         SizedBox(
           height: 650,
           child: ListView.builder(
@@ -327,6 +359,6 @@ class _TodayDealsState extends State<TodayDeals>
           ),
         ),
       ],
-    );
+    )));
   }
 }

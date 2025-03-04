@@ -1,4 +1,6 @@
 import 'package:ag_mortgage/Profile/Dashboard/component.dart';
+import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
 
 class FAQPage extends StatefulWidget {
@@ -149,22 +151,57 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+    
+         Navigator.pushNamed(context, "/settings");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: 
+    Scaffold(
       appBar: AppBar(
         title: const Text('FAQ'),
         centerTitle: true,
          leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const AccountPage(), // Start with MortgagePage
-              ),
+             Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: 3,
+                    child: ProfilePagewidget(startIndex: 0)))
+            
             ),
           },
         ),
@@ -230,7 +267,7 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
-      
+    ), 
     );
   }
 }

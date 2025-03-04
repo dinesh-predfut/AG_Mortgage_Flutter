@@ -71,20 +71,14 @@ class _AccountPageState extends State<AccountPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Text(
-                  '08045619801',
-                  style: TextStyle(color: Colors.grey),
+                 Text(
+                 controller.phoneNumber,
+                  style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(
-                            startIndex: 1,
-                          ),
-                        ));
+                      Navigator.pushReplacementNamed(context, '/editProfile');
                   },
                   icon: const Icon(
                     Icons.edit,
@@ -126,15 +120,8 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.credit_card,
                         text: 'My Cards',
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChangeNotifierProvider(
-                                create: (context) => CardController(),
-                                child: const MyCardsPage(),
-                              ),
-                            ),
-                          );
+                         
+                           Navigator.pushReplacementNamed(context, '/settings/getallCards');
                         },
                       ),
                       _buildMenuItem(
@@ -143,25 +130,17 @@ class _AccountPageState extends State<AccountPage> {
                         onTap: () {
                           // Handle navigation
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const AccountTermsandcondition(),
-                            ),
-                          );
+                             Navigator.pushReplacementNamed(context, '/howwearework');
+                          
                         },
                       ),
                       _buildMenuItem(
                         icon: Icons.help,
                         text: 'Help Desk',
                         onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HeplDeskPage(),
-                            ),
-                          );
+                        
+                  
+                           Navigator.pushReplacementNamed(context, '/helpDisk');
                         },
                       ),
                       _buildMenuItem(
@@ -174,18 +153,15 @@ class _AccountPageState extends State<AccountPage> {
                               builder: (context) => const FAQPage(),
                             ),
                           );
+                           Navigator.pushReplacementNamed(context, '/settings/faq');
                         },
                       ),
                       _buildMenuItem(
                         icon: Icons.description,
                         text: 'Terms of Service',
                         onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Terms_andcondition(),
-                            ),
-                          );
+                         
+                           Navigator.pushReplacementNamed(context, '/settings/termofservice');
                           // Handle navigation
                         },
                       ),

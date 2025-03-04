@@ -105,7 +105,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               const SizedBox(height: 10),
               const Text('Amount (<NGN 500,000)'),
               TextFormField(
-                controller: controller.amount ,
+                controller: controller.amount,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -182,7 +182,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               const SizedBox(height: 10),
               const Text('Duration of Year'),
               TextFormField(
-                controller: controller.tenure ,
+                controller: controller.tenure,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -193,9 +193,8 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               const Text('Start Date'),
               TextFormField(
                 controller: TextEditingController(
-                  text:DateFormat('dd-MM-yyyy')
-                          .format(controller.selectedStartDate.value)
-                      ,
+                  text: DateFormat('dd-MM-yyyy')
+                      .format(controller.selectedStartDate.value),
                 ), // Display selected date
                 readOnly: true, // Prevent manual text editing
                 decoration: InputDecoration(
@@ -234,35 +233,36 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text('Maturity Date'),
-                             TextFormField(
-                controller: TextEditingController(
-                  text:  DateFormat('dd-MM-yyyy')
-                          .format(controller.selectedStartDateMaturityDate.value)
-                      ,
-                ), // Display selected date
-                readOnly: true, // Prevent manual text editing
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+                TextFormField(
+                  controller: TextEditingController(
+                    text: DateFormat('dd-MM-yyyy')
+                        .format(controller.selectedStartDateMaturityDate.value),
+                  ), // Display selected date
+                  readOnly: true, // Prevent manual text editing
+                  decoration: InputDecoration(
+                    suffixIcon:
+                        const Icon(Icons.calendar_today), // Calendar icon
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate:
+                          controller.selectedStartDateMaturityDate.value,
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+
+                    if (pickedDate != null) {
+                      setState(() {
+                        controller.selectedStartDateMaturityDate.value =
+                            pickedDate;
+                      });
+                    }
+                  },
                 ),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: controller.selectedStartDateMaturityDate.value,
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-
-                  if (pickedDate != null) {
-                    setState(() {
-                      controller.selectedStartDateMaturityDate.value = pickedDate;
-                    });
-                  }
-                },
-              ),
-
                 const SizedBox(height: 10),
                 const Text('yieldValue'),
                 TextFormField(
@@ -282,16 +282,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       controller.addInvestment(context);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Investment(
-                              startIndex: 1), // Start with MortgagePage
-                        ),
-                      );
-                      // Perform form submission
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //     const SnackBar(content: Text('Form Submitted!')));
+                      Navigator.pushReplacementNamed(context, '/investment/card');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -372,7 +363,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle:  CalendarStyle(
+                calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
                     color: baseColor,
                     shape: BoxShape.circle,
@@ -565,12 +556,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide:BorderSide(color: baseColor),
+                  borderSide: BorderSide(color: baseColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide:
-                       BorderSide(color: baseColor, width: 2),
+                  borderSide: BorderSide(color: baseColor, width: 2),
                 ),
               ),
             ),
@@ -614,6 +604,7 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 }
+
 class PaymentMethodPage extends StatefulWidget {
   const PaymentMethodPage({super.key});
 
@@ -681,22 +672,11 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   );
                 } else if (selectedPaymentMethod == "Card") {
                   // Navigate to a page for Card payment
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Investment(
-                          startIndex: 2), // Example for Card payment
-                    ),
-                  );
+                  Navigator.pushReplacementNamed(context, '/investment/cardPayment');
                 } else {
                   // Default case: navigate to MortgagePageHome with startIndex as 3 (fallback case)
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const Investment(startIndex: 9), // Default case
-                    ),
-                  );
+                 
+                  Navigator.pushReplacementNamed(context, '/investment/bankPayment');
                 }
               },
               //
@@ -713,6 +693,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
     );
   }
 }
+
 class TermSheetPage extends StatelessWidget {
   const TermSheetPage({super.key});
 

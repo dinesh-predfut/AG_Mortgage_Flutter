@@ -2,8 +2,11 @@ import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/rent_To_Own.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import '../../../const/mapPage.dart';
 import '../../Mortgage/MortgageHome.dart';
 import 'controller.dart';
 import 'models.dart';
@@ -14,7 +17,7 @@ import '../../../const/Image.dart';
 class PropertyDetailsPage extends StatefulWidget {
   final int? id;
 
-  const PropertyDetailsPage({Key? key, required this.id}) : super(key: key);
+  const PropertyDetailsPage({super.key, required this.id});
 
   @override
   _PropertyDetailsPageState createState() => _PropertyDetailsPageState();
@@ -30,10 +33,41 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
     super.initState();
     fetchhouseViewedHouses = controller.fetchMostviewList(widget.id);
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+         Navigator.pushNamed(context, "/marketMain");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: Scaffold(
       appBar: AppBar(
         title: const Text("Property Details"),
         centerTitle: true,
@@ -171,6 +205,13 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                   title: 'Amenities',
                   content: amenitiesGrid(house.houseAmenities),
                 ),
+                sectionCard(
+                  title: 'Location',
+                  content: HouseLocationMap(
+                    latitude: house.latitude,
+                    longitude: house.longitude,
+                  ),
+                ),
 
                 // Developer Section
                 sectionCard(
@@ -179,7 +220,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Image.asset(Images.logo,
+                        child: Image.asset(Images.developerLogo,
                             fit: BoxFit.cover, width: 100),
                       ),
                       const SizedBox(height: 10),
@@ -194,7 +235,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                           context,
                           'Developer',
                           house.contractorNameAndDescription,
-                          "assets/logo.jpg",
+                         Images.developerLogo,
                         ),
                         child: const Align(
                           alignment: Alignment.centerRight,
@@ -278,7 +319,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
           );
         },
       ),
-    );
+    ));
   }
 
   Widget sectionCard({required String title, required Widget content}) {

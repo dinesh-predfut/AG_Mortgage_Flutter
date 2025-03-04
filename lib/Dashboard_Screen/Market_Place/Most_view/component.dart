@@ -63,7 +63,7 @@ class _MostViewedPageState extends State<MostViewedPage>
         child: Scaffold(
           appBar: AppBar(
             title:
-                const Text('Today Deal', style: TextStyle(color: Colors.black)),
+                const Text('Most View', style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.black),
             actions: [

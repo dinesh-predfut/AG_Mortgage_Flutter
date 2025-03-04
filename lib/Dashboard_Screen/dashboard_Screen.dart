@@ -12,6 +12,7 @@ import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
+import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -37,7 +38,6 @@ class _DashboardPageState extends State<DashboardPage> {
     Timer(const Duration(seconds: 2), () {
       fetchPlanOptions();
       controller.fetchPlanOptions();
-  
     });
   }
 
@@ -85,16 +85,15 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Column(
             children: [
               Row(
-
                 children: [
                   CircleAvatar(
-                  radius: 35,
-                  backgroundImage: controller.profileImageUrl != null
-                      ? NetworkImage(controller
-                          .profileImageUrl!) // Use the URL from the response
-                      : const AssetImage('')
-                          as ImageProvider, // Default image if no URL
-                ),
+                    radius: 35,
+                    backgroundImage: controller.profileImageUrl != null
+                        ? NetworkImage(controller
+                            .profileImageUrl!) // Use the URL from the response
+                        : const AssetImage('')
+                            as ImageProvider, // Default image if no URL
+                  ),
                   const SizedBox(width: 16),
                   Text(
                     'Hello, ${controller.profileName} 👋',
@@ -122,30 +121,17 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        if (planOptions.contains("Mortgage")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DashboardPageS("Mortgage"),
-                            ),
-                          );
-                        } else if (planOptions.contains("Rent-to-Own")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const DashboardPageS("Rent-to-Own"),
-                            ),
-                          );
-                        } else if (planOptions
+                        if (controller.planOptions.contains("Mortgage")) {
+                           Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
+                        
+                        } else if (controller.planOptions
+                            .contains("Rent-to-Own")) {
+                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
+                         
+                        } else if (controller.planOptions
                             .contains("Construction Finance")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const DashboardPageS("Construction Finance"),
-                            ),
-                          );
+                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
+                        
                         } else {
                           Navigator.pushNamed(
                               context, "/dashBoardPage/mortgage");
@@ -163,31 +149,23 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                         if (planOptions.contains("Mortgage")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DashboardPageS("Mortgage"),
-                            ),
-                          );
-                         }
-                          else if (planOptions.contains("Rent-to-Own")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const DashboardPageS("Rent-to-Own"),
-                            ),
-                          );
-                        } else if (planOptions
+                        if (controller.planOptions.contains("Mortgage")) {
+                           Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
+                      
+                        } else if (controller.planOptions
+                            .contains("Rent-to-Own")) {
+                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
+                        
+                        } else if (controller.planOptions
                             .contains("Construction Finance")) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const DashboardPageS("Construction Finance"),
-                            ),
-                          );
+                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) =>
+                          //         const DashboardPageS("Construction Finance"),
+                          //   ),
+                          // );
                         } else {
                           Navigator.pushNamed(context, "/rent-to-own");
                         }
@@ -204,31 +182,16 @@ class _DashboardPageState extends State<DashboardPage> {
                           colorBlendMode: BlendMode.srcIn,
                         ),
                         onTap: () {
-                          if (planOptions.contains("Mortgage")) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const DashboardPageS("Mortgage"),
-                              ),
-                            );
-                          } else if (planOptions.contains("Rent-to-Own")) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const DashboardPageS("Rent-to-Own"),
-                              ),
-                            );
-                          } else if (planOptions
+                          if (controller.planOptions.contains("Mortgage")) {
+                             Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
+                           
+                          } else if (controller.planOptions
+                              .contains("Rent-to-Own")) {
+                                 Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
+                         
+                          } else if (controller.planOptions
                               .contains("Construction Finance")) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const DashboardPageS(
-                                    "Construction Finance"),
-                              ),
-                            );
+                            Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
                           } else {
                             Navigator.pushNamed(context, "/construction");
                           }
@@ -244,7 +207,11 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                       Navigator.pushNamed(context, "/investment");
+                        if (controller.planOptions.contains("Investment")) {
+                          Navigator.pushNamed(context, "/investmentmore");
+                        } else {
+                          Navigator.pushNamed(context, "/investment");
+                        }
                       },
                     ),
                     const SizedBox(height: 16),
@@ -256,12 +223,13 @@ class _DashboardPageState extends State<DashboardPage> {
                         height: 24,
                       ),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MarketMain(),
-                          ),
-                        );
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MainLayout(
+                                    showBottomNavBar: true,
+                                    startIndex: 1,
+                                    child: MarketMain())));
                       },
                     ),
                   ],

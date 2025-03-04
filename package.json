@@ -1,0 +1,27 @@
+{
+  "name": "ag_mortgage_flutter",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dinesh-predfut/AG_Mortgage_Flutter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dinesh-predfut/AG_Mortgage_Flutter/issues"
+  },
+  "homepage": "https://github.com/dinesh-predfut/AG_Mortgage_Flutter#readme",
+  "dependencies": {
+    "ag_mortgage_flutter": "file:",
+    "libphonenumber-js": "^1.12.4"
+  }
+}

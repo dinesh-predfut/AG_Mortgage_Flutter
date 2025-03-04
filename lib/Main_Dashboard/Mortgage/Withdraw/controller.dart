@@ -26,6 +26,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
+  var phoneNumber = "";
   String? profileImageUrl;
  Future<InvestmentModels?> fetchInvestmentDetails() async {
     try {
@@ -114,6 +115,9 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
         if (data['firstName'] != null) {
           profileName = data['firstName'];
+        }
+         if (data['phoneNumber'] != null) {
+          phoneNumber = data['phoneNumber'];
         }
         // Adjust this to match your API response
         var profileImage = data['profileImage']; // Get profileImage URL

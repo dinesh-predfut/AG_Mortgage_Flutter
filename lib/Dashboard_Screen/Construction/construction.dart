@@ -247,13 +247,7 @@ class Construction_Landing extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ConstructionPage(
-                          startIndex: 10), // Start with MortgagePage
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/construction/term_condition");
                 },
                 child: const Center(
                   child: Text(
@@ -295,6 +289,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
     calculateEMI();
     // calculateMonthlyRental();
     calculateEMIAmountValue();
+    controller.updateEMI();
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -443,7 +438,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rent-to-Own'),
+        title: const Text('Construction Finance'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -617,8 +612,6 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   FutureBuilder<List<LoanModel>>(
                     future: controller.getScreeningPeriodsApi(),
                     builder: (context, snapshot) {
-                  
-
                       List<LoanModel> loanData = snapshot.data ?? [];
 
                       // Reset selectedLoan to null if it is not in loanData
@@ -652,7 +645,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Please select a screening period';
+                            return 'Please select a Construction ';
                           }
                           return null;
                         },
@@ -906,9 +899,14 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                       }),
                     ],
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null || value.isEmpty) {
                         return 'Please enter the monthly repayment amount';
                       }
+
+                      final int enteredAmount =
+                          int.tryParse(value.replaceAll(',', '')) ?? 0;
+
+
                       return null;
                     },
                   ),
@@ -921,12 +919,9 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // Form is valid, proceed with the submission
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ConstructionPage(startIndex: 2)),
-                          );
+
+                          Navigator.pushNamed(context,
+                              "/construction/termsheet/permissionPage");
                         } else {
                           Fluttertoast.showToast(
                             msg: "Please fill in all mandatory fields",
@@ -1566,6 +1561,11 @@ class ConstructionFinancePage extends StatefulWidget {
 class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
   // State variables
   final controller = Get.put(ContructionController());
+  @override
+  void initState() {
+    super.initState();
+    controller.voluntaryAmount.text = '0'; // Set default value on page load
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1635,7 +1635,8 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
                 TextInputFormatter.withFunction((oldValue, newValue) {
                   final newText = newValue.text.replaceAll(
                       RegExp(r'\D'), ''); // Remove non-digit characters
-                  final formattedText = controller.formatNumber(newText);
+                  final formattedText =
+                      controller.formatNumber(newText.isEmpty ? '0' : newText);
                   return newValue.copyWith(text: formattedText);
                 }),
               ],
@@ -1653,6 +1654,16 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
                 return null; // No error message when valid
               },
               onChanged: (value) {
+                // Set default value to '0' if empty
+                if (value.isEmpty) {
+                  controller.voluntaryAmount.text = '0';
+                  controller.voluntaryAmount.selection =
+                      TextSelection.fromPosition(
+                    TextPosition(
+                        offset: controller.voluntaryAmount.text.length),
+                  );
+                }
+
                 // Hide validation message dynamically
                 controller.formKey.currentState?.validate();
               },
@@ -2280,14 +2291,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ConstructionPage(
-                          startIndex: 1,
-                        ),
-                      ),
-                    );
+                    Navigator.pushNamed(context, "/construction/termsheet");
                   },
                   child: const Text(
                     'Accept',

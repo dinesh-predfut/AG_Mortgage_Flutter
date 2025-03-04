@@ -211,13 +211,7 @@ class RentToOwnLanding extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Rent_To_Own(
-                          startIndex: 7), // Start with MortgagePage
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/rent-to-own/terms_condition");
                 },
                 child: const Center(
                   child: Text(
@@ -469,7 +463,13 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                         style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
                 ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
+              // const Text(
+              //   'Tenancy Application',
+              //   textAlign: TextAlign.left,
+              //   style: TextStyle(fontWeight: FontWeight.w600),
+              // ),
+              const SizedBox(height: 5),
               // Apartment Type Dropdown
               const Text('House Type'),
               DropdownButtonFormField<int>(
@@ -769,9 +769,15 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                     },
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
 
                   // Initial Deposit
+                  // const Text(
+                  //   'Mortgage Application',
+                  //   textAlign: TextAlign.left,
+                  //   style: TextStyle(fontWeight: FontWeight.w600),
+                  // ),
+                  const SizedBox(height: 5),
 
                   const Text('Select Loan Repayment Period'),
                   Slider(
@@ -883,12 +889,8 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // Form is valid, proceed with the submission
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const Rent_To_Own(startIndex: 2)),
-                          );
+
+                          Navigator.pushNamed(context, "/rent-to-own/calendar");
                         } else {
                           Fluttertoast.showToast(
                             msg: "Please fill in all mandatory fields",
@@ -983,7 +985,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
-                calendarStyle:  CalendarStyle(
+                calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
                     color: baseColor,
                     shape: BoxShape.circle,
@@ -1008,13 +1010,14 @@ class _CalendarPageState extends State<CalendarPage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Rent_To_Own(startIndex: 3),
-                      ),
-                    );
-
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const Rent_To_Own(startIndex: 3),
+                    //   ),
+                    // );
+                    Navigator.pushNamed(
+                        context, "/rent-to-own/term_sheet_Details");
                     controller.getData(Params.userId as String);
                   },
                   style: ElevatedButton.styleFrom(
@@ -1082,13 +1085,14 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ElevatedButton(
               onPressed: () {
                 // Navigate to a page for Bank Transfer
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Rent_To_Own(
-                        startIndex: 5), // Example for Bank Transfer
-                  ),
-                );
+                   Navigator.pushNamed(context, "/rent-to-own/paymentPage/bank");
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const Rent_To_Own(
+                //         startIndex: 5), // Example for Bank Transfer
+                //   ),
+                // );
               },
               //
               style: ElevatedButton.styleFrom(
@@ -1247,12 +1251,12 @@ class Success extends StatelessWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DashboardPageS("Rent-To-Own"),
-                          ),
-                        );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DashboardPageS("Rent-To-Own"),
+                      ),
+                    );
                   },
                   //
                   style: ElevatedButton.styleFrom(
@@ -1416,12 +1420,12 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                       "NGN ${(cleanNumbers(controller.propertyValueController.text) * 0.8 - cleanNumbers(controller.downPayment.text)) / 25}"),
                   _buildRow(
                     "Down Payment",
-                    controller.downPayment.text.isNotEmpty ? "NGN ${controller.downPayment.text}"
+                    controller.downPayment.text.isNotEmpty
+                        ? "NGN ${controller.downPayment.text}"
                         : "-",
                   ),
-                     _buildRow(
-                    "Total Expected Deposit",
-                    "NGN ${(cleanNumbers(controller.downPayment.text) + cleanNumbers(controller.monthlyRendal.text))}"),
+                  _buildRow("Total Expected Deposit",
+                      "NGN ${(cleanNumbers(controller.downPayment.text) + cleanNumbers(controller.monthlyRendal.text))}"),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1449,6 +1453,7 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                     ),
                     TextButton(
                       onPressed: () {
+                      
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -1468,14 +1473,8 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                 child: ElevatedButton(
                   onPressed: () => {
                     controller.addRentoOwn(context),
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Rent_To_Own(
-                          startIndex: 4,
-                        ), // Start with MortgagePageHome
-                      ),
-                    )
+                       Navigator.pushNamed(context, "/rent-to-own/paymentPage")
+                   
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
@@ -1538,8 +1537,8 @@ Widget _buildRow(String label, value) {
       ],
     ),
   );
-  
 }
+
 class TermsAndConditionsDialogRentown extends StatelessWidget {
   final Houseview? house;
   final bool? viewBtn;
@@ -1968,7 +1967,7 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                   ElevatedButton(
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
@@ -1992,15 +1991,17 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RentToOwnForm(
-                          viewBtn: viewBtn, // Pass viewBtn
-                          house: house, // Pass house
-                        ),
-                      ),
-                    );
+                    Navigator.pushNamed(context, "/rent-to-own/term_sheet",
+                        arguments: house);
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => RentToOwnForm(
+                    //       viewBtn: viewBtn, // Pass viewBtn
+                    //       house: house, // Pass house
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: const Text(
                     'Accept',
@@ -2008,7 +2009,6 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
                         color: Colors.white, fontWeight: FontWeight.w600),
                   ),
                 ),
-             
               ],
             ),
           ],

@@ -20,7 +20,8 @@ class Houseview {
   final String embedMapDirection;
   final String houseStatus;
   final bool sponsored;
-
+  final double latitude;
+  final double longitude;
   Houseview({
     required this.id,
     required this.houseType,
@@ -43,34 +44,39 @@ class Houseview {
     required this.embedMapDirection,
     required this.houseStatus,
     required this.sponsored,
+    required this.longitude,
+    required this.latitude,
   });
 
   // Factory constructor for JSON deserialization
   factory Houseview.fromJson(Map<String, dynamic> json) {
-    return Houseview(
-      id: json['id'],
-      houseType: json['houseType'],
-      typeOfApartment: json['typeOfApartment'],
-      state: json['state'],
-      quantity: json['quantity'],
-      city: json['city'],
-      price: json['price'].toDouble(),
-      localGovernmentArea: json['localGovernmentArea'],
-      totalArea: json['totalArea'],
-      rooms: json['rooms'],
-      houseAmenities: List<String>.from(json['houseAmenities']),
-      contractorNameAndDescription: json['contractorNameAndDescription'],
-      houseDescription: json['houseDescription'],
-      street: json['street'],
-      houseNumber: json['houseNumber'],
-      housePictures: List<String>.from(json['housePictures']),
-      rating: json['rating']??0,
-      viewCount: json['viewCount'],
-      embedMapDirection: json['embedMapDirection'],
-      houseStatus: json['houseStatus'],
-      sponsored: json['sponsored'].toString().toLowerCase() == 'true',
-    );
-  }
+  return Houseview(
+    id: json['id'],
+    houseType: json['houseType'],
+    typeOfApartment: json['typeOfApartment'],
+    state: json['state'],
+    quantity: json['quantity'],
+    city: json['city'],
+    price: (json['price'] is int) ? (json['price'] as int).toDouble() : json['price'],
+    localGovernmentArea: json['localGovernmentArea'],
+    totalArea: json['totalArea'],
+    rooms: json['rooms'],
+    houseAmenities: List<String>.from(json['houseAmenities']),
+    contractorNameAndDescription: json['contractorNameAndDescription'],
+    houseDescription: json['houseDescription'],
+    street: json['street'],
+    houseNumber: json['houseNumber'],
+    housePictures: List<String>.from(json['housePictures']),
+    rating: json['rating'] ?? 0,
+    viewCount: json['viewCount'],
+    embedMapDirection: json['embedMapDirection'],
+    houseStatus: json['houseStatus'],
+    longitude: double.tryParse(json['longitude'].toString()) ?? 0.0, // ✅ Ensures conversion
+    latitude: double.tryParse(json['latitude'].toString()) ?? 0.0, // ✅ Ensures conversion
+    sponsored: json['sponsored'].toString().toLowerCase() == 'true',
+  );
+}
+
 
   // Method for JSON serialization
   Map<String, dynamic> toJson() {
@@ -96,6 +102,8 @@ class Houseview {
       'embedMapDirection': embedMapDirection,
       'houseStatus': houseStatus,
       'sponsored': sponsored,
+      'longitude': longitude,
+      'latitude': latitude,
     };
   }
 }

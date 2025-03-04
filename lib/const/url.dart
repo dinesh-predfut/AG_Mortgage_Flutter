@@ -8,6 +8,7 @@ class Urls {
   static const String getallCardsByid = "$baseUrl/api/cards/getCardsById?id=";
   static const String allCity = "$baseUrl/api/location/getAllAreas";
   static const String allArea = "$baseUrl/api/location/area?cityId=";
+    static const String checkToken = "$baseUrl/api/auth/verifyEmail";
   static const String addFavorites =
       "$baseUrl/api/apartmentAndMarketplace/favourite";
   static const String mortagaform = "$baseUrl/api/mortgage";

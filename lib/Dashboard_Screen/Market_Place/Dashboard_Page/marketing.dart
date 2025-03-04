@@ -1,6 +1,7 @@
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,7 @@ class _MarketplacePageState extends State<MarketplacePage>
   @override
   void initState() {
     super.initState();
+    
     futureHouses = controller.fetchHouses();
     fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
     fetchmostViewedHouses = controller.fetchmostViewedHouses();
@@ -36,6 +38,7 @@ class _MarketplacePageState extends State<MarketplacePage>
         TabController(length: controller.posts.length, vsync: this);
     controller.getFavoriteAll();
     fetchFavorites();
+    
   }
 
   void fetchFavorites() async {
@@ -210,7 +213,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                     child: Text('Error loading today\'s deals'));
               } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
                 return buildSectionmostview(
-                    snapshot.data!.items); // Pass today's deal items
+                    snapshot.data!.items, context); // Pass today's deal items
               } else {
                 return const Text("Data Not Available in Most viewe");
               }
@@ -229,7 +232,8 @@ class _MarketplacePageState extends State<MarketplacePage>
               } else if (snapshot.hasError) {
                 return const Center(child: Text('Error loading new houses'));
               } else if (snapshot.hasData && snapshot.data!.items.isNotEmpty) {
-                return todayDeals(snapshot.data!.items); // Pass new house items
+                return todayDeals(
+                    snapshot.data!.items, context); // Pass new house items
               } else {
                 return const Text("Data Not Available Today Deals");
               }
@@ -299,7 +303,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                       right: 10,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 15, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(4),
@@ -319,9 +323,9 @@ class _MarketplacePageState extends State<MarketplacePage>
                       top: 10,
                       left: 10,
                       child: GestureDetector(
-                          onTap: () {
-                            controller.toggleFavorite(home.id.toInt());
-                            fetchFavorites();
+                          onTap: ()=> {
+                            controller.toggleFavorite(home.id.toInt()),
+                            fetchFavorites()
                           },
                           child: Icon(
                             controller.favoriteHouseIds
@@ -341,17 +345,14 @@ class _MarketplacePageState extends State<MarketplacePage>
                       child: GestureDetector(
                         onTap: () {
                           // Handle the onTap function here
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  MarketMain(startIndex: 4, id: home.id),
-                            ),
-                          );
+
+                          Navigator.pushReplacementNamed(
+                              context, '/marketMain/sponsered',
+                              arguments: home.id);
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                              horizontal: 15, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -436,7 +437,7 @@ class _MarketplacePageState extends State<MarketplacePage>
     );
   }
 
-  Widget buildSectionmostview(List<dynamic> section) {
+  Widget buildSectionmostview(List<dynamic> section, BuildContext context) {
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -460,17 +461,18 @@ class _MarketplacePageState extends State<MarketplacePage>
         ),
       ),
       const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Text(
-              "Explore the most viewed homes by our customers",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: Colors.grey,
-              ),
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: Text(
+            "Explore the most viewed homes by our customers",
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              color: Colors.grey,
             ),
-          )),
+          ),
+        ),
+      ),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -482,11 +484,12 @@ class _MarketplacePageState extends State<MarketplacePage>
               itemBuilder: (context, index) {
                 final home = section[index];
                 final imageUrl = home.housePictures.isNotEmpty
-                    ? home.housePictures[
-                        0] // Assuming we take the first image for now
+                    ? home.housePictures[0] // Taking the first image
                     : '';
+
                 return Container(
                   width: 300,
+                  margin: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -496,108 +499,133 @@ class _MarketplacePageState extends State<MarketplacePage>
                       ),
                     ],
                   ),
-                  margin: const EdgeInsets.all(8.0),
-                  child: Card(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(10)),
-                              child: Image(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                              )),
+                  child: Stack(
+                    children: [
+                      Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Container(
-                            color: Colors.white,
-
-                            // ignore: avoid_unnecessary_containers
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(home.price.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text(home.houseType,
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.location_on,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 4),
-                                      Text(home.street as String,
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 12),
-                                      const Icon(Icons.bed,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                          home.houseType.length > 10
-                                              ? home.houseType.substring(0, 10)
-                                              : home.houseType,
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 12),
-                                      const Icon(Icons.square_foot,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 3),
-                                      const Text("2900 Sqft",
-                                          style: TextStyle(
-                                              fontSize: 12, color: Colors.grey))
-                                    ],
-                                  ),
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        // Handle the onTap function here
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => MarketMain(
-                                                startIndex: 4, id: home.id),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(10),
+                                ),
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(home.price.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 4),
+                                    Text(home.houseType,
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey)),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on,
+                                            size: 12, color: Colors.grey),
+                                        const SizedBox(width: 4),
+                                        Text(home.street as String,
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey)),
+                                        const SizedBox(width: 12),
+                                        const Icon(Icons.bed,
+                                            size: 12, color: Colors.grey),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                            home.houseType.length > 10
+                                                ? home.houseType
+                                                    .substring(0, 10)
+                                                : home.houseType,
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey)),
+                                        const SizedBox(width: 12),
+                                        const Icon(Icons.square_foot,
+                                            size: 12, color: Colors.grey),
+                                        const SizedBox(width: 3),
+                                        const Text("2900 Sqft",
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey))
+                                      ],
+                                    ),
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushReplacementNamed(
+                                              context, '/marketMain/sponsered',
+                                              arguments: home.id);
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: baseColor,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
                                           ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: const Text(
-                                          'View',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                          child: const Text(
+                                            'View',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            )),
-                      ],
-                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Positioned Favorite Button
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.toggleFavorite(home.id.toInt());
+                            fetchFavorites();
+                          },
+                          child: Icon(
+                            controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Colors.red
+                                : Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -608,7 +636,7 @@ class _MarketplacePageState extends State<MarketplacePage>
     ]);
   }
 
-  Widget todayDeals(List<dynamic> section) {
+  Widget todayDeals(List<dynamic> section, BuildContext context) {
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -653,14 +681,11 @@ class _MarketplacePageState extends State<MarketplacePage>
               itemCount: section.length,
               itemBuilder: (context, index) {
                 final home = section[index];
-                final imageUrl = home.housePictures.isNotEmpty
-                    ? home.housePictures[
-                        0] // Assuming we take the first image for now
-                    : '';
+                final imageUrl =
+                    home.housePictures.isNotEmpty ? home.housePictures[0] : '';
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: 340,
-                  // Adjust as needed for the card width
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -672,19 +697,15 @@ class _MarketplacePageState extends State<MarketplacePage>
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(imageUrl),
-
                       colorFilter: const ColorFilter.mode(
-                        Color.fromARGB(101, 0, 0,
-                            0), // Applies a semi-transparent overlay color
+                        Color.fromARGB(101, 0, 0, 0),
                         BlendMode.darken,
-                      ), // Replace with AssetImage if local
-                      fit: BoxFit
-                          .cover, // Ensures the image covers the entire container
+                      ),
+                      fit: BoxFit.cover,
                     ),
                   ),
                   child: Stack(
                     children: [
-                      // Overlay for gradient (optional, for better text visibility)
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -698,25 +719,39 @@ class _MarketplacePageState extends State<MarketplacePage>
                           ),
                         ),
                       ),
-                      // Text Content
-
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.toggleFavorite(home.id.toInt());
+                            fetchFavorites();
+                          },
+                          child: Icon(
+                            controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: controller.favoriteHouseIds
+                                    .contains(home.id.toInt())
+                                ? Colors.red
+                                : Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
                       Align(
                         alignment: Alignment.bottomRight,
                         child: GestureDetector(
                           onTap: () {
-                            // Handle the onTap function here
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MarketMain(startIndex: 4, id: home.id),
-                              ),
-                            );
+                            Navigator.pushReplacementNamed(
+                                context, '/marketMain/sponsered',
+                                arguments: home.id);
                           },
                           child: Container(
                             margin: const EdgeInsets.all(5),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                                horizontal: 15, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(40),
@@ -729,23 +764,6 @@ class _MarketplacePageState extends State<MarketplacePage>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      // Favorite button (Top-left)
-                      Positioned(
-                        top: 10,
-                        left: 10,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isFavorite = !isFavorite; // Toggle favorite state
-                            });
-                          },
-                          child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite ? Colors.red : Colors.white,
-                            size: 24,
                           ),
                         ),
                       ),
@@ -808,88 +826,78 @@ class _MarketplacePageState extends State<MarketplacePage>
       ),
     ]);
   }
-}
 
-Widget newHouses(BuildContext context, List<dynamic> section) {
-  return Column(children: [
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            "New House",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, "/seemorenewhouse");
-            },
-            child: const Text(
-              "See all",
-              style: TextStyle(color: Colors.blue),
+  Widget newHouses(BuildContext context, List<dynamic> section) {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "New House",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          )
-        ],
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/seemorenewhouse");
+              },
+              child: const Text(
+                "See all",
+                style: TextStyle(color: Colors.blue),
+              ),
+            )
+          ],
+        ),
       ),
-    ),
-    const Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: EdgeInsets.only(left: 8),
-          child: Text(
-            "Choose a home from a trusted developer",
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              color: Colors.grey,
+      const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: Text(
+              "Choose a home from a trusted developer",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                color: Colors.grey,
+              ),
             ),
-          ),
-        )),
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 250,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: section.length,
-            itemBuilder: (context, index) {
-              final home = section[index];
-              final imageUrl = home.housePictures.isNotEmpty
-                  ? home.housePictures[
-                      0] // Assuming we take the first image for now
-                  : '';
-              return Container(
-                width: 300,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                margin: const EdgeInsets.all(8.0),
-                child: Card(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+          )),
+      SizedBox(
+        height: 300,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: section.length,
+          itemBuilder: (context, index) {
+            final home = section[index];
+            final imageUrl = home.housePictures.isNotEmpty
+                ? home.housePictures[0] // Taking the first image
+                : '';
+
+            return Container(
+              width: 300,
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Card(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
                           width: 340,
+                          height: 160,
                           decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
                             borderRadius: BorderRadius.circular(10),
                             image: DecorationImage(
                               image: NetworkImage(imageUrl),
@@ -901,92 +909,109 @@ Widget newHouses(BuildContext context, List<dynamic> section) {
                             ),
                           ),
                         ),
-                      ),
-                      Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(home.price.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(home.houseType ?? "Unknown Type",
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.grey)),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.location_on,
-                                        size: 12, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Text(home.street ?? "Unknown City",
-                                        style: const TextStyle(
-                                            fontSize: 10, color: Colors.grey)),
-                                    const SizedBox(width: 12),
-                                    const Icon(Icons.bed,
-                                        size: 12, color: Colors.grey),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                        home.houseType.length > 10
-                                            ? home.houseType.substring(0, 10)
-                                            : home.houseType,
-                                        style: const TextStyle(
-                                            fontSize: 10, color: Colors.grey)),
-                                    const SizedBox(width: 12),
-                                    const Icon(Icons.square_foot,
-                                        size: 12, color: Colors.grey),
-                                    const SizedBox(width: 3),
-                                    Text(home.totalArea ?? "Unknown City",
-                                        style: const TextStyle(
-                                            fontSize: 10, color: Colors.grey))
-                                  ],
+                        // Favorite (Like) Button Positioned on Top-Left
+                        Positioned(
+                          top: 10,
+                          left: 10,
+                          child: GestureDetector(
+                            onTap: () {
+                              controller.toggleFavorite(home.id.toInt());
+                              fetchFavorites();
+                            },
+                            child: Icon(
+                              controller.favoriteHouseIds
+                                      .contains(home.id.toInt())
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: controller.favoriteHouseIds
+                                      .contains(home.id.toInt())
+                                  ? Colors.red
+                                  : Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(home.price.toString(),
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text(home.houseType ?? "Unknown Type",
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on,
+                                  size: 12, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              Text(home.street ?? "Unknown City",
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.grey)),
+                              const SizedBox(width: 12),
+                              const Icon(Icons.bed,
+                                  size: 12, color: Colors.grey),
+                              const SizedBox(width: 3),
+                              Text(
+                                  home.houseType.length > 10
+                                      ? home.houseType.substring(0, 10)
+                                      : home.houseType,
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.grey)),
+                              const SizedBox(width: 12),
+                              const Icon(Icons.square_foot,
+                                  size: 12, color: Colors.grey),
+                              const SizedBox(width: 3),
+                              Text(home.totalArea ?? "Unknown City",
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.grey)),
+                            ],
+                          ),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/marketMain/sponsered',
+                                  arguments: home.id,
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(5),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange[200],
+                                  borderRadius: BorderRadius.circular(40),
                                 ),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MarketMain(
-                                              startIndex: 4, id: home.id),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.all(5),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange[200],
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                      child: const Text(
-                                        'View',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
+                                child: const Text(
+                                  'View',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          )),
-                    ],
-                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-      ],
-    )
-  ]);
+      ),
+    ]);
+  }
 }

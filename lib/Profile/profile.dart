@@ -64,9 +64,9 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
 
   final List<Widget> _navPages = [
     const DashboardPage(),
-    const LandingPage(
-      startIndex: 1,
-    ),
+    // const LandingPage(
+    //   startIndex: 1,
+    // ),
     const NotificationsPage(),
     const ProfilePagewidget(startIndex: 0),
   ];
@@ -133,10 +133,42 @@ class _Edit_ProfileState extends State<Edit_Profile> {
     super.initState();
     controller.fetchCustomerDetails();
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+         Navigator.pushNamed(context, "/settings");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: 
+    Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
         centerTitle: true,
@@ -169,36 +201,24 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                     _buildMenuItem(
                       text: 'Personal Details',
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 2),
-                            ));
+                      
+                             Navigator.pushReplacementNamed(context, '/editProfile/profileinFoDetails');
                         // Handle navigat                                 ion
                       },
                     ),
                     _buildMenuItem(
                       text: 'Login Details',
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 3),
-                            ));
+                         Navigator.pushReplacementNamed(context, '/editProfile/LoginDetails');
+                      
                         // Handle navigation
                       },
                     ),
                     _buildMenuItem(
                       text: 'Employments Details',
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 4),
-                            ));
+                         Navigator.pushReplacementNamed(context, '/editProfile/employementDetails');
+                      
                         // Handle navigation
                       },
                     ),
@@ -206,12 +226,8 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       text: 'Home Address Details',
                       onTap: () {
                         // Handle navigation
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 5),
-                            ));
+                         Navigator.pushReplacementNamed(context, '/editProfile/homeAddress');
+                      
                       },
                     ),
                     _buildMenuItem(
@@ -230,23 +246,15 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       text: 'Anniversary',
                       onTap: () {
                         // Handle navigation
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 7),
-                            ));
+                         Navigator.pushReplacementNamed(context, '/editProfile/anniversary');
+                       
                       },
                     ),
                     _buildMenuItem(
                       text: 'Documents',
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProfilePagewidget(startIndex: 8),
-                            ));
+                           Navigator.pushReplacementNamed(context, '/editProfile/documentUpload');
+                        
                         // Handle navigation
                       },
                     ),
@@ -263,8 +271,8 @@ class _Edit_ProfileState extends State<Edit_Profile> {
           ],
         ),
       ),
-    );
-  }
+    )
+  );}
 
   Widget _buildMenuItem({
     required String text,

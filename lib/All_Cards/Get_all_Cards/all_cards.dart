@@ -96,6 +96,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                                       CardPaymentPage(selectedID: card.id),
                                 ),
                               );
+                                Navigator.pushReplacementNamed(context, '/selectedCard',arguments: card.id);
                             },
                             child: Container(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),

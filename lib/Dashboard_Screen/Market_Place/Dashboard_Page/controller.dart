@@ -132,6 +132,7 @@ class Market_Place_controller extends ChangeNotifier {
       if (jsonData is Map<String, dynamic> && jsonData.containsKey('items')) {
         List<dynamic> items = jsonData['items']; // Extract items list
         return items.map((e) => FavoriteHouse.fromJson(e)).toList();
+        
       } else {
         throw Exception('Unexpected API response format');
       }

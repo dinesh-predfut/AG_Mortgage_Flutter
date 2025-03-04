@@ -49,7 +49,7 @@ class _LoginState extends State<Login> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                   Text(
+                  Text(
                     "Login",
                     style: TextStyle(
                       fontSize: 24,
@@ -70,24 +70,30 @@ class _LoginState extends State<Login> {
                   const SizedBox(height: 30),
                   // Phone Number Field
                   IntlPhoneField(
-                  controller:signupController.numberController ,
+                    controller: signupController.numberController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:  BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                       counterText: "",
                     ),
-                    initialCountryCode: 'NG', // Nigeria as default
+                    initialCountryCode: 'NG', 
                     disableLengthCheck: true,
                     onChanged: (phone) {
-                      signupController.countryCodeController.text=phone.countryCode;
-                      print(phone
-                          ); // Prints full number with country code
+                      signupController.countryCodeController.text =
+                          phone.countryCode;
+            
+                    },
+                    onCountryChanged: (country) {
+                      signupController.countryCodeController.text =
+                          "+${country.dialCode}";
+                    
                     },
                   ),
+
                   const SizedBox(height: 20),
                   // Promo Code Field
                   TextField(
@@ -97,7 +103,7 @@ class _LoginState extends State<Login> {
                       labelText: "Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide:  BorderSide(color: baseColor),
+                        borderSide: BorderSide(color: baseColor),
                       ),
                       suffixIcon: IconButton(
                         iconSize: 20,
@@ -149,7 +155,7 @@ class _LoginState extends State<Login> {
                                 builder: (context) => const Rest_Password(),
                               ));
                         },
-                        child:  Text(
+                        child: Text(
                           "Reset Password",
                           style: TextStyle(color: baseColor),
                         ),

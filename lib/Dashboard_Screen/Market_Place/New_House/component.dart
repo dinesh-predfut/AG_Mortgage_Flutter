@@ -62,8 +62,8 @@ class _New_houseState extends State<New_house>
         length: _tabs.length,
         child: Scaffold(
           appBar: AppBar(
-            title:
-                const Text('Today Deal', style: TextStyle(color: Colors.black)),
+            title: const Text('New House',
+                style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.black),
             actions: [
@@ -142,8 +142,8 @@ class _New_houseState extends State<New_house>
               }).toList(),
             ),
           ),
-          body: FutureBuilder<ApiResponsemostview>(
-            future: controller.fetchmostViewedHouses(),
+          body: FutureBuilder<ApinewHoseview>(
+            future: controller.fetchnewtViewedHouses(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -226,166 +226,143 @@ class _New_houseState extends State<New_house>
   }
 
   Widget newHouses(BuildContext context, List<dynamic> section) {
-    return Column(children: [
-    
-      const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.only(left: 8),
-            // child: Text(
-            //   "Choose a home from a trusted developer",
-            //   textAlign: TextAlign.start,
-            //   style: TextStyle(
-            //     color: Colors.grey,
-            //   ),
-            // ),
-          )),
-      Column(
+    return SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 250,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: section.length,
-              itemBuilder: (context, index) {
-                final home = section[index];
-                final imageUrl = home.housePictures.isNotEmpty
-                    ? home.housePictures[
-                        0] // Assuming we take the first image for now
-                    : '';
-                return Container(
-                  width: 370,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  margin: const EdgeInsets.all(8.0),
-                  child: Card(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                            width: 340,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(imageUrl),
-                                colorFilter: const ColorFilter.mode(
-                                  Color.fromARGB(101, 0, 0, 0),
-                                  BlendMode.darken,
-                                ),
-                                fit: BoxFit.cover,
-                              ),
+          const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: Text(
+              "Choose a home from a trusted developer",
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Column(
+            children: List.generate(section.length, (index) {
+              final home = section[index];
+              final imageUrl =
+                  home.housePictures.isNotEmpty ? home.housePictures[0] : '';
+
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image Section
+                      ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(10)),
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9, // Maintains image consistency
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                              color: Colors.grey[300],
+                              child: Icon(Icons.image,
+                                  color: Colors.grey, size: 50),
                             ),
                           ),
                         ),
-                        Container(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(home.price.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text(home.houseType ?? "Unknown Type",
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.location_on,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 4),
-                                      Text(home.street ?? "Unknown City",
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 12),
-                                      const Icon(Icons.bed,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                          home.houseType.length > 10
-                                              ? home.houseType.substring(0, 10)
-                                              : home.houseType,
-                                          style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 12),
-                                      const Icon(Icons.square_foot,
-                                          size: 12, color: Colors.grey),
-                                      const SizedBox(width: 3),
-                                      Text(home.totalArea ?? "Unknown City",
-                                          style: const TextStyle(
-                                              fontSize: 10, color: Colors.grey))
-                                    ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(home.price.toString(),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text(home.houseType ?? "Unknown Type",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    size: 12, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(home.street ?? "Unknown City",
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.grey)),
+                                const SizedBox(width: 12),
+                                const Icon(Icons.bed,
+                                    size: 12, color: Colors.grey),
+                                const SizedBox(width: 3),
+                                Text(
+                                    home.houseType.length > 10
+                                        ? home.houseType.substring(0, 10)
+                                        : home.houseType,
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.grey)),
+                                const SizedBox(width: 12),
+                                const Icon(Icons.square_foot,
+                                    size: 12, color: Colors.grey),
+                                const SizedBox(width: 3),
+                                Text(home.totalArea ?? "Unknown City",
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.grey))
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MarketMain(
+                                          startIndex: 4, id: home.id),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[200],
+                                    borderRadius: BorderRadius.circular(40),
                                   ),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => MarketMain(
-                                                startIndex: 4, id: home.id),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.all(5),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.orange[200],
-                                          borderRadius:
-                                              BorderRadius.circular(40),
-                                        ),
-                                        child: const Text(
-                                          'View',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                  child: const Text(
+                                    'View',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            )),
-                      ],
-                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ),
         ],
-      )
-    ]);
+      ),
+    );
   }
 }

@@ -232,6 +232,8 @@ class Profile_Controller extends ChangeNotifier {
       print('Response Body: ${decodedResponse.body}');
 
       if (decodedResponse.statusCode == 200) {
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacementNamed(context, '/editProfile');
         Fluttertoast.showToast(
           msg: "Employment Updated Successfully",
           toastLength: Toast.LENGTH_SHORT,

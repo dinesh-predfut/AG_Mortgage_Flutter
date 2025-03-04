@@ -42,13 +42,13 @@ class _MortgagePageHomeState extends State<MortgagePageHome> {
   final List<Widget> _steps = [
     const Landing_Mortgage(),
     const MortgageFormPage(),
-    const CalendarPage(),
-    const TermSheetPage(),
+    const CalendarPageMortgage(),
+    const MortgageTermSheetPage(),
     const ADD_CardDetailsPage(),
     const PaymentMethodPage(),
     const Get_All_Cards(),
     const CardPaymentPage(),
-    const TermSheetPage(),
+    const MortgageTermSheetPage(),
     const BankTransferPage(),
     const TermsAndConditionsDialog(),
     const Success()
@@ -612,6 +612,8 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                                   const MortgagePageHome(startIndex: 2),
                             ),
                           );
+                          print("context$context");
+                               Navigator.pushReplacementNamed(context, '/mortgageCalendar');
                         } else {
                           Fluttertoast.showToast(
                             msg: "Please fill in all mandatory fields",
@@ -640,14 +642,14 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
   }
 }
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+class CalendarPageMortgage extends StatefulWidget {
+  const CalendarPageMortgage({super.key});
 
   @override
-  _CalendarPageState createState() => _CalendarPageState();
+  _CalendarPageMortgageState createState() => _CalendarPageMortgageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
   final controller = Get.put(MortgagController());
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
@@ -731,16 +733,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChangeNotifierProvider.value(
-                          value: Provider.of<MortgagController>(context,
-                              listen: false),
-                          child: const MortgagePageHome(startIndex: 3),
-                        ),
-                      ),
-                    );
+                         Navigator.pushReplacementNamed(context, '/mortgageTermsheet');
+                   
                     controller.getData(Params.userId as String);
                   },
                   style: ElevatedButton.styleFrom(
@@ -773,7 +767,7 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   String selectedPaymentMethod = "Card";
-final controller = Get.put(MortgagController());
+  final controller = Get.put(MortgagController());
 
   @override
   Widget build(BuildContext context) {
@@ -820,9 +814,8 @@ final controller = Get.put(MortgagController());
             ),
             const Spacer(),
             ElevatedButton(
-             
               onPressed: () {
-                 controller.addMortgageForm(context);
+                controller.addMortgageForm(context);
                 if (selectedPaymentMethod == "Bank Transfer") {
                   // Navigate to a page for Bank Transfer
                   Navigator.pushReplacement(
@@ -867,14 +860,14 @@ final controller = Get.put(MortgagController());
   }
 }
 
-class TermSheetPage extends StatefulWidget {
-  const TermSheetPage({super.key});
+class MortgageTermSheetPage extends StatefulWidget {
+  const MortgageTermSheetPage({super.key});
 
   @override
-  State<TermSheetPage> createState() => _TermSheetPageState();
+  State<MortgageTermSheetPage> createState() => _MortgageTermSheetPageState();
 }
 
-class _TermSheetPageState extends State<TermSheetPage>
+class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
     with SingleTickerProviderStateMixin {
   final controller = Get.put(MortgagController());
 
@@ -1052,7 +1045,6 @@ class _TermSheetPageState extends State<TermSheetPage>
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -1061,6 +1053,7 @@ class _TermSheetPageState extends State<TermSheetPage>
                         ), // Start with MortgagePageHome
                       ),
                     );
+                     Navigator.pushNamed(context, "/rent-to-own/paymentPage");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
@@ -1206,7 +1199,6 @@ class _BankTransferPageState extends State<BankTransferPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  
                   controller.bankTransfer(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -1308,7 +1300,6 @@ class Success extends StatelessWidget {
                     style: TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                 
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -1762,7 +1753,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                   ElevatedButton(
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
@@ -1786,15 +1777,9 @@ class TermsAndConditionsDialog extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MortgageFormPage(
-                          viewBtn: viewBtn, // Pass viewBtn
-                          house: house, // Pass house
-                        ),
-                      ),
-                    );
+                    
+                    Navigator.pushReplacementNamed(
+                        context, '/mortgageForm', arguments: house,);
                   },
                   child: const Text(
                     'Accept',
@@ -1802,7 +1787,6 @@ class TermsAndConditionsDialog extends StatelessWidget {
                         color: Colors.white, fontWeight: FontWeight.w600),
                   ),
                 ),
-             
               ],
             ),
           ],

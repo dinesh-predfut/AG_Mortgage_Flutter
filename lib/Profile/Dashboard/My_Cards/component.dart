@@ -3,7 +3,9 @@ import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
 import 'package:ag_mortgage/Profile/Dashboard/My_Cards/add_card_component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/component.dart';
+import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -128,10 +130,43 @@ CardController controller = CardController();
       ),
     );
   }
-
+ void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+         Navigator.pushNamed(context, "/settings");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-   return ChangeNotifierProvider(
+   return 
+   WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: 
+   ChangeNotifierProvider(
       create: (_) => CardController()..fetchCards(),
       child: Scaffold(
       appBar: AppBar(
@@ -141,12 +176,12 @@ CardController controller = CardController();
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {
             Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const AccountPage(), // Start with MortgagePage
-              ),
-            ),
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: 3,
+                    child: ProfilePagewidget(startIndex: 0))))
           },
         ),
         bottom: TabBar(
@@ -550,6 +585,7 @@ CardController controller = CardController();
         ],
       ),
     ),
+   ),
    );
   }
   void showEditWindow(BuildContext context, cardController) {
