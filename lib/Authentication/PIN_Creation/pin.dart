@@ -30,9 +30,9 @@ class _PIN_CreationState extends State<PIN_Creation> {
   @override
   void initState() {
     super.initState();
-    if (signupController.newPasswordController != null) {
+  
       signupController.newPasswordController.addListener(_validatePassword);
-    }
+    
   }
 
   void _validatePassword() {

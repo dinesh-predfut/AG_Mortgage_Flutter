@@ -49,4 +49,8 @@ class Urls {
   static const String constructionFinance =
       "$baseUrl/api/settings/constructionFinance";
   static const String construction = "$baseUrl/api/constructionFinance";
+  static const String documentUpload = "$baseUrl/api/customer/documentUpload";
+  static const String getAllDocuments = "$baseUrl/api/settings/document";
+  static const String getallNotification = "$baseUrl/api/notification";
+   static const String validateToken= "$baseUrl/api/auth/verifyRefreshToken";
 }

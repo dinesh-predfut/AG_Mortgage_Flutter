@@ -177,8 +177,7 @@ class _AccountPageState extends State<AccountPage> {
                             style: TextStyle(color: Colors.red),
                           ),
                           onTap: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pushNamed("/login");
+                           controller.onLogout(context);
                           },
                         ),
                       )

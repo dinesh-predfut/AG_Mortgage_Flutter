@@ -23,7 +23,13 @@ class _LoginState extends State<Login> {
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        signupController.onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+      child:Scaffold(
       body: Stack(
         children: [
           // Background image
@@ -168,6 +174,6 @@ class _LoginState extends State<Login> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

@@ -1,8 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+
+import '../../profile_All_controller.dart';
 
 class DocumentsPage extends StatefulWidget {
   @override
@@ -10,12 +17,13 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
-  final Map<String, String?> uploadedFiles = {
-    "National ID": null,
-    "Marriage Certificate": null,
-    "Driver's License": null,
-    // Add more document types as needed
-  };
+  final controller = Get.put(Profile_Controller());
+
+  void initState() {
+    super.initState();
+    controller.getAllDocuments(context);
+    print("List${controller.uploadedFiles}");
+  }
 
   Widget _buildUploadBox(String text, {required Function(String) onUpload}) {
     return GestureDetector(
@@ -69,7 +77,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
               children: [
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent, // Transparent background
+                    backgroundColor:
+                        Colors.transparent, // Transparent background
                     elevation: 0, // Remove shadow
                     foregroundColor: Colors.white,
                   ),
@@ -100,7 +109,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(label),
-          
           actions: [
             TextButton(
               onPressed: () {
@@ -119,11 +127,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
       },
     );
   }
- void _onBackPressed(BuildContext context) {
+
+  void _onBackPressed(BuildContext context) {
     // Custom logic for back navigation
     if (Navigator.of(context).canPop()) {
       print("its working");
-         Navigator.pushNamed(context, "/editProfile");
+      Navigator.pushNamed(context, "/editProfile");
     } else {
       // Show exit confirmation dialog if needed
       showDialog(
@@ -145,68 +154,95 @@ class _DocumentsPageState extends State<DocumentsPage> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        // Handle custom back navigation logic
-        _onBackPressed(context);
-        return false; // Prevent default back behavior
-      },
-    child:  Scaffold(
-      appBar: AppBar(
-        title: const Text("Documents"),
-        centerTitle: true,
-         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-      ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Fixed Percentage Circle
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: CircularPercentIndicator(
-                radius: 100.0,
-                animation: true,
-                lineWidth: 10.0,
-                percent: uploadedFiles.values.where((file) => file != null).length /
-                    uploadedFiles.length,
-                center: Text(
-                    "${uploadedFiles.values.where((file) => file != null).length}/${uploadedFiles.length}"),
-                progressColor: Colors.green,
-              ),
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Documents"),
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
             ),
-            // Document Upload and View Sections
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: uploadedFiles.keys.length,
-              itemBuilder: (context, index) {
-                String documentType = uploadedFiles.keys.elementAt(index);
-                String? filePath = uploadedFiles[documentType];
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: filePath == null
-                      ? _buildUploadBox(
-                          "Upload $documentType",
-                          onUpload: (path) {
-                            setState(() {
-                              uploadedFiles[documentType] = path;
-                            });
-                          },
-                        )
-                      : _buildDocumentViewSection(documentType, filePath),
-                );
-              },
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Fixed Percentage Circle
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CircularPercentIndicator(
+                    radius: 100.0,
+                    animation: true,
+                    lineWidth: 10.0,
+                    percent: controller.showFiles.isNotEmpty
+                        ? controller.showFiles
+                                .where((file) => file.isNotEmpty)
+                                .length /
+                            controller.showFiles.length
+                        : 0.0, // Avoid division by zero
+                    center: Text(
+                      "${controller.showFiles.where((file) => file.isNotEmpty).length}/${controller.showFiles.length}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    progressColor: Colors.green,
+                    backgroundColor: Colors.grey[300]!,
+                    circularStrokeCap: CircularStrokeCap.round,
+                  ),
+                ),
+                // Document Upload and View Sections
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.uploadedFiles.keys.length,
+                  itemBuilder: (context, index) {
+                    String documentType =
+                        controller.uploadedFiles.keys.elementAt(index);
+                    String? filePath = controller.uploadedFiles[documentType];
+                    print("Document Type: $index, File Path: $filePath");
+                    try {
+                      Map<String, dynamic> fileData =
+                          jsonDecode(filePath!); // Decode JSON
+                      controller.fileId = fileData['id'];
+                      controller.documentFileUrl = fileData['documentFile'];
+                      print(
+                          "Document Type: ${controller.fileId}, File ID: ${controller.documentFileUrl}");
+                    } catch (e) {
+                      print("Error decoding JSON: $e");
+                    }
+                    // List<String> documentFileUrls = controller.showFiles
+                    //     .map((file) => file.documentFile)
+                    //     .toList();
+                    // int fileId = fileData['id'];
+                    return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: controller.showFiles
+                                .contains(controller.fileId.toString())
+                            ? _buildUploadBox(
+                                "Upload $documentType",
+                                onUpload: (path) {
+                                  controller.pickAndUploadFile(
+                                      documentType, 13);
+                                  setState(() {
+                                    controller.uploadedFiles[documentType] =
+                                        path;
+                                  });
+                                },
+                              )
+                            : _buildDocumentViewSection(
+                                documentType, controller.documentFileUrl));
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    )
-    );
+          ),
+        ));
   }
 }

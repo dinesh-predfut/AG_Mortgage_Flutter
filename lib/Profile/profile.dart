@@ -67,7 +67,7 @@ class _ProfilePagewidgetState extends State<ProfilePagewidget> {
     // const LandingPage(
     //   startIndex: 1,
     // ),
-    const NotificationsPage(),
+     NotificationsPage(),
     const ProfilePagewidget(startIndex: 0),
   ];
 

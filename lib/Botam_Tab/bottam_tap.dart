@@ -17,8 +17,11 @@ class BottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) {
-        print("Current Index: $index"); // Print the index when tapped
-        onTap(index); // Call the original onTap function passed from the parent
+       if (index == currentIndex) {
+          // onTap(index); // Handle tap on the same tab
+        } else {
+          onTap(index); // Handle tap on a different tab
+        }
       
       },
       items: [

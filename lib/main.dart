@@ -1,3 +1,7 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:convert';
+
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
 import 'package:ag_mortgage/Authentication/Login/login.dart';
@@ -26,22 +30,36 @@ import 'package:ag_mortgage/Profile/Dashboard/My_Cards/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/Terms_Condition/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/component.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/constant.dart';
+import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/onboarding_pages/first_page.dart';
 import 'package:ag_mortgage/onboarding_pages/second_page.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Authentication/Login_Controller/controller.dart';
 import 'Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'Profile/Edit_Profile/Profile_Details/component.dart';
 // Import the BottomNavBar
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Get.lazyPut(() => ProfileController());
+  await SetSharedPref().getData(); // Retrieve saved data from SharedPreferences
+
+  if (Params.refreshToken != "null") {
+    print("Successfully retrieved refreshToken: ${Params.refreshToken}");
+  } else {
+    print("No refreshToken found.");
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -54,143 +72,6 @@ void main() {
   );
 }
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       initialRoute: '/',
-//       onGenerateRoute: (settings) {
-//         print("Navigating to: ${settings.name}");
-//         switch (settings.name) {
-//           case '/':
-//             return MaterialPageRoute(
-//                 builder: (context) => const LandingPage(startIndex: 0));
-//           case '/second':
-//             return MaterialPageRoute(
-//                 builder: (context) => const MortgagePageHome(startIndex: 0));
-//           case '/register':
-//             return MaterialPageRoute(
-//                 builder: (context) => const RegisterScreen());
-//           case '/login':
-//             return MaterialPageRoute(builder: (context) => const Login());
-//           case '/dashBoardPage':
-//             return MaterialPageRoute(
-//                 builder: (context) => const LandingPage(startIndex: 1));
-//           case '/dashBoardPage/mortgage':
-//             return MaterialPageRoute(
-//                 builder: (context) => const MortgagePageHome(startIndex: 0));
-//           case '/main_page':
-//             return MaterialPageRoute(
-//                 builder: (context) => const MortgagePageHome());
-//           case 'login/propertyView':
-//             final argument = settings.arguments as int?;
-
-//             return MaterialPageRoute(
-//               builder: (context) => PropertyDetailsPage(id: argument),
-//             );
-//           case '/rent-to-own':
-//             return MaterialPageRoute(
-//               builder: (context) => const Rent_To_Own(),
-//             );
-//           case '/construction':
-//             return MaterialPageRoute(
-//               builder: (context) => const ConstructionPage(),
-//             );
-//           case '/seemoretodaydeals':
-//             return MaterialPageRoute(
-//               builder: (context) => const MarketMain(startIndex: 2),
-//             );
-//                case '/seemoremostview':
-//             return MaterialPageRoute(
-//               builder: (context) => const MarketMain(startIndex: 1),
-//             );
-//                 case '/seemorenewhouse':
-//             return MaterialPageRoute(
-//               builder: (context) => const MarketMain(startIndex: 3),
-//             );
-//                 case '/filterPage':
-//             return MaterialPageRoute(
-//               builder: (context) => const MarketMain(startIndex: 5),
-//             );
-//              case '/marketMain':
-//             return MaterialPageRoute(
-//               builder: (context) => const LandingPage(startIndex: 2),
-//             );
-//               case '/favoritePage':
-//             return MaterialPageRoute(
-//               builder: (context) => const MarketMain(startIndex: 6),
-//             );
-//             case '/investment':
-//             return MaterialPageRoute(
-//               builder: (context) => const Investment(),
-//             );
-//              case '/investmentmore':
-//             return MaterialPageRoute(
-//               builder: (context) => const Investment_Forms(),
-//             );
-//           default:
-//             return MaterialPageRoute(
-//                 builder: (context) =>
-//                     const Login()); // Handle unknown routes
-//         }
-//       },
-//     );
-//   }
-// }
-
-// class LandingPage extends StatefulWidget {
-//   final int startIndex;
-//   const LandingPage({super.key, this.startIndex = 0});
-//   @override
-//   _LandingPageState createState() => _LandingPageState();
-// }
-
-// class _LandingPageState extends State<LandingPage> {
-//   int _currentIndex = 1;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _currentIndex = widget.startIndex; // ✅ Initialize with provided index
-//   }
-
-//   // ✅ Corrected List of Pages (Should be Widgets, not Routes)
-//   final List<Widget> _pages = [
-//     const Logo_Screen(),
-//     const DashboardPage(),
-//     const MarketMain(),
-//     const NotificationsPage(),
-//     const ProfilePagewidget(startIndex: 0),
-//     const MortgagePageHome(startIndex: 0)
-//   ];
-
-//   void _onItemTapped(int index) {
-//     setState(() {
-//       _currentIndex = index;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final bool showBottomNavBar = _currentIndex != 0;
-
-//     return Scaffold(
-//         body: _pages[_currentIndex],
-//         bottomNavigationBar: showBottomNavBar
-//             ? BottomNavBar(
-//                 currentIndex: _currentIndex - 1,
-//                 onTap: (index) => _onItemTapped(index + 1),
-//                 items: const [], // Adjust for LandingPage
-//               )
-//             : null,
-//       );
-
-//   }
-// }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -201,6 +82,36 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       onGenerateRoute: (settings) {
         print("Navigating to: ${settings.name}");
+
+        if (settings.name == '/') {
+          print("Token${Params.refreshToken}");
+          return MaterialPageRoute(
+            builder: (context) => FutureBuilder<dynamic>(
+              future: checkTokenValidity(
+                  Params.refreshToken), 
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (snapshot.hasData && snapshot.data == true) {
+                 
+                  return const MainLayout(
+                    showBottomNavBar: true,
+                    child: DashboardPage(),
+                  );
+                } else {
+                
+                  return const MainLayout(
+                    showBottomNavBar: false,
+                    child: Logo_Screen(),
+                  );
+                }
+              },
+            ),
+          );
+        }
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(
@@ -237,9 +148,9 @@ class MyApp extends StatelessWidget {
                 builder: (context) => const MainLayout(
                     showBottomNavBar: true, child: MarketMain(startIndex: 0)));
           case '/mainDashboard':
-          final argument = settings.arguments.toString();
+            final argument = settings.arguments.toString();
             return MaterialPageRoute(
-                builder: (context) =>  MainLayout(
+                builder: (context) => MainLayout(
                     showBottomNavBar: true, child: DashboardPageS(argument)));
           case '/marketMain/sponsered':
             final argument = settings.arguments as int?;
@@ -482,59 +393,80 @@ class _MainLayoutState extends State<MainLayout> {
     _selectedIndex = widget.startIndex; // Set from constructor
   }
 
-  void _onItemTapped(int index) {
-    if (index < 0 || index >= 4) return; // Ensure index is within range
-    setState(() {
-      _selectedIndex = index;
-    });
-    print("_selectedIndex$_selectedIndex");
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const DashboardPage())));
-        break;
-      case 1:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const MarketMain())));
-        break;
-      case 2:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const NotificationsPage())));
-        break;
-      case 3:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const AccountPage())));
-        break;
-      default:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const Logo_Screen())));
+ void _onItemTapped(int index) {
+  if (index < 0 || index >= 4) return; // Ensure index is within range
+
+  if (_selectedIndex == index) {
+    // Handle click on the same tab (like refreshing or scrolling to top)
+    if (index == 0) {
+      // Example: Refreshing DashboardPage
+      const DashboardPage(); // Implement your refresh logic in the DashboardPage class
+    } else if (index == 1) {
+      const MarketMain();
+    } else if (index == 2) {
+      NotificationsPage();
+    } else if (index == 3) {
+      const AccountPage();
     }
+    return; // Exit early to avoid unnecessary navigation
   }
+
+  // Update selected index if it's a different tab
+  setState(() {
+    _selectedIndex = index;
+  });
+
+  print("_selectedIndex$_selectedIndex");
+
+  // Navigate to the selected page
+  switch (index) {
+    case 0:
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainLayout(
+                  showBottomNavBar: true,
+                  startIndex: index,
+                  child: const DashboardPage())));
+      break;
+    case 1:
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainLayout(
+                  showBottomNavBar: true,
+                  startIndex: index,
+                  child: const MarketMain())));
+      break;
+    case 2:
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainLayout(
+                  showBottomNavBar: true,
+                  startIndex: index,
+                  child: NotificationsPage())));
+      break;
+    case 3:
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainLayout(
+                  showBottomNavBar: true,
+                  startIndex: index,
+                  child: const AccountPage())));
+      break;
+    default:
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainLayout(
+                  showBottomNavBar: true,
+                  startIndex: index,
+                  child: const Logo_Screen())));
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -584,3 +516,38 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 }
+
+Future<bool> checkTokenValidity(String token) async {
+  try {
+    var request = http.Request('POST', Uri.parse(Urls.validateToken));
+    request.body = json.encode({
+      "refreshToken": token,
+    });
+    request.headers.addAll({'Content-Type': 'application/json'});
+
+    http.StreamedResponse response = await request.send();
+    var decodeData = await http.Response.fromStream(response);
+    print("result ==> ${decodeData.body}");
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(decodeData.body);
+
+      
+      if (result.containsKey('refreshToken')) {
+        print("Token is valid. Refresh Token: ${result['refreshToken']}");
+        return true;
+      } else {
+        print("Token is invalid or missing.");
+        return false;
+      }
+    } else {
+    
+      return false;
+    }
+  } catch (e) {
+    print("Error: $e");
+    return false; 
+  }
+}
+
+

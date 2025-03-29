@@ -83,7 +83,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Construction Finance',
+          'Investment',
           style:
               TextStyle(color: Color(0xFF633095), fontWeight: FontWeight.w800),
         ),
@@ -267,12 +267,21 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 const Text('yieldValue'),
                 TextFormField(
                   controller: controller.yieldValue,
+                  readOnly: true,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
+                 decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(
+                        right: 8), // Adds spacing between NGN and input
+                    child: Text(
+                      'NGN',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
+                ),
                 ),
               ],
               // Add other form fields here

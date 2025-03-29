@@ -28,7 +28,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
   var profileName = "";
   var phoneNumber = "";
   String? profileImageUrl;
- Future<InvestmentModels?> fetchInvestmentDetails() async {
+  Future<InvestmentModels?> fetchInvestmentDetails() async {
     try {
       var url = Uri.parse(Urls.investment);
 
@@ -41,7 +41,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-         final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
 
         return InvestmentModels.fromJson(data);
       } else {
@@ -53,6 +53,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
       return null;
     }
   }
+
   static Future<bool> updateInvestment(InvestmentModels investment) async {
     try {
       var url = Uri.parse(Urls.investment);
@@ -61,9 +62,8 @@ class Main_Dashboard_controller extends ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${Params.userToken ?? ''}', 
+          'Authorization': 'Bearer ${Params.userToken ?? ''}',
         },
-       
       );
 
       print('Response Code: ${response.statusCode}');
@@ -95,6 +95,36 @@ class Main_Dashboard_controller extends ChangeNotifier {
       return false;
     }
   }
+
+
+String formatCurrency(dynamic value) {
+  try {
+    if (value == null || value.toString().isEmpty) return "";
+    double numericValue;
+
+    if (value is String) {
+      value = value.replaceAll(',', ''); // Remove commas from string
+      numericValue = double.tryParse(value) ?? 0.0; // Convert to double
+    } else if (value is num) {
+      numericValue = value.toDouble();
+    } else {
+      return "";
+    }
+
+    final formatter = NumberFormat("#,##0.##", "en_US");
+    return formatter.format(numericValue); 
+  } catch (error) {
+    print("Error formatting currency: $error");
+    return "";
+  }
+}
+
+  Future<void> onLogout(BuildContext context) async {
+     await SetSharedPref().clearData(); 
+    // ignore: use_build_context_synchronously
+    Navigator.of(context, rootNavigator: true).pushNamed("/login");
+  }
+
   Future<void> fetchPlanOptions() async {
     try {
       print('Response Code: ${Params.userId}');
@@ -116,7 +146,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
         if (data['firstName'] != null) {
           profileName = data['firstName'];
         }
-         if (data['phoneNumber'] != null) {
+        if (data['phoneNumber'] != null) {
           phoneNumber = data['phoneNumber'];
         }
         // Adjust this to match your API response
@@ -167,7 +197,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
       if (decodedResponse.statusCode == 200) {
         // ignore: use_build_context_synchronously
-      
+
         Fluttertoast.showToast(
           msg: "Withdrawal Successful",
           toastLength: Toast.LENGTH_SHORT,

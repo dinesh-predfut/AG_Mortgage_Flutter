@@ -22,7 +22,6 @@ class CustomerDetailsModel {
   final String profileImage;
   final String nin;
   final String bvn;
-  // final String employmentType;
   final String employer;
   final String jobTitle;
   final double netSalary;
@@ -32,6 +31,7 @@ class CustomerDetailsModel {
   final double monthlyIncome;
   final List<String> planOption;
   final NextOfKinDetailsModel? nextOfKinDetails;
+  final List<String> documents; // Add this field
 
   CustomerDetailsModel({
     required this.id,
@@ -54,7 +54,6 @@ class CustomerDetailsModel {
     required this.profileImage,
     required this.nin,
     required this.bvn,
-    // required this.employmentType,
     required this.employer,
     required this.jobTitle,
     required this.netSalary,
@@ -64,6 +63,7 @@ class CustomerDetailsModel {
     required this.monthlyIncome,
     required this.planOption,
     this.nextOfKinDetails,
+    required this.documents, // Add this field
   });
 
   factory CustomerDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -88,7 +88,6 @@ class CustomerDetailsModel {
       profileImage: json['profileImage'] ?? '',
       nin: json['nin'] ?? '',
       bvn: json['bvn'] ?? '',
-      // employmentType: json['employmentType'] ?? '',
       employer: json['employer'] ?? '',
       jobTitle: json['jobTitle'] ?? '',
       netSalary: (json['netSalary'] as num?)?.toDouble() ?? 0.0,
@@ -96,11 +95,46 @@ class CustomerDetailsModel {
       industry: json['industry'] ?? '',
       profession: json['profession'] ?? '',
       monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble() ?? 0.0,
-      planOption: List<String>.from(json['planOption'] ?? []),
+      planOption: json['planOption'] != null
+          ? List<String>.from(json['planOption'].map((e) => e.toString()))
+          : [],
       nextOfKinDetails: json['NextOfKinDetails'] != null
           ? NextOfKinDetailsModel.fromJson(json['NextOfKinDetails'])
           : null,
+      documents: json['Document'] != null
+          ? List<String>.from(json['Document'].map((e) => e.toString()))
+          : [],
     );
+  }
+}
+
+class DocumentModel {
+  final int id;
+  final int documentMasterId;
+  final String documentFile;
+
+  DocumentModel({
+    required this.id,
+    required this.documentMasterId,
+    required this.documentFile,
+  });
+
+  // Factory constructor to create an instance from JSON
+  factory DocumentModel.fromJson(Map<String, dynamic> json) {
+    return DocumentModel(
+      id: json['id'],
+      documentMasterId: json['documentMasterId'],
+      documentFile: json['documentFile'],
+    );
+  }
+
+  // Add the missing toJson() method
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "documentMasterId": documentMasterId,
+      "documentFile": documentFile,
+    };
   }
 }
 

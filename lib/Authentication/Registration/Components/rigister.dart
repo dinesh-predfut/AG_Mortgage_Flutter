@@ -106,10 +106,30 @@ class _RegisterScreenState extends State<RegisterScreen>
                   ),
                   const SizedBox(height: 20),
 
-                  IntlPhoneField(
+                  // IntlPhoneField(
+                  //   controller: signupController.registerPhoneNumber,
+                  //   keyboardType: TextInputType.phone,
+                  //   // validator: false,
+                  //   decoration: InputDecoration(
+                  //     labelText: "Phone Number",
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       borderSide: BorderSide(color: baseColor),
+                  //     ),
+                  //     counterText: "",
+                  //   ),
+                  //   initialCountryCode: 'NG', // Nigeria as default
+                  //   disableLengthCheck: true,
+                  //   onChanged: (phone) {
+                  //     signupController.registerPhoneNumber.text =
+                  //         phone.completeNumber;
+                  //     print(phone
+                  //         .completeNumber); // Prints full number with country code
+                  //   },
+                  // ),
+                    IntlPhoneField(
                     controller: signupController.registerPhoneNumber,
                     keyboardType: TextInputType.phone,
-                    // validator: false,
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
@@ -118,15 +138,20 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       counterText: "",
                     ),
-                    initialCountryCode: 'NG', // Nigeria as default
+                    initialCountryCode: 'NG', 
                     disableLengthCheck: true,
                     onChanged: (phone) {
-                      signupController.registerPhoneNumber.text =
-                          phone.completeNumber;
-                      print(phone
-                          .completeNumber); // Prints full number with country code
+                      signupController.countryCodeController.text =
+                          phone.countryCode;
+            
+                    },
+                    onCountryChanged: (country) {
+                      signupController.countryCodeController.text =
+                          "+${country.dialCode}";
+                    
                     },
                   ),
+
                   const SizedBox(height: 20),
 
                   // Phone Number Field

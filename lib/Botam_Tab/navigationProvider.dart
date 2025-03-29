@@ -31,7 +31,7 @@ class NavigationProvider with ChangeNotifier {
         // Navigate to Settings
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>  const NotificationsPage()),
+          MaterialPageRoute(builder: (context) =>NotificationsPage()),
         );
         break;
            case 3:

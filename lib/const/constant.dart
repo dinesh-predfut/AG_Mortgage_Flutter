@@ -12,18 +12,20 @@ class SetSharedPref {
   Future<void> setData({
     required String token,
     required int userId,
-    required String phoneNumber,
+    required String phoneNumber, 
+    required String refreshToken,
   }) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString("token", token);
     await pref.setString("phoneNumber", phoneNumber);
     await pref.setInt("userId", userId); 
-
-    print("Saving userId: $userId");
-
+    await pref.setString("refreshToken", refreshToken);
+  
+   Params.refreshToken = refreshToken;
     Params.userToken = token;
     Params.phoneNumber = phoneNumber;
     Params.userId = userId; 
+      print("Saving userId: ${Params.refreshToken}");
   }
 
   Future<void> getData() async {
@@ -34,7 +36,7 @@ class SetSharedPref {
     Params.phoneNumber = pref.getString("phoneNumber") ?? "null";
     Params.userId = pref.getInt("userId") ?? 0; 
 
-    print("Retrieved userId: ${Params.userId}"); 
+    print("Retrieved userId: ${Params.refreshToken}"); 
   }
 
   Future<void> clearData() async {

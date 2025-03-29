@@ -335,6 +335,28 @@ class MortgagController extends ChangeNotifier {
     print('Updated City Name: $cityName');
   }
 
+String formatCurrency(dynamic value) {
+  try {
+    if (value == null || value.toString().isEmpty) return "";
+    double numericValue;
+
+    if (value is String) {
+      value = value.replaceAll(',', ''); // Remove commas from string
+      numericValue = double.tryParse(value) ?? 0.0; // Convert to double
+    } else if (value is num) {
+      numericValue = value.toDouble();
+    } else {
+      return "";
+    }
+
+    final formatter = NumberFormat("#,##0.##", "en_US");
+    return formatter.format(numericValue); 
+  } catch (error) {
+    print("Error formatting currency: $error");
+    return "";
+  }
+}
+
   Future<void> findAndSetArea() async {
     List<SeletArea> allArea = await fetchAreasByCity();
 

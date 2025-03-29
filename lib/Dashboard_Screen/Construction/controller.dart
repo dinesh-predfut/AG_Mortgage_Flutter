@@ -196,7 +196,7 @@ class ContructionController extends GetxController {
         "estimatedAmountSpent": estimatedAmount.text.toString().replaceAll(',', ''),
         "totalMonthlySaving": totalMonthlySaving ?? '',
         "totalExpectedSaving": totalExpectedSaving ?? '',
-        "estimatedCompletionAmount": completionAmount.text,
+        "estimatedCompletionAmount": completionAmount.text.toString().replaceAll(',', ''),
         "loanRepaymentPeriod": sliderValue,
         "monthlyRepaymentAmount": monthlyRepaymentController.text.toString().replaceAll(',', ''),
         "valuationAmount": voluntaryAmount.text.toString().replaceAll(',', ''),

@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../const/commanFunction.dart';
 import '../Market_Place/Details_Page/models.dart';
 
 class ConstructionPage extends StatefulWidget {
@@ -286,7 +287,6 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
   @override
   void initState() {
     super.initState();
-    calculateEMI();
     // calculateMonthlyRental();
     calculateEMIAmountValue();
     controller.updateEMI();
@@ -349,10 +349,15 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
     double loanAmount =
         double.tryParse(controller.estimatedAmount.text.replaceAll(',', '')) ??
             0.0;
+    double completion =
+        double.tryParse(controller.completionAmount.text.replaceAll(',', '')) ??
+            0.0;
     int emiTenureInMonth = (controller.sliderValue * 12).toInt();
     // ignore: non_constant_identifier_names
     final FinalEMi = calculateEMIAmount(loanAmount, emiTenureInMonth);
     controller.monthlyRepaymentController.text = formattedEMI(FinalEMi);
+    updateControllerText(controller.completionAmount, formattedEMI(completion));
+    updateControllerText(controller.estimatedAmount, formattedEMI(loanAmount));
   }
 
   // void handleInputChange(String name, String value) {
@@ -386,37 +391,6 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
   //     controller.updateField(name, value);
   //   }
   // }
-
-  void calculateEMI() {
-    // calculateMonthlyRental();
-    calculateEMIAmountValue();
-    double propertyValue = double.tryParse(
-            controller.propertyValueController.text.replaceAll(',', '')) ??
-        0;
-    double initialDeposit =
-        double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0;
-    // ignore: non_constant_identifier_names
-    double TotalinitialDeposit = propertyValue * 0.4;
-    controller.downPayment.text = formattedEMI(TotalinitialDeposit);
-    // ignore: non_constant_identifier_names
-    double LoanCalculationAmount = propertyValue * 0.6;
-    controller.estimatedAmount.text = formattedEMI(LoanCalculationAmount);
-    if (initialDeposit > 0) {
-      var calculateTotalamount = TotalinitialDeposit - initialDeposit;
-      var monthlyRepayment = (calculateTotalamount) / 18;
-      print('Response body: ${monthlyRepayment}');
-      controller.monthlyRepaymentController.text =
-          formattedEMI(monthlyRepayment);
-      controller.downPayment.text = formattedEMI(initialDeposit);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
-    } else {
-      var withoutuInitialAmount = (TotalinitialDeposit) / 18;
-      controller.monthlyRepaymentController.text =
-          formattedEMI(withoutuInitialAmount);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
-      ;
-    }
-  }
 
   double calculateEMIAmount(double loanAmount, int tenureMonths) {
     const double yearlyInterest = 25;
@@ -482,6 +456,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                           ),
                         ),
                         isExpanded: true,
+                        hint: const Text("Select a City"),
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: cityData.isNotEmpty
                             ? cityData.map((item) {
@@ -532,6 +507,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                           ),
                         ),
                         isExpanded: true,
+                        hint: const Text("Select a Area"),
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: areaData.map((item) {
                           return DropdownMenuItem<int>(
@@ -709,6 +685,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                             50), // Rounded-full equivalent
                       ),
                     ),
+                    hint: const Text("Select a Stage"),
                     isExpanded: true,
                     items: const [
                       DropdownMenuItem<int>(
@@ -875,6 +852,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   TextFormField(
                     controller: controller.monthlyRepaymentController,
                     keyboardType: TextInputType.number,
+                    readOnly: true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(100),
@@ -905,7 +883,6 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
 
                       final int enteredAmount =
                           int.tryParse(value.replaceAll(',', '')) ?? 0;
-
 
                       return null;
                     },

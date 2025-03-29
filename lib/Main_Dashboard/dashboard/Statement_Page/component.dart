@@ -6,6 +6,7 @@ import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class StatementOfAccount extends StatefulWidget {
   final String plans;
@@ -16,46 +17,47 @@ class StatementOfAccount extends StatefulWidget {
 }
 
 class _StatementOfAccountState extends State<StatementOfAccount> {
-   final Controllers = Get.put(StatementPage());
+  final Controllers = Get.put(StatementPage());
+
   @override
   void initState() {
     super.initState();
-   Controllers.getAllTransactions(context);
+    Controllers.getAllTransactions(context);
   }
-  final List<Map<String, dynamic>> transactions = [
-    {
-      "date": "Today",
-      "type": "Deposit",
-      "amount": 450000,
-      "source": "From Visa...6521",
-      "time": "25 minutes ago",
-      "isDeposit": true,
-    },
-    {
-      "date": "9 September, 2024",
-      "type": "Withdraw",
-      "amount": 76000,
-      "source": "Into Visa...9102",
-      "time": "6:32 pm",
-      "isDeposit": false,
-    },
-    {
-      "date": "30 August, 2024",
-      "type": "Deposit",
-      "amount": 450000,
-      "source": "From Bank Transfer",
-      "time": "2:35 pm",
-      "isDeposit": true,
-    },
-    {
-      "date": "30 August, 2024",
-      "type": "Withdraw",
-      "amount": 84000,
-      "source": "Into Visa...9102",
-      "time": "9:12 am",
-      "isDeposit": false,
-    },
-  ];
+  // final List<Map<String, dynamic>> transactions = [
+  //   {
+  //     "date": "Today",
+  //     "type": "Deposit",
+  //     "amount": 450000,
+  //     "source": "From Visa...6521",
+  //     "time": "25 minutes ago",
+  //     "isDeposit": true,
+  //   },
+  //   {
+  //     "date": "9 September, 2024",
+  //     "type": "Withdraw",
+  //     "amount": 76000,
+  //     "source": "Into Visa...9102",
+  //     "time": "6:32 pm",
+  //     "isDeposit": false,
+  //   },
+  //   {
+  //     "date": "30 August, 2024",
+  //     "type": "Deposit",
+  //     "amount": 450000,
+  //     "source": "From Bank Transfer",
+  //     "time": "2:35 pm",
+  //     "isDeposit": true,
+  //   },
+  //   {
+  //     "date": "30 August, 2024",
+  //     "type": "Withdraw",
+  //     "amount": 84000,
+  //     "source": "Into Visa...9102",
+  //     "time": "9:12 am",
+  //     "isDeposit": false,
+  //   },
+  // ];
 
   final TextEditingController _amountController = TextEditingController();
 
@@ -90,7 +92,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Container(  
+                  Container(
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -108,25 +110,27 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                       child: Column(
                         children: [
                           Container(
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Column(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Total Month Paid",
                                       style: TextStyle(color: Colors.grey),
                                     ),
                                     Text(
-                                      "03",
+                                      {
+                                        "Deposit${Controllers.transactions.length}"
+                                      }.toString(),
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.w900),
                                     )
                                   ],
                                 ),
-                                Column(
+                                const Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
@@ -168,30 +172,30 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                 ],
                               ),
                               if (widget.plans == "Mortgage")
-                              ElevatedButton(
-                                onPressed: () => {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const Get_All_Cards(),
+                                ElevatedButton(
+                                  onPressed: () => {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Get_All_Cards(),
+                                      ),
                                     ),
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: baseColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: const EdgeInsets.only(
+                                        left: 15, right: 15, top: 5, bottom: 5),
                                   ),
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: baseColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                  child: const Text(
+                                    "Deposit",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
                                   ),
-                                  padding: const EdgeInsets.only(
-                                      left: 15, right: 15, top: 5, bottom: 5),
                                 ),
-                                child: const Text(
-                                  "Deposit",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white),
-                                ),
-                              ),
                             ],
                           ),
                         ],
@@ -205,19 +209,37 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
             // Transaction List
             Expanded(
               child: ListView.builder(
-                itemCount: transactions.length,
+                itemCount: Controllers.transactions.length,
                 itemBuilder: (context, index) {
-                  final transaction = transactions[index];
-                  final isFirstOfDate = index == 0 ||
-                      transactions[index]["date"] !=
-                          transactions[index - 1]["date"];
+                  final transaction = Controllers.transactions[index];
+
+                  // Parse and format the date
+                  DateTime transactionDate =
+                      DateTime.parse(transaction["date"]);
+                  String formattedDate =
+                      DateFormat('dd-MM-yyyy').format(transactionDate);
+
+                  // Check if it's today
+                  String todayDate =
+                      DateFormat('dd-MM-yyyy').format(DateTime.now());
+                  bool isToday = formattedDate == todayDate;
+
+                  // Show date only if it's the first occurrence of that date
+                  bool showDateHeader = index == 0 ||
+                      DateFormat('dd-MM-yyyy').format(DateTime.parse(
+                              Controllers.transactions[index - 1]["date"])) !=
+                          formattedDate;
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (isFirstOfDate) ...[
+                      // Show date header only if it's the first transaction of that date
+                      if (showDateHeader) ...[
                         const SizedBox(height: 20),
                         Text(
-                          transaction["date"],
+                          isToday
+                              ? "Today"
+                              : formattedDate, // Show "Today" if it's today's date
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -231,39 +253,29 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
-                          leading: CircleAvatar(
+                          leading: const CircleAvatar(
                             radius: 25,
-                            backgroundColor: transaction["isDeposit"]
-                                ? Colors.green
-                                : Colors.red,
+                            backgroundColor: Colors.red,
                             child: Icon(
-                              transaction["isDeposit"]
-                                  ? Icons.arrow_downward
-                                  : Icons.arrow_upward,
+                              Icons.arrow_upward,
                               color: Colors.white,
                             ),
                           ),
                           title: Text(
-                            "NGN ${transaction["amount"].toString()}",
+                            "NGN ${transaction["typeOfTransaction"].toString()}",
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(transaction["source"]),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                transaction["isDeposit"]
-                                    ? "Deposit"
-                                    : "Withdraw",
-                                style: TextStyle(
-                                  color: transaction["isDeposit"]
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
-                              ),
+                              // const Text(
+                              //   "Withdraw",
+                              //   style: TextStyle(color: Colors.red),
+                              // ),
                               const SizedBox(height: 4),
                               Text(
-                                transaction["time"],
+                                DateFormat('hh:mm a')
+                                    .format(transactionDate), // Show time only
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey),
                               ),
@@ -275,7 +287,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -408,12 +420,11 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:BorderSide(color: baseColor),
+                    borderSide: BorderSide(color: baseColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                         BorderSide(color: baseColor, width: 2),
+                    borderSide: BorderSide(color: baseColor, width: 2),
                   ),
                 ),
               ),
@@ -515,8 +526,8 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const DashboardPageS(''), // Start with MortgagePage
+                                builder: (context) => const DashboardPageS(
+                                    ''), // Start with MortgagePage
                               ),
                             );
                           },
@@ -537,4 +548,3 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
             ));
   }
 }
-

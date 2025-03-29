@@ -23,6 +23,8 @@ class DashboardPage extends StatefulWidget {
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
+
+  
 }
 
 class _DashboardPageState extends State<DashboardPage> {
@@ -34,7 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    print('Params.userId Code: ${Params.userId}');
+    print('Params.userId Code: ${Params.refreshToken}');
     Timer(const Duration(seconds: 2), () {
       fetchPlanOptions();
       controller.fetchPlanOptions();

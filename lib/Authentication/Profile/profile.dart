@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:ag_mortgage/Authentication/FinalPage/final.dart';
 import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/const/Image.dart';
+import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-
-
+import 'package:intl/intl.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -18,37 +18,10 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  File? _image;
-  final ImagePicker _picker = ImagePicker();
   ProfileController signupController = Get.find<ProfileController>();
-
-  Future<void> _pickImage() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
+ static String formatDate(DateTime date) {
+    return DateFormat('dd-MM-yyyy').format(date);
   }
-
-  Future<void> _submitData() async {
-    if (_image == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a picture')),
-      );
-      return;
-    } else {
-      signupController.checkUser(context);
-    }
-
-    // Mock API call to demonstrate backend sending
-    print("Send image to backend: ${_image?.path}");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Image uploaded successfully!')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,12 +51,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundImage:
-                          _image != null ? FileImage(_image!) : null,
-                      child: _image == null
+                      backgroundImage: signupController.image != null
+                          ? FileImage(signupController.image!)
+                          : null,
+                      child: signupController.image == null
                           ? IconButton(
                               icon: const Icon(Icons.camera_alt, size: 30),
-                              onPressed: _pickImage,
+                              onPressed: signupController.pickImage,
                             )
                           : null,
                     ),
@@ -94,9 +68,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       decoration: InputDecoration(
                         labelText: 'Date of Birth',
                         hintText: 'DD/MM/YYYY',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_today),
                           onPressed: () => signupController.selectDate(context),
                         ),
                       ),
@@ -112,7 +86,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 child: Text(gender),
                               ))
                           .toList(),
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        signupController.selectedGender = value;
+                      },
                       decoration: const InputDecoration(
                         labelText: 'Sex',
                         border: OutlineInputBorder(),
@@ -129,10 +105,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: baseColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 65
+                        ),
+                      ),
                       onPressed: () {
                         signupController.checkUser(context);
                       },
-                      child: const Text('Register'),
+                      child: const Text('Register',
+                          style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   ],
                 ),

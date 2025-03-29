@@ -104,84 +104,76 @@ class RentToOwnController extends GetxController {
   int cleanNumbers(dynamic amount) {
     if (amount == null) return 0;
 
-    // Convert the amount to a string and remove commas
     String amountString = amount.toString().replaceAll(',', '');
 
     return int.tryParse(amountString) ?? 0;
   }
-  Future<void> addRentoOwn(BuildContext context) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+ Future<void> addRentoOwn(BuildContext context) async {
+  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
 
-    try {
-      print('Preparing API request...');
-final monthlyRendalCalculation={(cleanNumbers(propertyValueController.text) * 0.8 - cleanNumbers(downPayment.text)) / 25};
-      // Prepare the request
-      var request = http.Request('POST', Uri.parse(Urls.rentToOwn));
-      request.body = json.encode({
-        "typeOfApartment": selectedApartmentType ?? '',
-        "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
-        "city": selectedCity ?? '',
-        "area": selectedArea ?? '',
-        "loanRepaymentPeriod": selectedLoan.value?.screeningPeriod,
-        "estimatedPropertyValue":
-            double.tryParse(propertyValueController.text.replaceAll(',', '')) ??
-                0.0,
-        "initialDeposit":
-            double.tryParse(downPayment.text.replaceAll(',', '').trim()) ?? 0.0,
-        "rentalRepaymentPeriod": sliderValue,
-        "monthlyRepaymentAmount": double.tryParse(
-                monthlyRepaymentController.text.replaceAll(',', '').trim()) ??
-            0.0,
-            "monthlyLoanAmount": double.tryParse(loanAmount.text.replaceAll(",", "").trim()) ?? 0.0,
-        "anniversary": formattedDate,
-        "monthlyRentalAmount": monthlyRendalCalculation,
-      });
-      request.headers.addAll({
-        'Content-Type': 'application/json ',
-        'Authorization': 'Bearer ${Params.userToken}',
-      });
+  try {
+    print('Preparing API request...');
+    final double monthlyRendalCalculation = 
+      (cleanNumbers(propertyValueController.text) * 0.8 - cleanNumbers(downPayment.text)) / 25;
 
-      print('Request Headers: ${request.headers}');
-      print('Request Body: ${request.body}');
+    var request = http.Request('POST', Uri.parse(Urls.rentToOwn));
+    request.body = json.encode({
+      "typeOfApartment": selectedApartmentType ?? '',
+      "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
+      "city": selectedCity ?? '',
+      "area": selectedArea ?? '',
+      "loanRepaymentPeriod": selectedLoan.value?.screeningPeriod,
+      "estimatedPropertyValue": double.tryParse(propertyValueController.text.replaceAll(',', '')) ?? 0.0,
+      "initialDeposit": double.tryParse(downPayment.text.replaceAll(',', '').trim()) ?? 0.0,
+      "rentalRepaymentPeriod": sliderValue,
+      "monthlyRepaymentAmount": double.tryParse(monthlyRepaymentController.text.replaceAll(',', '').trim()) ?? 0.0,
+      "monthlyLoanAmount": double.tryParse(loanAmount.text.replaceAll(",", "").trim()) ?? 0.0,
+      "anniversary": formattedDate,
+      "monthlyRentalAmount": monthlyRendalCalculation, // ✅ Fix: Correct data type
+    });
 
-      // Send the request
-      http.StreamedResponse streamedResponse = await request.send();
-      var decodedResponse = await http.Response.fromStream(streamedResponse);
+    request.headers.addAll({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${Params.userToken}',
+    });
 
-      // Log response
-      print('Response Status Code: ${decodedResponse.statusCode}');
-      print('Response Body: ${decodedResponse.body}');
+    print('Request Headers: ${request.headers}');
+    print('Request Body: ${request.body}');
 
-      if (decodedResponse.statusCode == 200) {
-        clearFields();
-        final result = jsonDecode(decodedResponse.body);
-        Fluttertoast.showToast(
-          msg: "Mortgage Created Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Color.fromARGB(255, 15, 15, 15),
-        );
-        print('API Success Response: $result');
+    // Send the request
+    http.StreamedResponse streamedResponse = await request.send();
+    var decodedResponse = await http.Response.fromStream(streamedResponse);
 
-        // Navigate to MortgagePage
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const DashboardPageS("Mortgage"), // Start with MortgagePage
-          ),
-        );
-      } else {
-        print('API Error: HTTP ${decodedResponse.statusCode}');
-        final errorResult = jsonDecode(decodedResponse.body);
-        print('Error Response: $errorResult');
-      }
-    } catch (error) {
-      print('Error Occurred: $error');
+    // Log response
+    print('Response Status Code: ${decodedResponse.statusCode}');
+    print('Response Body: ${decodedResponse.body}');
+
+    if (decodedResponse.statusCode == 200) {
+      clearFields();
+      final result = jsonDecode(decodedResponse.body);
+      Fluttertoast.showToast(
+        msg: "Rent-to-Own Created Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.grey,
+        textColor: const Color.fromARGB(255, 15, 15, 15),
+      );
+      print('API Success Response: $result');
+
+      // Navigate to MortgagePage
+      // ignore: use_build_context_synchronously
+                          Navigator.pushNamed(context, "/rent-to-own/paymentPage");
+
+    } else {
+      print('API Error: HTTP ${decodedResponse.statusCode}');
+      final errorResult = jsonDecode(decodedResponse.body);
+      print('Error Response: $errorResult');
     }
+  } catch (error) {
+    print('Error Occurred: $error');
   }
+}
+
 
   Future<List<LoanModel>> getScreeningPeriodsApi() async {
     var response = await http.get(

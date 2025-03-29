@@ -60,6 +60,7 @@ dependencies:
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
   webview_flutter: ^4.8.0
+  dio: ^5.8.0+1
  
 
 dev_dependencies:

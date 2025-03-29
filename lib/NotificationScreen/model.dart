@@ -1,58 +1,45 @@
-class NotificationItem {
-  final String iconUrl;
-  final String title;
-  final String description;
-  final String timestamp;
-  final int id;
+import 'package:ag_mortgage/NotificationScreen/notification.dart';
 
-  NotificationItem({
-    required this.iconUrl,
-    required this.title,
-    required this.description,
-    required this.timestamp,
+class NotificationModel {
+  final int id;
+  final int documentId;
+  final int customer;
+  final String notificationType;
+  final String notificationMessage;
+  final bool viewed;
+  final bool deleted;
+  final DateTime createdDate;
+  final DateTime dueDate;
+
+  NotificationModel({
     required this.id,
+    required this.documentId,
+    required this.customer,
+    required this.notificationType,
+    required this.notificationMessage,
+    required this.viewed,
+    required this.deleted,
+    required this.createdDate,
+    required this.dueDate,
   });
 
-  factory NotificationItem.fromJson(Map<String, dynamic> json) {
-    return NotificationItem(
-      iconUrl: json['iconUrl'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      timestamp: json['timestamp'] ?? '',
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
       id: json['id'] ?? 0,
+      documentId: json['documentId'] ?? 0,
+      customer: json['customer'] ?? 0,
+      notificationType: json['notificationType'] ?? 'Unknown Type',
+      notificationMessage: json['notificationMessage'] ?? 'No Message Available',
+      viewed: json['viewed'] ?? false,
+      deleted: json['deleted'] ?? false,
+      createdDate: json['createdDate'] != null
+          ? DateTime.parse(json['createdDate'])
+          : DateTime.now(),  // Providing a default if null
+      dueDate: json['dueDate'] != null
+          ? DateTime.parse(json['dueDate'])
+          : DateTime.now(),  // Providing a default if null
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'iconUrl': iconUrl,
-      'title': title,
-      'description': description,
-      'timestamp': timestamp,
-      'id': id,
-    };
-  }
-}
-
-class NotificationSectionModel {
-  final String date;
-  final List<NotificationItem> data;
-
-  NotificationSectionModel({required this.date, required this.data});
-
-  factory NotificationSectionModel.fromJson(Map<String, dynamic> json) {
-    return NotificationSectionModel(
-      date: json['date'] ?? '',
-      data: (json['data'] as List<dynamic>)
-          .map((item) => NotificationItem.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'date': date,
-      'data': data.map((item) => item.toJson()).toList(),
-    };
-  }
+  map(NotificationCard Function(dynamic item) param0) {}
 }

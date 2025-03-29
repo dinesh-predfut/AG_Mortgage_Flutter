@@ -9,6 +9,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -217,11 +218,26 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
   final _formKey = GlobalKey<FormState>();
 // Default value for slider
   double interestRate = 18; // Annual interest rate in percentage
-  String formattedEMI(double amount) {
-    // Format the number with international commas (thousands separators)
-    final numberFormatter = NumberFormat(
-        '#,###.##', 'en_US'); // en_US for international comma formatting
-    return numberFormatter.format(amount);
+  String formattedEMI(dynamic value) {
+    try {
+      if (value == null || value.toString().isEmpty) return "";
+      double numericValue;
+
+      if (value is String) {
+        value = value.replaceAll(',', ''); // Remove commas from string
+        numericValue = double.tryParse(value) ?? 0.0; // Convert to double
+      } else if (value is num) {
+        numericValue = value.toDouble();
+      } else {
+        return "";
+      }
+
+      final formatter = NumberFormat("#,##0.##", "en_US");
+      return formatter.format(numericValue);
+    } catch (error) {
+      print("Error formatting currency: $error");
+      return "";
+    }
   }
 
   void calculateEMI() {
@@ -243,13 +259,17 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
       print('Response body: ${monthlyRepayment}');
       controller.monthlyRepaymentController.text =
           formattedEMI(monthlyRepayment);
-      controller.initialDepositController.text = formattedEMI(initialDeposit);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
+      updateControllerText(
+          controller.initialDepositController, formattedEMI(initialDeposit));
+      updateControllerText(
+          controller.propertyValueController, formattedEMI(propertyValue));
     } else {
+      print("object");
       var withoutuInitialAmount = (TotalinitialDeposit) / 18;
-      controller.monthlyRepaymentController.text =
-          formattedEMI(withoutuInitialAmount);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
+      updateControllerText(controller.monthlyRepaymentController,
+          formattedEMI(withoutuInitialAmount));
+      updateControllerText(
+          controller.propertyValueController, formattedEMI(propertyValue));
     }
 
     // Update UI
@@ -613,7 +633,8 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                             ),
                           );
                           print("context$context");
-                               Navigator.pushReplacementNamed(context, '/mortgageCalendar');
+                          Navigator.pushReplacementNamed(
+                              context, '/mortgageCalendar');
                         } else {
                           Fluttertoast.showToast(
                             msg: "Please fill in all mandatory fields",
@@ -733,8 +754,9 @@ class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-                         Navigator.pushReplacementNamed(context, '/mortgageTermsheet');
-                   
+                    Navigator.pushReplacementNamed(
+                        context, '/mortgageTermsheet');
+
                     controller.getData(Params.userId as String);
                   },
                   style: ElevatedButton.styleFrom(
@@ -1053,7 +1075,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                         ), // Start with MortgagePageHome
                       ),
                     );
-                     Navigator.pushNamed(context, "/rent-to-own/paymentPage");
+                    Navigator.pushNamed(context, "/rent-to-own/paymentPage");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
@@ -1777,9 +1799,11 @@ class TermsAndConditionsDialog extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                    
                     Navigator.pushReplacementNamed(
-                        context, '/mortgageForm', arguments: house,);
+                      context,
+                      '/mortgageForm',
+                      arguments: house,
+                    );
                   },
                   child: const Text(
                     'Accept',

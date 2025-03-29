@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ag_mortgage/Authentication/FinalPage/final.dart';
 import 'package:ag_mortgage/Authentication/Login/login.dart';
@@ -16,6 +17,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class ProfileController extends GetxController {
   RxBool showMsg = false.obs;
@@ -29,7 +31,7 @@ class ProfileController extends GetxController {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lasttNameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
-  TextEditingController registerPhoneNumber= TextEditingController();
+  TextEditingController registerPhoneNumber = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController otpController = TextEditingController();
@@ -41,7 +43,8 @@ class ProfileController extends GetxController {
   TextEditingController nin = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   String? selectedGender;
-
+  File? image;
+    final ImagePicker _picker = ImagePicker();
   RxInt secondsRemaining = 120.obs;
   Timer? timer;
   XFile path = XFile("null");
@@ -51,7 +54,15 @@ class ProfileController extends GetxController {
     // userProfile();
     super.onInit();
   }
-
+Future<void> pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+     
+        image = File(pickedFile.path);
+  
+    }
+  }
   nextFuncation(BuildContext context) {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
@@ -61,7 +72,7 @@ class ProfileController extends GetxController {
       Fluttertoast.showToast(msg: "enter_last_name_msg");
     } else if (registerPhoneNumber.text.isEmpty) {
       Fluttertoast.showToast(msg: "enter_number_msg");
-    } else if (numberController.text.length < 9) {
+    } else if (registerPhoneNumber.text.length < 9) {
       Fluttertoast.showToast(msg: "enter_valid_number_msg");
     }
     // ignore: unnecessary_null_comparison
@@ -72,10 +83,36 @@ class ProfileController extends GetxController {
     } else {
       Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) =>const PIN_Creation()
-            // const Authentication(),
-          ));
+          MaterialPageRoute(builder: (context) => const PIN_Creation()
+              // const Authentication(),
+              ));
+    }
+  }
+
+  void onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      print("its working");
+      Navigator.pushNamed(context, "/register");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -88,9 +125,10 @@ class ProfileController extends GetxController {
         "firstName": firstNameController.text,
         "lastName": lasttNameController.text,
         "dateOfBirth": dobController.text,
-        "phoneNumber": countryCodeController.text.trim() + registerPhoneNumber.text,
+        "phoneNumber":
+            countryCodeController.text.trim() + registerPhoneNumber.text,
         "email": emailController.text,
-        "gender": selectedGender.toString(),
+        "gender": selectedGender,
         "password": newPasswordController.text,
         "nin": nin.text
       });
@@ -100,17 +138,12 @@ class ProfileController extends GetxController {
       var decodeData = await http.Response.fromStream(response);
       // final result = jsonDecode(decodeData.body);
       print("result ==> ${decodeData.body}");
+      var responseBody = jsonDecode(decodeData.body);
 
+      String message = responseBody['message'];
       if (response.statusCode == 200) {
-        // Get.to(() => Authentication(isReset: false), binding: InitialBinding());
-        // Fluttertoast.showToast(
-        //     msg:
-        //         "${"otp_sent".tr} ${countryCode + numberController.text.trim()}",
-        //     toastLength: Toast.LENGTH_LONG);
-        // isLoading(false);
-        // ignore: use_build_context_synchronously
         Fluttertoast.showToast(
-          msg: "User Created successful!",
+          msg: message,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.grey,
@@ -121,23 +154,24 @@ class ProfileController extends GetxController {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const FinalPageAuth(),
+              builder: (context) => const Authentication(),
             ));
       } else {
+     
         Fluttertoast.showToast(
-          msg: "Already Account Created Please Login",
+          msg: message,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0,
         );
-         // ignore: use_build_context_synchronously
-         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>   Login(),
-            ));
+        // ignore: use_build_context_synchronously
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => Login(),
+        //     ));
         // Fluttertoast.showToast(msg: result["message"]);
         isLoading(false);
       }
@@ -153,7 +187,8 @@ class ProfileController extends GetxController {
 
       var request = http.Request('POST', Uri.parse(Urls.sendOTP));
       request.body = json.encode({
-        "email": countryCodeController.text.trim() + registerPhoneNumber.text.trim(),
+        "email":
+            countryCodeController.text.trim() + registerPhoneNumber.text.trim(),
         "userType": "customer",
         "resendType": "emailVerification"
       });
@@ -194,12 +229,14 @@ class ProfileController extends GetxController {
       rethrow;
     }
   }
-
+ static String formatDate(DateTime date) {
+    return DateFormat('dd-MM-yyyy').format(date);
+  }
   Future signIn(BuildContext context) async {
     try {
       isLoading(true);
       showMsg(false);
-print("countryCodeController.text${countryCodeController.text}");
+      print("countryCodeController.text${countryCodeController.text}");
       var request = http.Request('POST', Uri.parse(Urls.signup));
       request.body = json.encode({
         "username": countryCodeController.text + numberController.text.trim(),
@@ -212,13 +249,13 @@ print("countryCodeController.text${countryCodeController.text}");
 
       if (response.statusCode == 200) {
         signInModel.value = SignInModel.fromJson(decodeData);
-        print("login response ==> ${signInModel.value.userId}");
+        print("login response ==> ${signInModel.value.refreshToken}");
 
         SetSharedPref().setData(
-          token: signInModel.value.token ?? "null",
-          phoneNumber: signInModel.value.username ?? "null",
-          userId: signInModel.value.userId ?? 0,
-        );
+            token: signInModel.value.token ?? "null",
+            phoneNumber: signInModel.value.username ?? "null",
+            userId: signInModel.value.userId ?? 0,
+            refreshToken: signInModel.value.refreshToken ?? "null");
 
         isLoading(false);
         showMsg(false);
@@ -278,7 +315,7 @@ print("countryCodeController.text${countryCodeController.text}");
 
     if (pickedDate != null) {
       dobController.text =
-          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+          "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
     }
   }
 }

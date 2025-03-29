@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Investment/models.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class InvestmentController extends ChangeNotifier {
     print(
         "Months: $months, Interest: $interest, Total Maturity Amount: $totalMaturityAmount");
     yieldValue.text = formattedEMI(totalMaturityAmount);
-    amount.text = formattedEMI(cleanedValue);
+    updateControllerText(amount, formattedEMI(cleanedValue));
     return totalMaturityAmount;
   }
 
@@ -87,7 +88,7 @@ class InvestmentController extends ChangeNotifier {
     String date = DateFormat('yyyy-MM-dd').format(selectedStartDate.value);
 
     try {
-      print('addMortgageForm Preparing API request...');
+     
 
       // Prepare the request
       var request = http.Request('POST', Uri.parse(Urls.investment));

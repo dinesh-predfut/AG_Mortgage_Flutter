@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../const/commanFunction.dart';
 import '../Market_Place/Details_Page/models.dart';
 
 // ignore: camel_case_types
@@ -375,23 +376,30 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
         double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0;
     // ignore: non_constant_identifier_names
     double TotalinitialDeposit = propertyValue * 0.4;
-    controller.downPayment.text = formattedEMI(TotalinitialDeposit);
+    updateControllerText(
+        controller.downPayment, formattedEMI(TotalinitialDeposit));
     // ignore: non_constant_identifier_names
     double LoanCalculationAmount = propertyValue * 0.6;
-    controller.loanAmount.text = formattedEMI(LoanCalculationAmount);
+
+    updateControllerText(
+        controller.loanAmount, formattedEMI(LoanCalculationAmount));
     if (initialDeposit > 0) {
       var calculateTotalamount = TotalinitialDeposit - initialDeposit;
       var monthlyRepayment = (calculateTotalamount) / 18;
       print('Response body: ${monthlyRepayment}');
-      controller.monthlyRepaymentController.text =
-          formattedEMI(monthlyRepayment);
-      controller.downPayment.text = formattedEMI(initialDeposit);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
+      updateControllerText(controller.monthlyRepaymentController,
+          formattedEMI(monthlyRepayment));
+      updateControllerText(
+          controller.downPayment, formattedEMI(initialDeposit));
+      updateControllerText(
+          controller.propertyValueController, formattedEMI(propertyValue));
     } else {
       var withoutuInitialAmount = (TotalinitialDeposit) / 18;
-      controller.monthlyRepaymentController.text =
-          formattedEMI(withoutuInitialAmount);
-      controller.propertyValueController.text = formattedEMI(propertyValue);
+      updateControllerText(controller.monthlyRepaymentController,
+          formattedEMI(withoutuInitialAmount));
+
+      updateControllerText(
+          controller.propertyValueController, formattedEMI(propertyValue));
       ;
     }
   }
@@ -474,6 +482,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
               const Text('House Type'),
               DropdownButtonFormField<int>(
                 value: controller.selectedApartmentType,
+
                 items: const [
                   DropdownMenuItem(value: 1, child: Text('Studio')),
                   DropdownMenuItem(
@@ -516,6 +525,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
 
                       return DropdownButtonFormField<int>(
                         value: controller.selectedCity,
+                        hint: const Text("Selet a City"),
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(100),
@@ -566,6 +576,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
 
                       return DropdownButtonFormField<int>(
                         value: controller.selectedArea,
+                        hint: const Text("Selet a Area"),
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(100),
@@ -1085,7 +1096,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ElevatedButton(
               onPressed: () {
                 // Navigate to a page for Bank Transfer
-                   Navigator.pushNamed(context, "/rent-to-own/paymentPage/bank");
+                Navigator.pushNamed(context, "/rent-to-own/paymentPage/bank");
                 // Navigator.pushReplacement(
                 //   context,
                 //   MaterialPageRoute(
@@ -1311,7 +1322,7 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
   @override
   void initState() {
     super.initState();
-    fetchData();
+    // fetchData();
 
     controller.findAndSetArea();
     controller.findAndSetCity();
@@ -1453,7 +1464,6 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                     ),
                     TextButton(
                       onPressed: () {
-                      
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -1473,8 +1483,6 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                 child: ElevatedButton(
                   onPressed: () => {
                     controller.addRentoOwn(context),
-                       Navigator.pushNamed(context, "/rent-to-own/paymentPage")
-                   
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
