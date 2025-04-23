@@ -23,8 +23,6 @@ class DashboardPage extends StatefulWidget {
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
-
-  
 }
 
 class _DashboardPageState extends State<DashboardPage> {
@@ -123,17 +121,17 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        if (controller.planOptions.contains("Mortgage")) {
-                           Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
-                        
+                        if (controller.planOptions.contains(25)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Mortgage");
                         } else if (controller.planOptions
-                            .contains("Rent-to-Own")) {
-                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
-                         
+                            .contains(26)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Rent-to-Own");
                         } else if (controller.planOptions
-                            .contains("Construction Finance")) {
-                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
-                        
+                            .contains(27)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Construction Finance");
                         } else {
                           Navigator.pushNamed(
                               context, "/dashBoardPage/mortgage");
@@ -151,24 +149,19 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        if (controller.planOptions.contains("Mortgage")) {
-                           Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
-                      
+                        print("controller.planOptions${controller.planOptions}");
+                         if (controller.planOptions.contains(25)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Mortgage");
                         } else if (controller.planOptions
-                            .contains("Rent-to-Own")) {
-                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
-                        
+                            .contains(26)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Rent-to-Own");
                         } else if (controller.planOptions
-                            .contains("Construction Finance")) {
-                               Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) =>
-                          //         const DashboardPageS("Construction Finance"),
-                          //   ),
-                          // );
-                        } else {
+                            .contains(27)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Construction Finance");
+                        }  else {
                           Navigator.pushNamed(context, "/rent-to-own");
                         }
                       },
@@ -184,17 +177,18 @@ class _DashboardPageState extends State<DashboardPage> {
                           colorBlendMode: BlendMode.srcIn,
                         ),
                         onTap: () {
-                          if (controller.planOptions.contains("Mortgage")) {
-                             Navigator.pushNamed(context, "/mainDashboard",arguments:"Mortgage" );
-                           
-                          } else if (controller.planOptions
-                              .contains("Rent-to-Own")) {
-                                 Navigator.pushNamed(context, "/mainDashboard",arguments:"Rent-to-Own" );
-                         
-                          } else if (controller.planOptions
-                              .contains("Construction Finance")) {
-                            Navigator.pushNamed(context, "/mainDashboard",arguments:"Construction Finance" );
-                          } else {
+                           if (controller.planOptions.contains(25)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Mortgage");
+                        } else if (controller.planOptions
+                            .contains(26)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Rent-to-Own");
+                        } else if (controller.planOptions
+                            .contains(27)) {
+                          Navigator.pushNamed(context, "/mainDashboard",
+                              arguments: "Construction Finance");
+                        } else {
                             Navigator.pushNamed(context, "/construction");
                           }
                         }),
@@ -209,7 +203,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        if (controller.planOptions.contains("Investment")) {
+                        if (controller.planOptions.contains(28)) {
                           Navigator.pushNamed(context, "/investmentmore");
                         } else {
                           Navigator.pushNamed(context, "/investment");

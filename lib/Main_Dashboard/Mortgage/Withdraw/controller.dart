@@ -23,7 +23,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
   TextEditingController account = TextEditingController();
   TextEditingController amount = TextEditingController();
   final TextEditingController repaymentDate = TextEditingController();
-  var planOptions = <String>[].obs; // Observable list to store plan options
+  var planOptions = <int>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
   var phoneNumber = "";
@@ -96,31 +96,30 @@ class Main_Dashboard_controller extends ChangeNotifier {
     }
   }
 
+  String formatCurrency(dynamic value) {
+    try {
+      if (value == null || value.toString().isEmpty) return "";
+      double numericValue;
 
-String formatCurrency(dynamic value) {
-  try {
-    if (value == null || value.toString().isEmpty) return "";
-    double numericValue;
+      if (value is String) {
+        value = value.replaceAll(',', ''); // Remove commas from string
+        numericValue = double.tryParse(value) ?? 0.0; // Convert to double
+      } else if (value is num) {
+        numericValue = value.toDouble();
+      } else {
+        return "";
+      }
 
-    if (value is String) {
-      value = value.replaceAll(',', ''); // Remove commas from string
-      numericValue = double.tryParse(value) ?? 0.0; // Convert to double
-    } else if (value is num) {
-      numericValue = value.toDouble();
-    } else {
+      final formatter = NumberFormat("#,##0.##", "en_US");
+      return formatter.format(numericValue);
+    } catch (error) {
+      print("Error formatting currency: $error");
       return "";
     }
-
-    final formatter = NumberFormat("#,##0.##", "en_US");
-    return formatter.format(numericValue); 
-  } catch (error) {
-    print("Error formatting currency: $error");
-    return "";
   }
-}
 
   Future<void> onLogout(BuildContext context) async {
-     await SetSharedPref().clearData(); 
+    await SetSharedPref().clearData();
     // ignore: use_build_context_synchronously
     Navigator.of(context, rootNavigator: true).pushNamed("/login");
   }
@@ -152,12 +151,15 @@ String formatCurrency(dynamic value) {
         // Adjust this to match your API response
         var profileImage = data['profileImage']; // Get profileImage URL
 
-        print("WWWWWWWW$profileName");
+        // print("WWWWWWWW$profileName");
 
         if (data['planOption'] != null) {
-          planOptions.value = List<String>.from(data['planOption']);
+          planOptions.value = List<int>.from(data['planOption']);
         }
-
+        if (planOptions.contains(26)) {
+          print("Passhere");
+        }
+        print("WWWWWWWW$planOptions");
         // Assuming you want to store the image URL for use in your UI
         profileImageUrl = profileImage; // Store the image URL
       } else {

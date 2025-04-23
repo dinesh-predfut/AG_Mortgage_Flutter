@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../const/commanFunction.dart';
+
 class MarketplacePage extends StatefulWidget {
   const MarketplacePage({super.key});
 
@@ -29,7 +31,7 @@ class _MarketplacePageState extends State<MarketplacePage>
   @override
   void initState() {
     super.initState();
-    
+
     futureHouses = controller.fetchHouses();
     fetchnewtViewedHouses = controller.fetchnewtViewedHouses();
     fetchmostViewedHouses = controller.fetchmostViewedHouses();
@@ -38,7 +40,6 @@ class _MarketplacePageState extends State<MarketplacePage>
         TabController(length: controller.posts.length, vsync: this);
     controller.getFavoriteAll();
     fetchFavorites();
-    
   }
 
   void fetchFavorites() async {
@@ -94,7 +95,7 @@ class _MarketplacePageState extends State<MarketplacePage>
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, "/filterPage");
+              Navigator.pushNamed(context, "/marketMain/filter");
             },
             icon: const Icon(Icons.tune),
           ),
@@ -251,7 +252,7 @@ class _MarketplacePageState extends State<MarketplacePage>
         const Padding(
           padding: EdgeInsets.all(8.0),
           child: Text(
-            "Sponsoreds", // Displaying section name statically or dynamically if available
+            "Explore Properties", // Displaying section name statically or dynamically if available
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
@@ -306,7 +307,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                             horizontal: 15, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                         child: const Text(
                           'Sponsored',
@@ -323,10 +324,10 @@ class _MarketplacePageState extends State<MarketplacePage>
                       top: 10,
                       left: 10,
                       child: GestureDetector(
-                          onTap: ()=> {
-                            controller.toggleFavorite(home.id.toInt()),
-                            fetchFavorites()
-                          },
+                          onTap: () => {
+                                controller.toggleFavorite(home.id.toInt()),
+                                fetchFavorites()
+                              },
                           child: Icon(
                             controller.favoriteHouseIds
                                     .contains(home.id.toInt())
@@ -376,7 +377,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            home.price.toString(),
+                            "NGN ${formattedEMI(home.price)}",
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -385,8 +386,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            home.houseType ??
-                                "Unknown Type", // House type dynamically
+                            "${home.rooms} Bedroom Apartment ", // House type dynamically
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white70,
@@ -396,31 +396,31 @@ class _MarketplacePageState extends State<MarketplacePage>
                           Row(
                             children: [
                               const Icon(Icons.location_on,
-                                  size: 10, color: Colors.white70),
+                                  size: 15, color: Colors.white70),
                               const SizedBox(width: 6),
                               Text(
                                 home.street ?? "Unknown City", // Dynamic city
                                 style: const TextStyle(
-                                    fontSize: 8, color: Colors.white70),
+                                    fontSize: 10, color: Colors.white70),
                               ),
                               const SizedBox(width: 10),
                               const Icon(Icons.bed,
-                                  size: 10, color: Colors.white70),
+                                  size: 15, color: Colors.white70),
                               const SizedBox(width: 3),
                               Text(
                                 home.rooms?.toString() ??
                                     "0", // Rooms dynamically
                                 style: const TextStyle(
-                                    fontSize: 8, color: Colors.white70),
+                                    fontSize: 10, color: Colors.white70),
                               ),
                               const SizedBox(width: 10),
                               const Icon(Icons.square_foot,
-                                  size: 10, color: Colors.white70),
+                                  size: 15, color: Colors.white70),
                               const SizedBox(width: 3),
                               Text(
                                 "${home.street ?? '0'} Sqft", // Area dynamically
                                 style: const TextStyle(
-                                    fontSize: 8, color: Colors.white70),
+                                    fontSize: 10, color: Colors.white70),
                               ),
                             ],
                           ),
@@ -528,12 +528,12 @@ class _MarketplacePageState extends State<MarketplacePage>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(home.price.toString(),
+                                    Text("NGN ${formattedEMI(home.price)}",
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 4),
-                                    Text(home.houseType,
+                                    Text("${home.rooms} Bedroom Apartment ",
                                         style: const TextStyle(
                                             fontSize: 12, color: Colors.grey)),
                                     const SizedBox(height: 4),
@@ -562,8 +562,8 @@ class _MarketplacePageState extends State<MarketplacePage>
                                         const Icon(Icons.square_foot,
                                             size: 12, color: Colors.grey),
                                         const SizedBox(width: 3),
-                                        const Text("2900 Sqft",
-                                            style: TextStyle(
+                                        Text(home.totalArea,
+                                            style: const TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey))
                                       ],
@@ -773,14 +773,14 @@ class _MarketplacePageState extends State<MarketplacePage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(home.price.toString(),
+                          Text("NGN ${formattedEMI(home.price)}",
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 )),
                             const SizedBox(height: 4),
-                            Text(home.houseType,
+                            Text("${home.rooms} Bedroom Apartment ",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.white70,
@@ -808,8 +808,8 @@ class _MarketplacePageState extends State<MarketplacePage>
                                 const Icon(Icons.square_foot,
                                     size: 12, color: Colors.white70),
                                 const SizedBox(width: 3),
-                                const Text("2312",
-                                    style: TextStyle(
+                                Text(home.totalArea,
+                                    style: const TextStyle(
                                         fontSize: 12, color: Colors.white70))
                               ],
                             ),
@@ -938,11 +938,11 @@ class _MarketplacePageState extends State<MarketplacePage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(home.price.toString(),
+                          Text("NGN ${formattedEMI(home.price)}",
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text(home.houseType ?? "Unknown Type",
+                          Text(home.rooms,
                               style: const TextStyle(
                                   fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 4),
@@ -988,7 +988,7 @@ class _MarketplacePageState extends State<MarketplacePage>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange[200],
+                                  color: baseColor,
                                   borderRadius: BorderRadius.circular(40),
                                 ),
                                 child: const Text(

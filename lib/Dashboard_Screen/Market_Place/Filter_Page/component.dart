@@ -2,6 +2,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -151,6 +152,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                       ),
                     ),
                     isExpanded: true,
+                    hint: const Text("Select Location"),
                     icon: const Icon(Icons.keyboard_arrow_down),
                     items: cityData.isNotEmpty
                         ? cityData.map((item) {
@@ -196,6 +198,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                       ),
                     ),
                     isExpanded: true,
+                    hint: const Text("Select House Type"),
                     icon: const Icon(Icons.keyboard_arrow_down),
                     items: apartmenttype.isNotEmpty
                         ? apartmenttype.map((item) {
@@ -222,41 +225,107 @@ class _FilterHousePageState extends State<FilterHousePage>
                   );
                 },
               ),
+              // const SizedBox(height: 16),
+              // const Text(
+              //   "Bedrooms",
+              //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              // ),
+              // TextField(
+              //   keyboardType: TextInputType.number,
+              //   decoration: InputDecoration(
+              //       hintText: "Input Preferred Number of Bedrooms",
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(100),
+              //       )),
+              //   onChanged: (value) {
+              //     setState(() {
+              //       controller.selectedBedrooms = int.tryParse(value);
+              //     });
+              //   },
+              // ),
               const SizedBox(height: 16),
               const Text(
-                "Bedrooms",
+                "Min Price",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextField(
+                controller: controller.minPriceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                    hintText: "Input Preferred Number of Bedrooms",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    )),
+                  hintText: "Input your Min Price (NGN)",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(
+                        right: 8), // Adds spacing between NGN and input
+                    child: Text(
+                      'NGN',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
                 onChanged: (value) {
                   setState(() {
-                    controller.selectedBedrooms = int.tryParse(value);
+                    double? minPriceValue =
+                        double.tryParse(value.replaceAll(',', ''));
+
+                    if (minPriceValue == null || value.isEmpty) {
+                      minPriceValue =
+                          0; // Set initial value to 0 if null or empty
+                    }
+
+                    controller.minPriceController.text =
+                        formattedEMI(minPriceValue);
+                    controller.minPriceController.selection =
+                        TextSelection.fromPosition(
+                      TextPosition(
+                          offset: controller.minPriceController.text.length),
+                    );
+                    controller.budget = minPriceValue.toInt();
                   });
                 },
               ),
               const SizedBox(height: 16),
               const Text(
-                "Budget",
+                "Max Price",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextField(
+                controller: controller.maxPriceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  hintText: "Input your Budget (NGN)",
+                  hintText: "Input your Max Price (NGN)",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(
+                        right: 8), // Adds spacing between NGN and input
+                    child: Text(
+                      'NGN',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
                 onChanged: (value) {
-                  setState(() {
-                    controller.budget = double.tryParse(value) as int?;
-                  });
+                  setState(
+                    () {
+                      double? maxPriceValue =
+                          double.tryParse(value.replaceAll(',', ''));
+                      if (maxPriceValue != null) {
+                        controller.maxPriceController.text =
+                            formattedEMI(maxPriceValue);
+                        controller.maxPriceController.selection =
+                            TextSelection.fromPosition(
+                          TextPosition(
+                              offset:
+                                  controller.maxPriceController.text.length),
+                        );
+                        controller.maxPrice = maxPriceValue.toInt();
+                      }
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 16),
@@ -296,7 +365,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                       controller.clearFields();
+                        controller.clearFields();
                         Navigator.pushNamed(context,
                             "/marketMain"); // Navigates back to the previous screen
                       },
@@ -315,7 +384,7 @@ class _FilterHousePageState extends State<FilterHousePage>
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                         controller.fetchnewtViewedHouses();
+                        controller.fetchnewtViewedHouses();
                         controller.fetchTodayDeals();
                         controller.fetchHouses();
                         controller.fetchmostViewedHouses();

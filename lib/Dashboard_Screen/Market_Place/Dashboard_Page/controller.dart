@@ -17,6 +17,9 @@ class Market_Place_controller extends ChangeNotifier {
   int? selectedHouseType;
   int? selectedBedrooms;
   int? budget;
+  int? maxPrice;
+final TextEditingController maxPriceController = TextEditingController();
+final TextEditingController minPriceController = TextEditingController();
   late TabController _tabController;
   int? selectedCity;
   List<String> selectedAmenities = [];
@@ -24,7 +27,8 @@ class Market_Place_controller extends ChangeNotifier {
   List<int> favoriteHouseIds = [];
   // List<PostsModel> get posts => _posts
   Future<ApinewHoseview> fetchnewtViewedHouses() async {
-    const String baseUrl = "3.253.82.115"; // Use IP address directly
+    print("budget$budget");
+    const String baseUrl = "3.253.82.115";
 
     const String endpoint = "/api/apartmentAndMarketplace";
     String amenitiesString =
@@ -38,6 +42,8 @@ class Market_Place_controller extends ChangeNotifier {
       'newHouses': 'true',
       'page': '0',
       'size': '10',
+       if (budget != null) 'minPrice': budget.toString().replaceAll(',', ''),
+  if (maxPrice != null) 'maxPrice': maxPrice.toString().replaceAll(',', ''),
     };
 
     // Construct the URI correctly
@@ -132,7 +138,6 @@ class Market_Place_controller extends ChangeNotifier {
       if (jsonData is Map<String, dynamic> && jsonData.containsKey('items')) {
         List<dynamic> items = jsonData['items']; // Extract items list
         return items.map((e) => FavoriteHouse.fromJson(e)).toList();
-        
       } else {
         throw Exception('Unexpected API response format');
       }
@@ -156,6 +161,8 @@ class Market_Place_controller extends ChangeNotifier {
       'mostViewed': 'true',
       'page': '0',
       'size': '10',
+       if (budget != null) 'minPrice': budget.toString().replaceAll(',', ''),
+  if (maxPrice != null) 'maxPrice': maxPrice.toString().replaceAll(',', ''),
     };
 
     // Construct the URI correctly
@@ -196,6 +203,8 @@ class Market_Place_controller extends ChangeNotifier {
       'sponsored': 'true',
       'page': '0',
       'size': '10',
+       if (budget != null) 'minPrice': budget.toString().replaceAll(',', ''),
+  if (maxPrice != null) 'maxPrice': maxPrice.toString().replaceAll(',', ''),
     };
 
     // Construct the URI correctly
@@ -237,6 +246,8 @@ class Market_Place_controller extends ChangeNotifier {
       'todaysDeal': 'true',
       'page': '0',
       'size': '10',
+       if (budget != null) 'minPrice': budget.toString().replaceAll(',', ''),
+  if (maxPrice != null) 'maxPrice': maxPrice.toString().replaceAll(',', ''),
     };
 
     // Construct the URI correctly
@@ -340,6 +351,9 @@ class Market_Place_controller extends ChangeNotifier {
     selectedBedrooms = null;
     budget = null;
     selectedCity = null;
+    maxPrice= null;
+    maxPriceController.text="";
+        minPriceController.text="";
     selectedAmenities.clear();
   }
 }

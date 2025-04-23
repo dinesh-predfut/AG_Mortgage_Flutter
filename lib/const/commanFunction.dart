@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void updateControllerText(TextEditingController controller, String newText) {
   // Get the previous cursor position
@@ -16,3 +17,9 @@ void updateControllerText(TextEditingController controller, String newText) {
   // Set the cursor back to the original position
   controller.selection = TextSelection.collapsed(offset: clampedPosition);
 }
+  String formattedEMI(double amount) {
+    // Format the number with international commas (thousands separators)
+    final numberFormatter = NumberFormat(
+        '#,###.##', 'en_US'); // en_US for international comma formatting
+    return numberFormatter.format(amount);
+  }

@@ -1,6 +1,7 @@
 // controllers/card_controller.dart
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 // import 'dart:html';
 import 'dart:io';
 import 'package:dio/dio.dart' as dio;
@@ -52,9 +53,10 @@ class Profile_Controller extends ChangeNotifier {
       TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   Map<String, String?> uploadedFiles = {};
-  List<String> showFiles = [];
+  List<dynamic> showFiles = [];
+  var finalData = <dynamic>[].obs;
   List<dynamic> userDocuments = []; // Initialize an empty list
- late int fileId ;
+  late int fileId;
   DateTime? dob;
   bool isDocumentUploaded = false;
   bool isDocumentUploaded2 = false;
@@ -62,7 +64,7 @@ class Profile_Controller extends ChangeNotifier {
   List<String> planOption = [];
   String? nationalIdPath;
   String? passportIdPath;
-  String? documentFileUrl ;
+  String? documentFileUrl;
   String? nextOfKinPassportPath;
   String? HelpDiskPhone;
   String? HelpDiskEmail;
@@ -99,11 +101,14 @@ class Profile_Controller extends ChangeNotifier {
         var jsonData = json.decode(response.body);
         CustomerDetailsModel customerDetails =
             CustomerDetailsModel.fromJson(jsonData);
+        // final Map<String, dynamic> parsedData = jsonDecode(jsonData);
+         showFiles = jsonData['Document'] ?? [];
+        ;
 
         planOption = customerDetails.planOption ?? [];
         planOption = planOption.toSet().toList(); // Remove duplicates
 
-        print('Updated Plan Options: $planOption');
+        print('Updated Plan Options: $jsonData');
         employerController.text = customerDetails?.employer ?? '';
         jobTitleController.text = customerDetails?.jobTitle ?? '';
         netSalaryController.text =
@@ -130,7 +135,8 @@ class Profile_Controller extends ChangeNotifier {
         selectedCityHome = customerDetails.city.toString() ?? '';
         selectedarea = customerDetails.area.toString();
         selectedState = customerDetails.state.toString() ?? '';
-        showFiles = customerDetails.documents;
+        // showFiles = customerDetails.documents;
+
         // showFiles = documents.toSet().cast<String>().toList();
 
         print('showFiles Filtered Documents: $showFiles');
@@ -142,7 +148,7 @@ class Profile_Controller extends ChangeNotifier {
         );
       }
     } catch (error) {
-      print('Error Occurred: $error');
+      print('Error Occurred11: $error');
       Fluttertoast.showToast(
         msg: "An error occurred: $error",
         toastLength: Toast.LENGTH_SHORT,
@@ -233,7 +239,6 @@ class Profile_Controller extends ChangeNotifier {
         "netWorth": netWorthController.text,
         "industry": industryController.text,
         "profession": professionController.text,
-        "monthlyIncome": monthlyIncomeController.text,
         "monthlyIncome": monthlyIncomeController.text,
       });
 
@@ -353,7 +358,7 @@ class Profile_Controller extends ChangeNotifier {
       final decodedResponse = await http.Response.fromStream(streamedResponse);
 
       debugPrint('Response Code: ${decodedResponse.statusCode}');
-      debugPrint('Response Body: ${decodedResponse.body}');
+      debugPrint('Response Bodyaaa: ${decodedResponse.body}');
 
       if (decodedResponse.statusCode == 200) {
         final List<dynamic> responseJson = jsonDecode(decodedResponse.body);
@@ -367,35 +372,55 @@ class Profile_Controller extends ChangeNotifier {
         }
 
         // Filter documents based on `planOption`
-        final filteredDocuments = responseJson
-            .where((item) => planOption.contains(item['planType']))
-            .toList();
-        debugPrint('Filtered Documents: $filteredDocuments');
+        final filteredDocuments = responseJson.where((item) {
+          final planType =
+              item['planId']?.toString().replaceFirst('KWIK ', '') ?? '';
+          debugPrint('Filtered planType: $planType');
 
- 
-        final view = responseJson
-            .where((item) => showFiles.contains(item['id'].toString()))
-            .toList();
+          return planOption.contains(planType);
+        }).toList();
 
-          documents = filteredDocuments.map((item) {
-        final documentData = {
-          'id': item['id'],
-          'planId': item['planId'],
-          'planType': item['planType'],
-          'documentName': item['documentName'],
-          'monthToNotify': item['monthToNotify'],
-          'dueMonth': item['dueMonth'],
-          'status': view.any((doc) => doc['id'] == item['id']),
-        };
-         uploadedFiles[item['id'].toString()] = jsonEncode(documentData);
-     
-        return documentData;
-      }).toList();
+        debugPrint('Filtered Documentsds: $filteredDocuments');
+        List<dynamic> decodedList = responseJson;
+        //  List<dynamic> Item = showFiles;
+        List<String> showFiless =
+            decodedList.map((doc) => doc['id'].toString()).toList();
 
+        List<dynamic> view = responseJson.where((item) {
+          return showFiles.any((doc) => doc['documentMasterId'] == item['id']);
+        }).toList();
+
+        final resultData = filteredDocuments.map((items) {
+          final documentId = items['id'];
+          final matchedVerification = showFiles.firstWhere(
+            (item) {
+              debugPrint(
+                  'Comparing ${item['documentMasterId']} with $documentId');
+              return item['documentMasterId'].toString() ==
+                  documentId.toString();
+            },
+            orElse: () => null,
+          );
+
+          debugPrint(
+              'matchedVerification for $documentId: $showFiles');
+
+          return {
+            ...items,
+            'matchedVerification': matchedVerification,
+            'verificationStatus':
+                matchedVerification?['verificationStatus'] ?? 'Manual',
+            'status': matchedVerification?['documentFile'] == null,
+          };
+        }).toList();
+
+        finalData.assignAll(resultData);
+
+        debugPrint('resultData Files List: $finalData');
         final completedCount =
             documents.where((item) => item['status'] == true).length;
-        debugPrint('Completed Uploads: $view');
-        debugPrint('Uploaded Files List: $uploadedFiles');
+        debugPrint('Completed view: $uploadedFiles');
+        debugPrint('Uploaded Files List: $documents');
 
         Fluttertoast.showToast(
           msg: "Documents fetched successfully",

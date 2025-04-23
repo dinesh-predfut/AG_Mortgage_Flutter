@@ -22,7 +22,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   void initState() {
     super.initState();
     controller.getAllDocuments(context);
-    print("List${controller.uploadedFiles}");
+    print("Listalls${controller.finalData}");
   }
 
   Widget _buildUploadBox(String text, {required Function(String) onUpload}) {
@@ -67,40 +67,38 @@ class _DocumentsPageState extends State<DocumentsPage> {
     );
   }
 
-  Widget _buildDocumentViewSection(String label, String? filePath) {
-    return filePath != null
-        ? Container(
-            decoration: BoxDecoration(color: Colors.orange[300]),
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.transparent, // Transparent background
-                    elevation: 0, // Remove shadow
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    _showDocumentPopup(filePath, label);
-                  },
-                  icon: const Icon(Icons.check_circle),
-                  label: Text(label),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _showDocumentPopup(filePath, label);
-                  },
-                  child: const Text(
-                    'View',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+  Widget _buildDocumentViewSection(
+      String label, String? documentFile, String? filePath) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.orange[300]),
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent, // Transparent background
+              elevation: 0, // Remove shadow
+              foregroundColor: Colors.white,
             ),
-          )
-        : const SizedBox.shrink();
+            onPressed: () {
+              _showDocumentPopup(documentFile!, label);
+            },
+            icon: const Icon(Icons.check_circle),
+            label: Text(label),
+          ),
+          TextButton(
+            onPressed: () {
+              _showDocumentPopup(documentFile!, label);
+            },
+            child: const Text(
+              'View',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showDocumentPopup(String filePath, String label) {
@@ -120,7 +118,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.file(File(filePath), fit: BoxFit.contain),
+              Image.network(
+                filePath,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Text('Failed to load image'),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const CircularProgressIndicator();
+                },
+              ),
             ],
           ),
         );
@@ -176,70 +182,94 @@ class _DocumentsPageState extends State<DocumentsPage> {
             child: Column(
               children: [
                 // Fixed Percentage Circle
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: CircularPercentIndicator(
-                    radius: 100.0,
-                    animation: true,
-                    lineWidth: 10.0,
-                    percent: controller.showFiles.isNotEmpty
-                        ? controller.showFiles
-                                .where((file) => file.isNotEmpty)
-                                .length /
-                            controller.showFiles.length
-                        : 0.0, // Avoid division by zero
-                    center: Text(
-                      "${controller.showFiles.where((file) => file.isNotEmpty).length}/${controller.showFiles.length}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    progressColor: Colors.green,
-                    backgroundColor: Colors.grey[300]!,
-                    circularStrokeCap: CircularStrokeCap.round,
-                  ),
-                ),
+              Obx(() => Padding(
+  padding: const EdgeInsets.all(16.0),
+  child: CircularPercentIndicator(
+    radius: 100.0,
+    animation: true,
+    lineWidth: 10.0,
+    percent: controller.finalData.isNotEmpty
+        ? controller.finalData.where((file) => file["status"] == true).length /
+            controller.finalData.length
+        : 0.0,
+    center: Text(
+      "${controller.finalData.where((file) => file["status"] == true).length}/${controller.finalData.length}",
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+    progressColor: Colors.green,
+    backgroundColor: Colors.grey[300]!,
+    circularStrokeCap: CircularStrokeCap.round,
+  ),
+)),
+
                 // Document Upload and View Sections
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: controller.uploadedFiles.keys.length,
-                  itemBuilder: (context, index) {
-                    String documentType =
-                        controller.uploadedFiles.keys.elementAt(index);
-                    String? filePath = controller.uploadedFiles[documentType];
-                    print("Document Type: $index, File Path: $filePath");
-                    try {
-                      Map<String, dynamic> fileData =
-                          jsonDecode(filePath!); // Decode JSON
-                      controller.fileId = fileData['id'];
-                      controller.documentFileUrl = fileData['documentFile'];
-                      print(
-                          "Document Type: ${controller.fileId}, File ID: ${controller.documentFileUrl}");
-                    } catch (e) {
-                      print("Error decoding JSON: $e");
-                    }
-                    // List<String> documentFileUrls = controller.showFiles
-                    //     .map((file) => file.documentFile)
-                    //     .toList();
-                    // int fileId = fileData['id'];
-                    return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: controller.showFiles
-                                .contains(controller.fileId.toString())
-                            ? _buildUploadBox(
-                                "Upload $documentType",
-                                onUpload: (path) {
-                                  controller.pickAndUploadFile(
-                                      documentType, 13);
-                                  setState(() {
-                                    controller.uploadedFiles[documentType] =
-                                        path;
-                                  });
-                                },
-                              )
-                            : _buildDocumentViewSection(
-                                documentType, controller.documentFileUrl));
-                  },
-                ),
+               Obx(() =>  ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.finalData.length,
+                        itemBuilder: (context, index) {
+                          final item = controller.finalData[index];
+                          final String documentType =
+                              item['documentName'] ?? '';
+                          final bool showUpload = item['status'];
+                          final matchedVerification =
+                              item['matchedVerification'];
+                          final String documentFile =
+                              matchedVerification != null
+                                  ? matchedVerification['documentFile'] ?? ''
+                                  : '';
+                          final int uploaddocumentFile =
+                              matchedVerification?['documentMasterId'] ?? 0;
+
+                          print("showUpload111$documentFile");
+                          // For already uploaded file data
+                          final String? filePath =
+                              controller.uploadedFiles[documentType];
+
+                          try {
+                            if (filePath != null) {
+                              Map<String, dynamic> fileData =
+                                  jsonDecode(filePath);
+                              controller.fileId = fileData['id'];
+                              controller.documentFileUrl =
+                                  fileData['documentName'];
+                            }
+                          } catch (e) {
+                            print("Error decoding file path JSON: $e");
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: showUpload
+                                ? _buildUploadBox(
+                                    "Upload $documentType",
+                                    onUpload: (path) {
+                                      final matchedVerification = item['id'];
+
+                                      print(
+                                          "Matched Verification for $documentType: $matchedVerification");
+                                      print(
+                                          'Uploading for document: $documentType, documentMasterId: $uploaddocumentFile');
+
+                                      controller.pickAndUploadFile(
+                                        documentType,
+                                        matchedVerification, // use the already safely extracted int
+                                      );
+
+                                      setState(() {
+                                        controller.uploadedFiles[documentType] =
+                                            path;
+                                      });
+                                    },
+                                  ):_buildDocumentViewSection(
+                                    documentType,
+                                    documentFile,
+                                    controller.documentFileUrl,
+                                  )
+                                
+                          );
+                        },
+               )),
               ],
             ),
           ),

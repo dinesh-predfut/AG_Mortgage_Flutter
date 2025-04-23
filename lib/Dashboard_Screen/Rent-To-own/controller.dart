@@ -118,6 +118,7 @@ class RentToOwnController extends GetxController {
 
     var request = http.Request('POST', Uri.parse(Urls.rentToOwn));
     request.body = json.encode({
+      "id":Params.userId,
       "typeOfApartment": selectedApartmentType ?? '',
       "apartmentOrMarketplace": apartmentOrMarketplace ?? "",
       "city": selectedCity ?? '',

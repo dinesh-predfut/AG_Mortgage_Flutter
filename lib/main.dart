@@ -64,8 +64,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Market_Place_controller()),
-        // ChangeNotifierProvider(
-        //     create: (_) => MortgagController()), // Provide MortgageProvider
+        ChangeNotifierProvider(
+            create: (_) => MortgagController()), // Provide MortgageProvider
       ],
       child: const MyApp(),
     ),
@@ -87,8 +87,7 @@ class MyApp extends StatelessWidget {
           print("Token${Params.refreshToken}");
           return MaterialPageRoute(
             builder: (context) => FutureBuilder<dynamic>(
-              future: checkTokenValidity(
-                  Params.refreshToken), 
+              future: checkTokenValidity(Params.refreshToken),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
@@ -96,13 +95,11 @@ class MyApp extends StatelessWidget {
                   );
                 }
                 if (snapshot.hasData && snapshot.data == true) {
-                 
                   return const MainLayout(
                     showBottomNavBar: true,
                     child: DashboardPage(),
                   );
                 } else {
-                
                   return const MainLayout(
                     showBottomNavBar: false,
                     child: Logo_Screen(),
@@ -135,18 +132,22 @@ class MyApp extends StatelessWidget {
                     showBottomNavBar: true, child: CalendarPageMortgage()));
           case '/mortgageTermsheet':
             return MaterialPageRoute(
-                builder: (context) => MainLayout(
+                builder: (context) =>  const MainLayout(
                       showBottomNavBar: true,
-                      child: ChangeNotifierProvider.value(
-                        value: Provider.of<MortgagController>(context,
-                            listen: false),
-                        child: const MortgageTermSheetPage(),
-                      ),
+                      child: MortgageTermSheetPage(),
                     ));
           case '/marketMain':
             return MaterialPageRoute(
                 builder: (context) => const MainLayout(
-                    showBottomNavBar: true, child: MarketMain(startIndex: 0)));
+                    startIndex: 1,
+                    showBottomNavBar: true,
+                    child: MarketMain(startIndex: 0)));
+          case '/marketMain/filter':
+            return MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                    startIndex: 1,
+                    showBottomNavBar: true,
+                    child: MarketMain(startIndex: 5)));
           case '/mainDashboard':
             final argument = settings.arguments.toString();
             return MaterialPageRoute(
@@ -393,80 +394,79 @@ class _MainLayoutState extends State<MainLayout> {
     _selectedIndex = widget.startIndex; // Set from constructor
   }
 
- void _onItemTapped(int index) {
-  if (index < 0 || index >= 4) return; // Ensure index is within range
+  void _onItemTapped(int index) {
+    if (index < 0 || index >= 4) return; // Ensure index is within range
 
-  if (_selectedIndex == index) {
-    // Handle click on the same tab (like refreshing or scrolling to top)
-    if (index == 0) {
-      // Example: Refreshing DashboardPage
-      const DashboardPage(); // Implement your refresh logic in the DashboardPage class
-    } else if (index == 1) {
-      const MarketMain();
-    } else if (index == 2) {
-      NotificationsPage();
-    } else if (index == 3) {
-      const AccountPage();
+    if (_selectedIndex == index) {
+      // Handle click on the same tab (like refreshing or scrolling to top)
+      if (index == 0) {
+        // Example: Refreshing DashboardPage
+        const DashboardPage(); // Implement your refresh logic in the DashboardPage class
+      } else if (index == 1) {
+        const MarketMain();
+      } else if (index == 2) {
+        NotificationsPage();
+      } else if (index == 3) {
+        const AccountPage();
+      }
+      return; // Exit early to avoid unnecessary navigation
     }
-    return; // Exit early to avoid unnecessary navigation
+
+    // Update selected index if it's a different tab
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    print("_selectedIndex$_selectedIndex");
+
+    // Navigate to the selected page
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: index,
+                    child: const DashboardPage())));
+        break;
+      case 1:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: index,
+                    child: const MarketMain())));
+        break;
+      case 2:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: index,
+                    child: NotificationsPage())));
+        break;
+      case 3:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: index,
+                    child: const AccountPage())));
+        break;
+      default:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainLayout(
+                    showBottomNavBar: true,
+                    startIndex: index,
+                    child: const Logo_Screen())));
+    }
   }
-
-  // Update selected index if it's a different tab
-  setState(() {
-    _selectedIndex = index;
-  });
-
-  print("_selectedIndex$_selectedIndex");
-
-  // Navigate to the selected page
-  switch (index) {
-    case 0:
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: index,
-                  child: const DashboardPage())));
-      break;
-    case 1:
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: index,
-                  child: const MarketMain())));
-      break;
-    case 2:
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: index,
-                  child: NotificationsPage())));
-      break;
-    case 3:
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: index,
-                  child: const AccountPage())));
-      break;
-    default:
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: index,
-                  child: const Logo_Screen())));
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -532,7 +532,6 @@ Future<bool> checkTokenValidity(String token) async {
     if (response.statusCode == 200) {
       final result = jsonDecode(decodeData.body);
 
-      
       if (result.containsKey('refreshToken')) {
         print("Token is valid. Refresh Token: ${result['refreshToken']}");
         return true;
@@ -541,13 +540,10 @@ Future<bool> checkTokenValidity(String token) async {
         return false;
       }
     } else {
-    
       return false;
     }
   } catch (e) {
     print("Error: $e");
-    return false; 
+    return false;
   }
 }
-
-

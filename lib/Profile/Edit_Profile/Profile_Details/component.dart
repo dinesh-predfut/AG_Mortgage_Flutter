@@ -6,6 +6,7 @@ import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -27,6 +28,7 @@ class PersonalDetailsPage extends StatefulWidget {
 
 class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
   final controller = Get.put(Profile_Controller());
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -48,11 +50,12 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
       controller.uploadImage(compressedImage);
     }
   }
- void _onBackPressed(BuildContext context) {
+
+  void _onBackPressed(BuildContext context) {
     // Custom logic for back navigation
     if (Navigator.of(context).canPop()) {
       print("its working");
-         Navigator.pushNamed(context, "/editProfile");
+      Navigator.pushNamed(context, "/editProfile");
     } else {
       // Show exit confirmation dialog if needed
       showDialog(
@@ -74,145 +77,201 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        // Handle custom back navigation logic
-        _onBackPressed(context);
-        return false; // Prevent default back behavior
-      },
-    child:  Scaffold(
-      appBar: AppBar(
-        title: const Text('Personal Details'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Profile e Section
-              Center(
-                child: Column(children: [
-                  Stack(
-                    alignment: Alignment
-                        .bottomRight, // Align the camera icon at the bottom-right
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: controller.image != null
-                            ? FileImage(controller.image!) as ImageProvider<
-                                Object> // Show local file if available
-                            : NetworkImage(controller.showImage!)
-                                as ImageProvider,
-                        child: (controller.image == null &&
-                                (controller.showImage == null ||
-                                    controller.showImage!.isEmpty))
-                            ? const Icon(Icons.person,
-                                size: 60, color: Colors.grey)
-                            : null,
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Personal Details'),
+            centerTitle: true,
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Profile e Section
+                  Center(
+                    child: Column(children: [
+                      Stack(
+                        alignment: Alignment
+                            .bottomRight, // Align the camera icon at the bottom-right
+                        children: [
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: controller.image != null
+                                ? FileImage(controller.image!) as ImageProvider<
+                                    Object> // Show local file if available
+                                : NetworkImage(controller.showImage!)
+                                    as ImageProvider,
+                            child: (controller.image == null &&
+                                    (controller.showImage == null ||
+                                        controller.showImage!.isEmpty))
+                                ? const Icon(Icons.person,
+                                    size: 60, color: Colors.grey)
+                                : null,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.camera_alt, size: 30),
+                            onPressed: _pickImage,
+                            color: Colors.blue,
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.camera_alt, size: 30),
-                        onPressed: _pickImage,
-                        color: Colors.blue,
-                      ),
-                    ],
+                      const SizedBox(height: 8),
+                      const Text('Change Profile Picture'),
+                    ]),
                   ),
-                  const SizedBox(height: 8),
-                  const Text('Change Profile Picture'),
-                ]),
-              ),
 
-              const SizedBox(height: 16),
-              // Form Section
-              // controller.isEdited ? _buildUploadedForm() : _buildInitialForm(),
-              _buildUploadedForm(),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: baseColor, // Transparent background
-                  elevation: 0, // Remove shadow
-                  foregroundColor:
-                      Colors.white, // Text and icon color// Text and icon color
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded corners
-                  ),
+                  const SizedBox(height: 16),
+                  // Form Section
+                  // controller.isEdited ? _buildUploadedForm() : _buildInitialForm(),
+                  _buildUploadedForm(),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
+  Widget _buildUploadedForm() {
+    return Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: TextEditingController(
+                text: controller.dob != null
+                    ? DateFormat('yyyy-MM-dd').format(controller.dob!)
+                    : '',
+              ), // Display selected date
+              readOnly: true, // Prevent manual text editing
+              decoration: InputDecoration(
+                labelText: 'Date of Birth',
+                suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                onPressed: () {
+              ),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: controller.dob ?? DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+
+                if (pickedDate != null) {
+                  setState(() {
+                    controller.dob = pickedDate;
+                  });
+                }
+              },
+            ),
+            _buildEditableField('Sex', value: controller.gender),
+            _buildEditableField(
+              "NIN",
+              value: controller.nin,
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                if (val.length <= 11) {
+                  return 'Value must be more than 11 characters';
+                }
+                return null;
+              },
+            ),
+            // _buildEditableField('NINs', value: controller.nin),
+            controller.isDocumentUploadedPd
+                ? _buildDocumentViewSection(
+                    'National ID', controller.nationalIdPath)
+                : _buildUploadBox(
+                    'Upload Picture of your National ID',
+                    onUpload: (filePath) {
+                      setState(() {
+                        controller.nationalIdPath = filePath;
+                        controller.isDocumentUploadedPd = true;
+                      });
+                    },
+                  ),
+            const SizedBox(height: 16),
+            const Text('Next of Kin Details',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            _buildEditableField('Full Name', value: controller.fullName),
+            _buildEditableField('Relationship', value: controller.relationShip),
+            _buildEditableField('Phone Number', value: controller.phoneNumber),
+            _buildEditableField('Email (Optional)', value: controller.email),
+            _buildEditableField('Address', value: controller.address),
+            controller.isDocumentUploadedPd
+                ? _buildDocumentViewSection(
+                    'Passport ID', controller.nationalIdPath)
+                : _buildUploadBox(
+                    'Upload Picture of your Passport ID',
+                    onUpload: (filePath) {
+                      setState(() {
+                        controller.passportIdPath = filePath;
+                        controller.isDocumentUploadedPd = true;
+                      });
+                    },
+                  ),
+            const SizedBox(height: 16),
+            SizedBox(
+                    width: double.infinity,
+                    child:ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                alignment: Alignment.center,
+                backgroundColor: baseColor, // Transparent background
+                elevation: 0, // Remove shadow
+                foregroundColor:
+                    Colors.white, // Text and icon color// Text and icon color
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30), // Rounded corners
+                ),
+              ),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
                   controller.kinDetails(context);
-                      Navigator.pushReplacementNamed(context, '/editProfile');
+                  Navigator.pushReplacementNamed(context, '/editProfile');
 
                   setState(() {
                     controller.isEdited = true;
                   });
-                },
-                child: const Text('Save Changes'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ));
-  }
-
-  Widget _buildUploadedForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: TextEditingController(
-            text: controller.dob != null
-                ? DateFormat('yyyy-MM-dd').format(controller.dob!)
-                : '',
-          ), // Display selected date
-          readOnly: true, // Prevent manual text editing
-          decoration: InputDecoration(
-            labelText: 'Date of Birth',
-            suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+                }
+                else {
+                          Fluttertoast.showToast(
+                            msg: "Please fill in all mandatory fields",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        }
+              },
+              child: const Text('Save Changes'),
             ),
-          ),
-          onTap: () async {
-            DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: controller.dob ?? DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
-            );
-
-            if (pickedDate != null) {
-              setState(() {
-                controller.dob = pickedDate;
-              });
-            }
-          },
-        ),
-        _buildEditableField('Sex', value: controller.gender),
-        _buildEditableField('NIN', value: controller.nin),
-        _buildDocumentViewSection('National ID', controller.nationalIdPathPd),
-        const SizedBox(height: 16),
-        const Text('Next of Kin Details',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        _buildEditableField('Full Name', value: controller.fullName),
-        _buildEditableField('Relationship', value: controller.relationShip),
-        _buildEditableField('Phone Number', value: controller.phoneNumber),
-        _buildEditableField('Email (Optional)', value: controller.email),
-        _buildEditableField('Address', value: controller.address),
-        _buildDocumentViewSection('Possport ID', controller.passportIdPathPd),
-      ],
-    );
+        )],
+          
+        ));
   }
 
-  Widget _buildEditableField(String label, {required value}) {
+  Widget _buildEditableField(String label,
+      {required value, String? Function(String?)? validator}) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: TextField(
+        child: TextFormField(
           controller: value,
+          validator: validator,
           decoration: InputDecoration(
             labelText: label,
             // suffixIcon: const Icon(Icons.edit),
