@@ -1,8 +1,10 @@
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/component.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Term_Sheet/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Term_Sheet/model.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -20,6 +22,7 @@ class Term_Sheets extends StatefulWidget {
 class _Term_SheetsState extends State<Term_Sheets>
     with SingleTickerProviderStateMixin {
   final controller = Get.put(MortgagControllerDashboard());
+
   String testPlan = "Rent-To-Own";
   Map<String, dynamic> data = {};
   // Future<void> fetchData() async {
@@ -38,8 +41,9 @@ class _Term_SheetsState extends State<Term_Sheets>
   void initState() {
     super.initState();
     print("check${widget.plans.toLowerCase()}");
-    //  controller.findAndSetArea(controller.selectedArea!.toInt());
-    //  controller.findAndSetCity(controller.selectedCity!.toInt());
+    controller.findAndSetArea();
+    controller.findAndSetCity();
+    controller.fetchMortgageDetails();
   }
 
   int cleanNumbers(dynamic amount) {
@@ -66,7 +70,10 @@ class _Term_SheetsState extends State<Term_Sheets>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Term Sheet'),
+        title: Text(
+          'Term Sheet',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -110,7 +117,7 @@ class _Term_SheetsState extends State<Term_Sheets>
                                 arguments: customer.apartmentOrMarketplace);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue, // baseColor
+                            backgroundColor: baseColor, // baseColor
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20.0, vertical: 10.0),
                             shape: RoundedRectangleBorder(
@@ -128,16 +135,16 @@ class _Term_SheetsState extends State<Term_Sheets>
                         [
                           _buildRow(
                               "City",
-                              customer.city != null
-                                  ? customer.city.toString()
+                              controller.cityNameValue.text != null
+                                  ? controller.cityNameValue.text.toString()
                                   : "N/A"),
                           _buildRow(
                               "Area",
-                              customer.area != null
-                                  ? customer.area.toString()
+                              controller.areaNameValue.text != null
+                                  ? controller.areaNameValue.text.toString()
                                   : "N/A"),
                           _buildRow("Selling Price",
-                              "NGN ${customer.estimatedPropertyValue != null ? customer.estimatedPropertyValue.toString() : 'N/A'}"),
+                              "NGN ${customer.estimatedPropertyValue != null ?formattedEMI(customer.estimatedPropertyValue!.toDouble() ): 'N/A'}"),
                         ],
                         buttonAction: () {},
                       ),
@@ -148,10 +155,10 @@ class _Term_SheetsState extends State<Term_Sheets>
                           _buildRow(
                               "Initial Deposit",
                               customer.initialDeposit != null
-                                  ? "NGN ${customer.initialDeposit.toString()}"
+                                  ? "NGN ${formattedEMI(customer.initialDeposit!.toDouble())}"
                                   : 'N/A'),
                           _buildRow("Loan",
-                              "NGN ${(customer.estimatedPropertyValue! * 0.7)}"),
+                              "NGN ${(formattedEMI(customer.estimatedPropertyValue! * 0.7))}"),
                           _buildRow(
                               "Repayment Period",
                               customer.loanRepaymentPeriod != null
@@ -160,7 +167,7 @@ class _Term_SheetsState extends State<Term_Sheets>
                           _buildRow(
                               "Monthly Repayment",
                               customer.monthlyRepaymentAmount != null
-                                  ? "NGN ${customer.monthlyRepaymentAmount.toString()}"
+                                  ? "NGN ${formattedEMI(customer.monthlyRepaymentAmount!.toDouble())}"
                                   : "N/A"),
                           _buildRow(
                               "Starting Date",
@@ -182,11 +189,11 @@ class _Term_SheetsState extends State<Term_Sheets>
                             controller.formatProfileDate(estimatedProfileDate),
                           ),
                           _buildRow("Estimated\nTotal Monthly Savings",
-                              "NGN ${customer.monthlyRepaymentAmount != null ? customer.monthlyRepaymentAmount.toString() : "N/A"}"),
+                              "NGN ${customer.monthlyRepaymentAmount != null ? formattedEMI(customer.monthlyRepaymentAmount!.toDouble()) : "N/A"}"),
                           _buildRow("Initial Deposit",
-                              "NGN ${customer.initialDeposit != null ? " ${customer.initialDeposit.toString()}" : "N/A"}"),
+                              "NGN ${customer.initialDeposit != null ? " ${formattedEMI(customer.initialDeposit!.toDouble())}" : "N/A"}"),
                           _buildRow("Minimum Total Expected Saving",
-                              "NGN ${(customer.estimatedPropertyValue! * 0.3)}"),
+                              "NGN ${(formattedEMI(customer.estimatedPropertyValue! * 0.3))}"),
                         ],
                       ),
                       Container(
@@ -270,7 +277,7 @@ class _Term_SheetsState extends State<Term_Sheets>
                                 arguments: customer.apartmentOrMarketplace);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue, // baseColor
+                            backgroundColor: baseColor, // baseColor
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20.0, vertical: 10.0),
                             shape: RoundedRectangleBorder(
@@ -288,16 +295,16 @@ class _Term_SheetsState extends State<Term_Sheets>
                         [
                           _buildRow(
                               "City",
-                              customer.city != null
-                                  ? customer.city.toString()
+                              controller.cityNameValue.text != null
+                                  ? controller.cityNameValue.text.toString()
                                   : "N/A"),
                           _buildRow(
                               "Area",
-                              customer.area != null
-                                  ? customer.area.toString()
+                              controller.areaNameValue.text != null
+                                  ? controller.areaNameValue.text.toString()
                                   : "N/A"),
                           _buildRow("Selling Price",
-                              "NGN ${customer.estimatedPropertyValue != null ? customer.estimatedPropertyValue.toString() : 'N/A'}"),
+"NGN ${customer.estimatedPropertyValue != null ? formattedEMI(customer.estimatedPropertyValue!) : 'N/A'}")
                         ],
                         buttonAction: () {},
                       ),
@@ -308,10 +315,10 @@ class _Term_SheetsState extends State<Term_Sheets>
                           _buildRow(
                               "Down Payment",
                               customer.initialDeposit != null
-                                  ? "NGN ${customer.initialDeposit.toString()}"
+                                  ? "NGN ${formattedEMI(customer.initialDeposit!.toDouble())}"
                                   : 'N/A'),
                           _buildRow("Loan",
-                              "NGN ${(customer.estimatedPropertyValue! * 0.6)}"),
+                              "NGN ${(formattedEMI(customer.estimatedPropertyValue! * 0.6))}"),
                           _buildRow(
                               "Repayment Period",
                               customer.rentalRepaymentPeriod != null
@@ -320,12 +327,12 @@ class _Term_SheetsState extends State<Term_Sheets>
                           _buildRow(
                               "Screening Monthly Rental",
                               customer.monthlyLoanAmount != null
-                                  ? "NGN ${customer.monthlyLoanAmount.toString()}"
+                                  ? "NGN ${formattedEMI(customer.monthlyLoanAmount!.toDouble())}"
                                   : "N/A"),
                           _buildRow(
                               "Monthly Repayment",
                               customer.monthlyRentalAmount != null
-                                  ? "NGN ${customer.monthlyRentalAmount.toString()}"
+                                  ? "NGN ${formattedEMI(customer.monthlyRentalAmount!.toDouble())}"
                                   : "N/A"),
                           _buildRow(
                               "Starting Date",
@@ -349,11 +356,11 @@ class _Term_SheetsState extends State<Term_Sheets>
                                 customer.anniversary ?? 'N/A'),
                           ),
                           _buildRow("Total Monthly Rental",
-                              "NGN ${(((customer.estimatedPropertyValue ?? 0) * 0.8) - (customer.initialDeposit ?? 0)) / 25}"),
+                              "NGN ${formattedEMI((((customer.estimatedPropertyValue ?? 0) * 0.8) - (customer.initialDeposit ?? 0)) / 25)}"),
                           _buildRow("Down Payment",
-                              "NGN ${customer.initialDeposit != null ? " ${customer.initialDeposit.toString()}" : "N/A"}"),
+                              "NGN ${customer.initialDeposit != null ? " ${formattedEMI(customer.initialDeposit!.toDouble())}" : "N/A"}"),
                           _buildRow("Total Expected Deposit",
-                              "NGN ${(customer.initialDeposit ?? 0) + (customer.monthlyLoanAmount ?? 0)}"),
+                              "NGN ${formattedEMI((customer.initialDeposit ?? 0) + (customer.monthlyLoanAmount ?? 0))}"),
                         ],
                       ),
                       Container(
@@ -427,7 +434,7 @@ class _Term_SheetsState extends State<Term_Sheets>
                                 arguments: customer.typeOfConstruction);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue, // baseColor
+                            backgroundColor: baseColor, // baseColor
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20.0, vertical: 10.0),
                             shape: RoundedRectangleBorder(
@@ -445,13 +452,13 @@ class _Term_SheetsState extends State<Term_Sheets>
                         [
                           _buildRow(
                               "City",
-                              customer.city != null
-                                  ? customer.city.toString()
+                              controller.cityNameValue.text != null
+                                  ? controller.cityNameValue.text .toString()
                                   : "N/A"),
                           _buildRow(
                               "Area",
-                              customer.area != null
-                                  ? customer.area.toString()
+                              controller.areaNameValue.text != null
+                                  ? controller.areaNameValue.text.toString()
                                   : "N/A"),
                           _buildRow(
                               "Type of Construction",
@@ -460,7 +467,7 @@ class _Term_SheetsState extends State<Term_Sheets>
                           _buildRow(
                               "Estimated Budget",
                               // ignore: unnecessary_null_comparison
-                              "NGN ${ controller.formatNumber(customer.estimatedAmountSpent.toStringAsFixed(2))}"),
+                              "NGN ${controller.formatNumber(customer.estimatedAmountSpent.toStringAsFixed(2))}"),
                         ],
                         buttonAction: () {},
                       ),
@@ -473,7 +480,6 @@ class _Term_SheetsState extends State<Term_Sheets>
                               customer.estimatedAmountSpent != null
                                   ? "NGN ${customer.estimatedAmountSpent.toString()}"
                                   : 'N/A'),
-                         
                           _buildRow(
                               "Repayment Period",
                               customer.repaymentPeriod != null
@@ -485,7 +491,6 @@ class _Term_SheetsState extends State<Term_Sheets>
                               customer.totalMonthlySaving != null
                                   ? "NGN ${controller.formatNumber(customer.totalExpectedSaving.toString())}"
                                   : "N/A"),
-                        
                           _buildRow(
                               "Starting Date",
                               controller.formatProfileDate(
@@ -509,12 +514,11 @@ class _Term_SheetsState extends State<Term_Sheets>
                           ),
                           _buildRow("Total Monthly Rental",
                               "NGN ${controller.formatNumber(customer.totalMonthlySaving.toString())}"),
-                         
                           _buildRow("Total Expected Deposit",
                               "NGN ${controller.formatNumber(customer.totalExpectedSaving.toString())}"),
                         ],
                       ),
-                       const SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Container(
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(

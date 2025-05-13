@@ -127,18 +127,18 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
               'Net Salary', controller.netSalaryController, 'NGN', context),
           _buildEditableField('Net Worth (Optional)',
               controller.netWorthController, 'NGN', context),
-          controller.isDocumentUploaded2
-              ? _buildDocumentViewSection('Business Registration Document',
-                  controller.passportIdPath, context)
-              : _buildUploadBox(
-                  'Upload Business Registration Document',
-                  onUpload: (filePath) {
-                    setState(() {
-                      controller.passportIdPath = filePath;
-                      controller.isDocumentUploaded2 = true;
-                    });
-                  },
-                ),
+          // controller.isDocumentUploaded2
+          //     ? _buildDocumentViewSection('Business Registration Document',
+          //         controller.passportIdPath, context)
+          //     : _buildUploadBox(
+          //         'Upload Business Registration Document',
+          //         onUpload: (filePath) {
+          //           setState(() {
+          //             controller.passportIdPath = filePath;
+          //             controller.isDocumentUploaded2 = true;
+          //           });
+          //         },
+          //       ),
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.center,
@@ -176,18 +176,18 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
             controller.monthlyIncomeController, 'NGN', context),
         _buildEditableField('Net Worth (Optional)',
             controller.selfNetWorthController, 'NGN', context),
-        controller.isDocumentUploaded
-            ? _buildDocumentViewSection('Business Registration Document',
-                controller.passportIdPath, context)
-            : _buildUploadBox(
-                'Upload Business Registration Document',
-                onUpload: (filePath) {
-                  setState(() {
-                    controller.passportIdPath = filePath;
-                    controller.isDocumentUploaded = true;
-                  });
-                },
-              ),
+        // controller.isDocumentUploaded
+        //     ? _buildDocumentViewSection('Business Registration Document',
+        //         controller.passportIdPath, context)
+        //     : _buildUploadBox(
+        //         'Upload Business Registration Document',
+        //         onUpload: (filePath) {
+        //           setState(() {
+        //             controller.passportIdPath = filePath;
+        //             controller.isDocumentUploaded = true;
+        //           });
+        //         },
+        //       ),
                Align(
             alignment: Alignment.center,
             child: ElevatedButton(

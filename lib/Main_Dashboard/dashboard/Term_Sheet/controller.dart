@@ -33,6 +33,7 @@ class MortgagControllerDashboard extends ChangeNotifier {
   int? selectedApartmentType = 1;
   int? propertyValueController;
   int? selectedCity;
+  
   int? monthlyRepaymentController;
   int? selectedArea;
   int? initialDepositController;
@@ -48,6 +49,7 @@ class MortgagControllerDashboard extends ChangeNotifier {
       final response = await http.get(Uri.parse(Urls.allCity));
       final body = json.decode(response.body) as List;
       if (response.statusCode == 200) {
+        fetchAreasByCity();
         return body.map((dynamic json) {
           final map = json as Map<String, dynamic>;
           return PostsModel(
@@ -60,10 +62,10 @@ class MortgagControllerDashboard extends ChangeNotifier {
     throw Exception('error fetching data');
   }
 
-  Future<List<SeletArea>> fetchAreasByCity( cityId) async {
+  Future<List<SeletArea>> fetchAreasByCity() async {
     try {
       var response = await http.get(
-        Uri.parse('${Urls.allArea}$cityId'),
+        Uri.parse('${Urls.allArea}$selectedCity'),
         headers: {
           'Authorization': 'Bearer ${Params.userToken}',
           'Content-Type': 'application/json',
@@ -74,7 +76,7 @@ class MortgagControllerDashboard extends ChangeNotifier {
         List<dynamic> data = json.decode(response.body);
         if (data.isEmpty) {
           Fluttertoast.showToast(
-            msg: "No areas found for the selected city",
+            msg: "No areas found for the selected cityss",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.grey,
@@ -90,6 +92,35 @@ class MortgagControllerDashboard extends ChangeNotifier {
     } catch (e) {
       throw Exception("Error: $e");
     }
+  }
+
+  Future<void> findAndSetCity() async {
+    List<PostsModel> allCity = await getALLCityApi();
+
+    var matchCity = allCity.firstWhere(
+      (item) => item.id == selectedCity,
+      orElse: () => PostsModel(id: -1, name: "Unknown"),
+    );
+
+    cityNameValue.text = matchCity.name.toString();
+
+    print('Updated City Name City Name: $cityNameValue');
+  }
+
+  Future<void> findAndSetArea() async {
+    List<SeletArea> allArea = await fetchAreasByCity();
+
+    if (allArea.isEmpty) {
+      areaNameValue.text = "No areas found";
+      return;
+    }
+    var matchArea = allArea.firstWhere(
+      (item) => item.id == selectedArea,
+      orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+    );
+
+    areaNameValue.text = matchArea.name.toString();
+    print("22222${areaNameValue.text}");
   }
 
   String formatNumber(String number) {
@@ -145,35 +176,6 @@ class MortgagControllerDashboard extends ChangeNotifier {
     }
   }
 
-  Future<void> findAndSetCity(int selectedCity) async {
-    List<PostsModel> allCity = await getALLCityApi();
-
-    var matchCity = allCity.firstWhere(
-      (item) => item.id == selectedCity,
-      orElse: () => PostsModel(id: -1, name: "Unknown"),
-    );
-
-    cityNameValue.text = matchCity.name.toString();
-
-    print('Updated City Name: $cityName');
-  }
-
-  Future<void> findAndSetArea(int selectedArea) async {
-    List<SeletArea> allArea = await fetchAreasByCity(selectedArea);
-
-    if (allArea.isEmpty) {
-      areaNameValue.text = "No areas found";
-      return;
-    }
-    var matchArea = allArea.firstWhere(
-      (item) => item.id == selectedArea,
-      orElse: () => SeletArea(id: -1, name: "Unknown Area"),
-    );
-
-    areaNameValue.text = matchArea.name.toString();
-    print("22222${areaNameValue.text}");
-  }
-
   String calculateProfileDate(String anniversaryDate, int remainingMonths) {
     DateTime startDate = DateTime.parse(anniversaryDate);
 
@@ -203,83 +205,108 @@ class MortgagControllerDashboard extends ChangeNotifier {
     return DateFormat('MMM yyyy').format(dateTime).toUpperCase();
   }
 
+  Future<List<CustomerModel>> fetchMortgageDetails() async {
+    try {
+      print('userId: ${Params.userId}');
 
+      final url = Uri.parse('${Urls.getMortgageDetails}?id=${Params.userId}');
 
-Future<List<CustomerModel>> fetchMortgageDetails() async {
-  try {
-    print('userId: ${Params.userId}');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
 
-    final url = Uri.parse('${Urls.getMortgageDetails}?id=${Params.userId}');
+      final response = await http.get(url, headers: headers);
 
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${Params.userToken ?? ''}',
-    };
-
-    final response = await http.get(url, headers: headers);
-
-    if (response.statusCode == 200) {
-     List<dynamic> data = json.decode(response.body);
-     
-      return data.map((json) => CustomerModel.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load data: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<CustomerModel> customers =
+            data.map((json) => CustomerModel.fromJson(json)).toList();
+        final customer = customers[0];
+        selectedCity = customer.city;
+        selectedArea=customer.area;
+        print("selectedCity$selectedCity");
+        if (customers.isNotEmpty) {
+          fetchAreasByCity();
+        }
+        return customers;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to fetch mortgage details');
     }
-  } catch (e) {
-    print('Error: $e');
-    throw Exception('Failed to fetch mortgage details');
-  }  
-}
-
-Future<List<CustomerModel>> fetchRentToOwnDetails() async {
-  try {
-    print('userId: ${Params.userId}');
-
-    final url = Uri.parse('${Urls.getRentToOwnDetails}?id=${Params.userId}');
-
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${Params.userToken ?? ''}',
-    };
-
-    final response = await http.get(url, headers: headers);
-
-    if (response.statusCode == 200) {
-     List<dynamic> data = json.decode(response.body);
-     
-      return data.map((json) => CustomerModel.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load data: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('Error: $e');
-    throw Exception('Failed to fetch mortgage details');
   }
-}
-Future<List<ConstructionProject>> fetchConstructionFinance() async {
-  try {
-    print('userId: ${Params.userId}');
 
-    final url = Uri.parse('${Urls.getAllConstructionFinanceDetailsByCustomer}?id=${Params.userId}');
+  Future<List<CustomerModel>> fetchRentToOwnDetails() async {
+    try {
+      print('userId: ${Params.userId}');
 
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${Params.userToken ?? ''}',
-    };
+      final url = Uri.parse('${Urls.getRentToOwnDetails}?id=${Params.userId}');
 
-    final response = await http.get(url, headers: headers);
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
 
-    if (response.statusCode == 200) {
-     List<dynamic> data = json.decode(response.body);
-     
-      return data.map((json) => ConstructionProject.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load data: ${response.statusCode}');
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<CustomerModel> customers =
+            data.map((json) => CustomerModel.fromJson(json)).toList();
+        final customer = customers[0];
+        selectedCity = customer.city;
+        selectedArea=customer.area;
+        print("selectedCity$selectedCity");
+        if (customers.isNotEmpty) {
+          fetchAreasByCity();
+        }
+        return customers;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to fetch mortgage details');
     }
-  } catch (e) {
-    print('Error: $e');
-    throw Exception('Failed to fetch mortgage details');
   }
-}
 
+  Future<List<ConstructionProject>> fetchConstructionFinance() async {
+    try {
+      print('userId: ${Params.userId}');
+
+      final url = Uri.parse(
+          '${Urls.getAllConstructionFinanceDetailsByCustomer}?id=${Params.userId}');
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+       
+         List<dynamic> data = json.decode(response.body);
+        List<ConstructionProject> customers =
+            data.map((json) => ConstructionProject.fromJson(json)).toList();
+      
+        if (customers.isNotEmpty) {
+            final customer = customers[0];
+        selectedCity = customer.city;
+        selectedArea=customer.area;
+        print("selectedCity$selectedCity");
+          fetchAreasByCity();
+        }
+        return customers;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to fetch mortgage details');
+    }
+  }
 }

@@ -1,24 +1,22 @@
+import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:ag_mortgage/Authentication/OTP_Reset/otp_reset.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:ag_mortgage/const/Image.dart'; 
-class Rest_Password extends StatelessWidget {
-  const Rest_Password({Key? key}) : super(key: key);
+import 'package:ag_mortgage/const/Image.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart'; 
+
+class Rest_Password extends StatefulWidget {
+
+   Rest_Password({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // ignore: prefer_const_constructors
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const RegisterScreen(),
-    );
-  }
+  State<Rest_Password> createState() => _Rest_PasswordState();
 }
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
-
+class _Rest_PasswordState extends State<Rest_Password> {
+        ProfileController signupController = Get.find<ProfileController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,9 +66,10 @@ class RegisterScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   // Phone Number Field
                   TextField(
+                    controller: signupController.forgetPassword,
                       keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: "Phone Number",
+                      labelText: "Email",
                       
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -85,11 +84,12 @@ class RegisterScreen extends StatelessWidget {
                   ElevatedButton(
                     
                     onPressed: () { 
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const OTPAuthentication(),
-                          ));
+                      signupController.forgetPasswords(context);
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => const OTPAuthentication(),
+                      //     ));
                     },
                     
                     style: ElevatedButton.styleFrom(

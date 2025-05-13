@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'dart:ffi';
 // import 'dart:html';
 import 'dart:io';
+import 'package:ag_mortgage/Profile/profile.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
@@ -34,7 +36,7 @@ class Profile_Controller extends ChangeNotifier {
   final TextEditingController jobTitleController = TextEditingController();
   final TextEditingController netSalaryController = TextEditingController();
   final TextEditingController netWorthController = TextEditingController();
-
+  final TextEditingController countryCodeController = TextEditingController();
   final TextEditingController industryController = TextEditingController();
   final TextEditingController professionController = TextEditingController();
   final TextEditingController monthlyIncomeController = TextEditingController();
@@ -45,6 +47,8 @@ class Profile_Controller extends ChangeNotifier {
   final TextEditingController fullName = TextEditingController();
   final TextEditingController relationShip = TextEditingController();
   final TextEditingController phoneNumber = TextEditingController();
+  final TextEditingController userPhonenumber = TextEditingController();
+  final TextEditingController useremail = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController address = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
@@ -53,6 +57,9 @@ class Profile_Controller extends ChangeNotifier {
       TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   Map<String, String?> uploadedFiles = {};
+  // List<Apartment> apartments = [];
+  Apartment? selectedApartment;
+  bool isUploading = false;
   List<dynamic> showFiles = [];
   var finalData = <dynamic>[].obs;
   List<dynamic> userDocuments = []; // Initialize an empty list
@@ -84,6 +91,73 @@ class Profile_Controller extends ChangeNotifier {
   String? selectedState;
   String? selectedarea;
 
+// Future<List<Apartment>>fetchApartments() async {
+//     try {
+//     final url = Uri.parse(Urls.fetchApartmentsApi);
+//       var headers = {
+//         'Content-Type': 'application/json',
+//         'Authorization': 'Bearer ${Params.userToken ?? ''}',
+//       };
+
+//       var response = await http.get(url, headers: headers);
+
+//       print('Response Code: ${response.statusCode}');
+//       print('Response Body: ${response.body}');
+
+//       if (response.statusCode == 200) {
+//        List data = jsonDecode(response.body);
+//       final List<Apartment> fetchedApartments =
+//          return data.map((e) => Apartment.fromJson(e)).toList();
+//       apartments.addAll(fetchedApartments);
+      
+
+//         print('showFiles Filtered Documents: $showFiles');
+//         print('showFiles Filtered Documentss: $showFiles');
+//       } else {
+//         Fluttertoast.showToast(
+//           msg: "Error: ${response.body}",
+//           toastLength: Toast.LENGTH_SHORT,
+//         );
+//       }
+//     } catch (error) {
+//       print('Error Occurred11: $error');
+//       Fluttertoast.showToast(
+//         msg: "An error occurred: $error",
+//         toastLength: Toast.LENGTH_SHORT,
+//       );
+//     }
+//   }
+    Future<List<Apartment>?> fetchApartments() async {
+    try {
+      var response = await http.get(
+        Uri.parse(Urls.fetchApartmentsApi),
+        headers: {
+          'Authorization': 'Bearer ${Params.userToken}',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        if (data.isEmpty) {
+          Fluttertoast.showToast(
+            msg: "No areas found for the selected city",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey,
+            textColor: const Color.fromARGB(255, 56, 55, 55),
+            fontSize: 16.0,
+          );
+        }
+        print("datass1${data}");
+        return data.map((json) => Apartment.fromJson(json)).toList();
+      } else {
+        throw Exception("Failed to fetch areas");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
+    }
+  }
   Future<CustomerDetailsModel?> fetchCustomerDetails() async {
     try {
       var url = Uri.parse('${Urls.getEmployeeDetailsID}?id=${Params.userId}');
@@ -102,7 +176,7 @@ class Profile_Controller extends ChangeNotifier {
         CustomerDetailsModel customerDetails =
             CustomerDetailsModel.fromJson(jsonData);
         // final Map<String, dynamic> parsedData = jsonDecode(jsonData);
-         showFiles = jsonData['Document'] ?? [];
+        showFiles = jsonData['Document'] ?? [];
         ;
 
         planOption = customerDetails.planOption ?? [];
@@ -127,7 +201,10 @@ class Profile_Controller extends ChangeNotifier {
         relationShip.text =
             customerDetails.nextOfKinDetails?.relationship ?? '';
         phoneNumber.text = customerDetails.nextOfKinDetails?.phoneNumber ?? '';
+        userPhonenumber.text = customerDetails.phoneNumber ?? '';
         email.text = customerDetails.nextOfKinDetails?.email ?? '';
+        useremail.text = customerDetails?.email ?? '';
+
         address.text = customerDetails.nextOfKinDetails?.address ?? '';
         kinID = customerDetails.nextOfKinDetails?.id ?? 0;
 
@@ -291,7 +368,7 @@ class Profile_Controller extends ChangeNotifier {
       var request = http.Request('PUT', Uri.parse(Urls.logInDetails));
       request.body = json.encode({
         "id": Params.userId,
-        "phoneNumber": phoneNumber.text,
+        "phoneNumber": countryCodeController.text + userPhonenumber.text,
         "email": email.text,
         "password": passwordController.text,
       });
@@ -402,8 +479,7 @@ class Profile_Controller extends ChangeNotifier {
             orElse: () => null,
           );
 
-          debugPrint(
-              'matchedVerification for $documentId: $showFiles');
+          debugPrint('matchedVerification for $documentId: $showFiles');
 
           return {
             ...items,
@@ -449,36 +525,92 @@ class Profile_Controller extends ChangeNotifier {
     }
   }
 
-  Future<String?> pickAndUploadFile(String documentType, int docId) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'png', 'pdf'],
-    );
+  Future<dynamic> fetchDataBasedOnAccountId(
+      String url, dynamic accountId) async {
+    print('url: $url');
+    print('accountId: $accountId');
 
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      String? uploadedPath = await uploadFile(file, docId);
-      return uploadedPath;
-    } else {
+    try {
+      final String fullUrl = 'http://3.253.82.115/api/$url$accountId';
+      print('Requesting: $fullUrl');
+
+      var request = http.Request('GET', Uri.parse(fullUrl));
+
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
+
+      http.StreamedResponse streamedResponse = await request.send();
+      var decodedResponse = await http.Response.fromStream(streamedResponse);
+
+      if (decodedResponse.statusCode == 200) {
+        final responseData = json.decode(decodedResponse.body);
+        print('Response: $responseData');
+        return responseData;
+      } else {
+        print('Error: ${decodedResponse.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
       return null;
     }
   }
 
-  Future<String?> uploadFile(File file, int docId) async {
-    print("file.path${file.path}");
-    print("file.path${docId}");
+  Future<String?> uploadFile(PlatformFile file, int docId, int dueMonth,
+      String planType, bool dataNeeded, String dataType, context) async {
+    print("file.path: ${file.path}");
+    print("docId: $docId");
+    print("Uploading file: ${file.name}");
+    print("Plan Type: $planType, Data Type: $dataType");
+
     try {
+      final updatedPlanType = removeKwikPrefix(planType);
+      final String url = await getURLbasedPlanType(updatedPlanType);
+
+      // Use actual customerId not stringified userId
+      var result = await fetchDataBasedOnAccountId(url, Params.userId);
+
+      if (result == null || result.isEmpty) {
+        throw Exception("No data returned for accountId");
+      }
+
+      String startDate = result[0]['startDate'];
+      String calculatedDate = addMonthsToDate(startDate, dueMonth);
+      String isPastDates = isPastDate(calculatedDate) ? 'Delayed' : 'OnTime';
+
       dio.FormData formData = dio.FormData();
+
       formData.files.add(MapEntry(
         'documentFile',
-        await dio.MultipartFile.fromFile(file.path,
-            filename: file.path.split('/').last),
+        await dio.MultipartFile.fromFile(
+          file.path!,
+          filename: file.name,
+        ),
       ));
-      formData.fields.add(MapEntry('documentMasterId', docId.toString()));
-      print("formData${docId.toString()}");
+
+      formData.fields
+        ..add(MapEntry('documentMasterId', docId.toString()))
+        ..add(MapEntry('submissionStatus', isPastDates))
+        ..add(MapEntry('dataNeeded', dataNeeded.toString()))
+        ..add(MapEntry('dataType', dataType))
+        ..add(const MapEntry('verificationStatus', 'Applied'));
+
       dio.Dio dioInstance = dio.Dio();
+      print('--- FormData Fields ---');
+      for (var field in formData.fields) {
+        print('${field.key}: ${field.value}');
+      }
+
+      print('--- FormData Files ---');
+      for (var file in formData.files) {
+        final f = file.value;
+        print(
+            '${file.key}: filename=${f.filename}, contentType=${f.contentType}');
+      }
       dio.Response response = await dioInstance.put(
-        "http://3.253.82.115/api/customer/documentUpload?documentMasterId=$docId",
+        "http://3.253.82.115/api/customer/documentUpload",
         data: formData,
         options: dio.Options(
           headers: {
@@ -489,12 +621,33 @@ class Profile_Controller extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        return response
-            .data['filePath']; // Assuming the API returns a file path
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfilePagewidget(startIndex: 8),
+            ));
+        Fluttertoast.showToast(
+          msg: "Documents Upload successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        return response.data['filePath'];
       } else {
+        Fluttertoast.showToast(
+          msg: "File size exceeds the limit of 3MB.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
         throw Exception('Failed to upload');
       }
     } catch (e) {
+      Fluttertoast.showToast(
+        msg: "File size exceeds the limit of 3MB.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
       debugPrint("Upload failed: $e");
       return null;
     }
@@ -554,13 +707,13 @@ class Profile_Controller extends ChangeNotifier {
   Future<bool> kinDetails(BuildContext context) async {
     print('userId: ${Params.userId}');
     try {
-      var request = http.Request('PUT', Uri.parse(Urls.kinDetails));
+      var request = http.Request('POST', Uri.parse(Urls.kinDetails));
       request.body = json.encode({
         "customerId": Params.userId,
         "id": kinID,
         "name": fullName.text,
         "relationship": relationShip.text,
-        "phoneNumber": phoneNumber.text,
+        "phoneNumber": countryCodeController.text + phoneNumber.text,
         "email": email.text,
         "address": address.text
       });
@@ -605,6 +758,33 @@ class Profile_Controller extends ChangeNotifier {
         toastLength: Toast.LENGTH_SHORT,
       );
       return false;
+    }
+  }
+
+  void handleFileChange(
+      docId, dueMonth, planType, dataNeeded, dataType, context) async {
+    if (isUploading) return; // prevent double upload
+    isUploading = true;
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null && result.files.isNotEmpty) {
+      final file = result.files.first;
+
+      final fileSizeInBytes = file.size;
+      final fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+      print(
+          "Doc ID: $file, Plan Type: $fileSizeInBytes, Data Type: $fileSizeInMB");
+
+      if (fileSizeInMB <= 3) {
+        uploadFile(
+            file, docId, dueMonth, planType, dataNeeded, dataType, context);
+      } else {
+        Fluttertoast.showToast(
+          msg: "File size exceeds the limit of 3MB.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ class _AuthenticationState extends State<Authentication> {
   ); // Create a controller for each OTP field.
 
   int _countdown = 50;
+  ProfileController signupController = Get.find<ProfileController>();
 
   @override
   void initState() {
@@ -132,6 +133,7 @@ class _AuthenticationState extends State<Authentication> {
                       // Collect the OTP and handle the verification logic.
                       String otp = getOtp();
                       print("Entered OTP: $otp");
+                      // signupController.sendOTP();
                       Navigator.push(
                               context,
                               MaterialPageRoute(

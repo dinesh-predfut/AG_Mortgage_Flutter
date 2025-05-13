@@ -150,7 +150,7 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        "Forget your Password?",
+                        "Forgot your Password?",
                         style: TextStyle(color: Colors.grey),
                       ),
                       TextButton(
@@ -158,7 +158,7 @@ class _LoginState extends State<Login> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const Rest_Password(),
+                                builder: (context) =>  Rest_Password(),
                               ));
                         },
                         child: Text(

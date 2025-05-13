@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/models.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
@@ -121,14 +124,14 @@ class RentToOwnLanding extends StatelessWidget {
               ),
             ),
             // Title Section
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 "Rent to Own",
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
+                  color: baseColor,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -193,6 +196,9 @@ class RentToOwnLanding extends StatelessWidget {
                           Text("Execute Tenancy Agreement"),
                         ],
                       ),
+                      SizedBox(height: 8.0),
+                      Text(
+                          "Ready to move from tenant to homeowner? These are the simple steps to get Started."),
                     ],
                   ),
                 ],
@@ -292,6 +298,11 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
 
     final double initialDeposit =
         (double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0);
+    final downPayment = double.tryParse(
+            controller.propertyValueController.text.replaceAll(',', '')) ??
+        0;
+    final calculatedDownPayment = downPayment * 0.4;
+    controller.downPayment.text = calculatedDownPayment.toString();
     final double loanAmount = (double.tryParse(
                 controller.propertyValueController.text.replaceAll(',', '')) ??
             0) -
@@ -316,7 +327,6 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
 
     final double monthlyRental =
         interestOnSecurityDeposit + interestOnFinanceAmount + profit;
-    // Update formData with the calculated monthly rent
     controller.monthlyRendal.text = formattedEMI(monthlyRental);
 
     print("Interest on Security Deposit: $interestOnSecurityDeposit");
@@ -376,6 +386,8 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
         double.tryParse(controller.downPayment.text.replaceAll(',', '')) ?? 0;
     // ignore: non_constant_identifier_names
     double TotalinitialDeposit = propertyValue * 0.4;
+    controller.downPayment.text = formattedEMI(propertyValue * 0.4);
+    // controller.downPayment.text = TotalinitialDeposit.toString();
     updateControllerText(
         controller.downPayment, formattedEMI(TotalinitialDeposit));
     // ignore: non_constant_identifier_names
@@ -424,7 +436,10 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rent-to-Own'),
+        title: Text(
+          'Rent-to-Own',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -441,7 +456,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Center(
                 child: Text(
-                  'Let us know your preference',
+                  'Move in as a tenant and convert to home owner',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
@@ -467,7 +482,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text("View House",
+                    child: const Text("+ House",
                         style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
                 ),
@@ -478,36 +493,49 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
               //   style: TextStyle(fontWeight: FontWeight.w600),
               // ),
               const SizedBox(height: 5),
-              // Apartment Type Dropdown
               const Text('House Type'),
-              DropdownButtonFormField<int>(
-                value: controller.selectedApartmentType,
+              FutureBuilder<List<Apartment>>(
+                future: controller.fetchApartments(),
+                builder: (context, snapshot) {
+                  // Ensure data is not null
+                  List<Apartment> apartment = snapshot.data ?? [];
 
-                items: const [
-                  DropdownMenuItem(value: 1, child: Text('Studio')),
-                  DropdownMenuItem(
-                      value: 2, child: Text('1 Bedroom Apartment')),
-                  DropdownMenuItem(
-                      value: 3, child: Text('2 Bedroom Apartment')),
-                  DropdownMenuItem(
-                      value: 4, child: Text('3 Bedroom Apartment')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    controller.selectedApartmentType = value;
-                  });
+                  return DropdownButtonFormField<int>(
+                    value: controller.selectedCity,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    isExpanded: true,
+                    hint: const Text('Select a House Type'),
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: apartment.isNotEmpty
+                        ? apartment.map((item) {
+                            return DropdownMenuItem<int>(
+                              value: item.id,
+                              child: Text(item.apartmentType ?? 'Unknown Name'),
+                            );
+                          }).toList()
+                        : [], // Prevents mapping on null
+
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          controller.selectedApartmentType = value;
+                        });
+                        // controller.findAndSetCity();
+                      }
+                    },
+
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a city';
+                      }
+                      return null;
+                    },
+                  );
                 },
-                // validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return 'Please select an apartment type';
-                //   }
-                //   return null;
-                // },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
               ),
               const SizedBox(height: 20),
 
@@ -627,8 +655,10 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                       calculateEMI();
                     },
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter the estimated property value';
+                      if (value == null ||
+                          value.trim().isEmpty ||
+                          value.trim() == '0') {
+                        return 'Please enter a valid estimated property value';
                       }
                       return null;
                     },
@@ -721,7 +751,7 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  const Text('Monthly Rendal'),
+                  const Text('Monthly Rental'),
                   TextFormField(
                     controller: controller.monthlyRendal,
                     keyboardType: TextInputType.number,
@@ -741,12 +771,6 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
                     ),
                     onChanged: (value) {
                       // calculateEMI();
-                    },
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter the estimated property value';
-                      }
-                      return null;
                     },
                   ),
 
@@ -828,8 +852,8 @@ class _RentToOwnFormState extends State<RentToOwnForm> {
 
                   // Repayment Period
                   const Text(
-                    'Repayment Period',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    'Monthly Repayment',
+                    style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(
                     width: double.infinity,
@@ -939,14 +963,17 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   final controller = Get.put(RentToOwnController());
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  DateTime _initialFocusedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Anniversaryss'),
+        title: Text(
+          'Repayment',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -962,7 +989,7 @@ class _CalendarPageState extends State<CalendarPage> {
             children: [
               const Center(
                 child: Text(
-                  'Set your anniversary for payment..',
+                  'Set your repayment date',
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ),
@@ -975,38 +1002,39 @@ class _CalendarPageState extends State<CalendarPage> {
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Your next anniversary date is:",
+                  "Your next repayment date is:",
                   style: TextStyle(fontSize: 15, height: 5),
                 ),
               ),
               Text(
-                ' ${DateFormat('dd-MM-yyyy').format(controller.selectedDay)}',
+                controller.selectedDay != null
+                    ? DateFormat('dd-MM-yyyy').format(controller.selectedDay!)
+                    : '',
                 style: const TextStyle(fontSize: 25, color: Colors.black),
               ),
               TableCalendar(
-                focusedDay: _focusedDay,
+                focusedDay: controller.selectedDay ?? _initialFocusedDay,
                 firstDay: DateTime(2000),
                 lastDay: DateTime(2100),
-                selectedDayPredicate: (day) {
-                  return isSameDay(controller.selectedDay, day);
-                },
+                selectedDayPredicate: (day) =>
+                    controller.selectedDay != null &&
+                    isSameDay(controller.selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
                     controller.selectedDay = selectedDay;
-                    _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
                 calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
-                    color: baseColor,
+                    color: Colors.amber[800],
                     shape: BoxShape.circle,
                   ),
                   todayDecoration: const BoxDecoration(
-                    color: Colors.orange,
+                    color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
                   markerDecoration: const BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.orange,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -1021,15 +1049,19 @@ class _CalendarPageState extends State<CalendarPage> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => const Rent_To_Own(startIndex: 3),
-                    //   ),
-                    // );
-                    Navigator.pushNamed(
-                        context, "/rent-to-own/term_sheet_Details");
-                    controller.getData(Params.userId as String);
+                    if (controller.selectedDay == null) {
+                      Fluttertoast.showToast(
+                        msg: "Please select a repayment date",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                      );
+                    } else {
+                      Navigator.pushNamed(
+                          context, "/rent-to-own/term_sheet_Details");
+                      controller.getData(Params.userId as String);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
@@ -1066,7 +1098,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Payment"),
+        title: Text(
+          "Payment",
+          style: TextStyle(color: baseColor),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -1074,9 +1109,11 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "How would you like to make your first deposit?",
-              style: TextStyle(fontSize: 16),
+            const Center(
+              child: Text(
+                "Make Your First Deposit",
+                style: TextStyle(fontSize: 16),
+              ),
             ),
             const SizedBox(height: 20),
             ListTile(
@@ -1127,7 +1164,11 @@ class BankTransferPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bank Transfer'),
+        title: Text(
+          'Bank Transfer',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -1185,10 +1226,12 @@ class BankTransferPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8.0),
-            const Text(
-              "Use this account number for this transaction only",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black),
+            const Center(
+              child: Text(
+                "Use this account number for this transaction only",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
             const Spacer(),
             Center(
@@ -1231,8 +1274,15 @@ class BankTransferPage extends StatelessWidget {
   }
 }
 
-class Success extends StatelessWidget {
+class Success extends StatefulWidget {
   const Success({super.key});
+
+  @override
+  State<Success> createState() => _SuccessState();
+}
+
+class _SuccessState extends State<Success> {
+  final controller = Get.put(Main_Dashboard_controller());
 
   @override
   Widget build(BuildContext context) {
@@ -1253,11 +1303,11 @@ class Success extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Deposite Successful",
+                  "Deposit Successful",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                const Text(
-                    "Congratulations Pelumi! You have made your first deposit",
+                Text(
+                    "Congratulations ${controller.profileName} You have made your first deposit",
                     style: TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -1275,7 +1325,7 @@ class Success extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   child: const Text(
-                    "Processd",
+                    "Proceed to Home",
                     style: TextStyle(color: Colors.white, letterSpacing: 2),
                   ),
                 ),
@@ -1310,20 +1360,16 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
     }
   }
 
-  int cleanNumbers(dynamic amount) {
-    if (amount == null) return 0;
-
-    // Convert the amount to a string and remove commas
-    String amountString = amount.toString().replaceAll(',', '');
-
-    return int.tryParse(amountString) ?? 0;
+  double cleanNumbers(String input) {
+    String cleaned = input.replaceAll(",", "").trim();
+    return double.tryParse(cleaned) ?? 0.0;
   }
 
   @override
   void initState() {
     super.initState();
     // fetchData();
-
+    controller.findApartments();
     controller.findAndSetArea();
     controller.findAndSetCity();
   }
@@ -1343,14 +1389,17 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
     print("44411${initialDeposit}");
     String todayDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
     String anniversary =
-        DateFormat('dd-MM-yyyy').format(controller.selectedDay);
+        DateFormat('dd-MM-yyyy').format(controller.selectedDay!);
     String anniversaryDate = controller.selectedDay?.toString() ?? '';
     String estimatedProfileDate =
         controller.calculateProfileDate(anniversaryDate, 16);
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Term Sheet'),
+          title: Text(
+            'Term Sheet',
+            style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -1373,7 +1422,10 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "login/propertyView",
+                        arguments: controller.apartmentOrMarketplace);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
                     padding: const EdgeInsets.symmetric(
@@ -1390,8 +1442,7 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
               _buildSection(
                 "House Details",
                 [
-                  _buildRow("Apartment Type",
-                      controller.selectedApartmentType.toString()),
+                  _buildRow("Apartment Type", controller.apartmentName.text),
                   _buildRow("City", controller.cityNameValue.text),
                   _buildRow("Area", controller.areaNameValue.text),
                   _buildRow("Selling Price",
@@ -1405,16 +1456,43 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                 [
                   _buildRow(
                       "Down Payment", "NGN ${(controller.downPayment.text)} "),
-                  _buildRow(
-                      "Down Payment", "NGN ${(controller.loanAmount.text)} "),
+                  _buildRow("Loan", "NGN ${(controller.loanAmount.text)} "),
                   _buildRow("Repayment Period",
                       "${controller.sliderValue.toInt()} Years"),
                   _buildRow("Screening Monthly Rental",
                       "NGN ${(controller.monthlyRendal.text)}"),
                   _buildRow("Monthly Repayment",
                       "NGN ${(controller.monthlyRepaymentController.text.toString())}"),
-                  _buildRow("Starting Date", todayDate),
-                  _buildRow("Next Anniversary Date", anniversary),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Starting Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(todayDate,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Next Anniversary Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(anniversary,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1428,15 +1506,31 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                     controller.formatProfileDate(estimatedProfileDate),
                   ),
                   _buildRow("Total Monthly Rental",
-                      "NGN ${(cleanNumbers(controller.propertyValueController.text) * 0.8 - cleanNumbers(controller.downPayment.text)) / 25}"),
+                      "NGN ${formattedEMI((cleanNumbers(controller.propertyValueController.text) * 0.8 - cleanNumbers(controller.downPayment.text)) / 25)}"),
                   _buildRow(
                     "Down Payment",
                     controller.downPayment.text.isNotEmpty
                         ? "NGN ${controller.downPayment.text}"
                         : "-",
                   ),
-                  _buildRow("Total Expected Deposit",
-                      "NGN ${(cleanNumbers(controller.downPayment.text) + cleanNumbers(controller.monthlyRendal.text))}"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Total Expected Deposit",
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 44, 44, 44),
+                                fontWeight: FontWeight.bold)),
+                        Text(
+                            "NGN ${formattedEMI((cleanNumbers(controller.downPayment.text) + cleanNumbers(controller.monthlyRendal.text)))}",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1449,33 +1543,29 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Estimated Mortgage Month",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          controller
-                              .formatProfileDateName(estimatedProfileDate),
-                        )
-                      ],
+                    const Text(
+                      "Amount to Deposit",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MortgagePageHome(
-                              startIndex: 1,
-                            ), // Start with MortgagePageHome
-                          ),
-                        );
-                      },
-                      child: const Text("Recalculate"),
-                    ),
+                    Text(controller.downPayment.text.isNotEmpty
+                        ? "NGN ${controller.downPayment.text}"
+                        : "-")
                   ],
+                ),
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MortgagePageHome(
+                          startIndex: 1,
+                        ), // Start with MortgagePageHome
+                      ),
+                    );
+                  },
+                  child: Text("Recalculate"),
                 ),
               ),
               const SizedBox(height: 24.0),
@@ -1492,7 +1582,7 @@ class _TermSheetPageRentState extends State<TermSheetPageRent>
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text("Proceed to Pay",
+                  child: const Text("Proceed to Payment",
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -1619,7 +1709,7 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'KWIK by AGMB is a digital platform for the KWIK Mortgage program. This program helps users gradually save for a 30% down payment over 18 months, instilling a strong savings culture and enabling them to meet mortgage requirements to purchase verified properties.\n\nPlease note that the KWIK platform is not a regular savings or current account. It has specific terms and is for people on a mission to own a home. Applicants are encouraged to read these Terms carefully and fully understand them before signing up.',
+              'KWIK by AGMB is a digital platform for the KWIK Rent-to-Own program. This program helps users gradually save for a 30% down payment over 18 months, instilling a strong savings culture and enabling them to meet Rent-to-Own requirements to purchase verified properties.\n\nPlease note that the KWIK platform is not a regular savings or current account. It has specific terms and is for people on a mission to own a home. Applicants are encouraged to read these Terms carefully and fully understand them before signing up.',
               style: TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 20),
@@ -1665,7 +1755,7 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
             _buildSubBulletPoint(
                 'Are tracked separately from contractual savings.'),
             _buildSubBulletPoint(
-                'Enhance the user’s financial profile and improve their chances of mortgage approval.'),
+                'Enhance the user’s financial profile and improve their chances of Rent-to-Own approval.'),
             const SizedBox(height: 20),
             const Text(
               '3.2 Monthly Deposits',
@@ -1898,7 +1988,7 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _buildBulletPoint(
-                'Use the platform to monitor your savings, build mortgage credibility, choose properties, and manage your mortgage application.'),
+                'Use the platform to monitor your savings, build Rent-to-Own credibility, choose properties, and manage your Rent-to-Own application.'),
             _buildBulletPoint(
                 'The platform will be updated regularly. Install updates to enjoy all features.'),
             _buildBulletPoint(

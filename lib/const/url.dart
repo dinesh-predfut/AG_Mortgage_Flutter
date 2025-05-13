@@ -4,15 +4,18 @@ class Urls {
   static const String signup = "$baseUrl/api/auth/signin";
   static const String sendOTP =
       "$baseUrl/api/auth/resend-email-verification-otp";
+        static const String forgetPassword =
+      "$baseUrl/api/auth/forgotPassword";
   static const String getallCards = "$baseUrl/api/cards";
   static const String getallCardsByid = "$baseUrl/api/cards/getCardsById?id=";
-  static const String allCity = "$baseUrl/api/location/getAllAreas";
+  static const String allCity = "$baseUrl/api/location/getAllCity";
   static const String allArea = "$baseUrl/api/location/area?cityId=";
-    static const String checkToken = "$baseUrl/api/auth/verifyEmail";
+  static const String checkToken = "$baseUrl/api/auth/verifyEmail";
   static const String addFavorites =
       "$baseUrl/api/apartmentAndMarketplace/favourite";
   static const String mortagaform = "$baseUrl/api/mortgage";
   static const String investment = "$baseUrl/api/investment";
+    static const String investmentByid = "$baseUrl/api/investment/getAllInvestmentDetailsByCustomer?id=";
   static const String depositAmont = "$baseUrl/api/deposit";
   static const String rentToOwn = "$baseUrl/api/rentToOwn";
   static const String withdraw = "$baseUrl/api/withdraw";
@@ -52,5 +55,9 @@ class Urls {
   static const String documentUpload = "$baseUrl/api/customer/documentUpload";
   static const String getAllDocuments = "$baseUrl/api/settings/document";
   static const String getallNotification = "$baseUrl/api/notification";
-   static const String validateToken= "$baseUrl/api/auth/verifyRefreshToken";
+  static const String validateToken = "$baseUrl/api/auth/verifyRefreshToken";
+  static const String getScore = "$baseUrl/api/getCreditScore?customerId=";
+  static const String referalOverAll = "$baseUrl/api/customer/referralCode/stats";
+    static const String fetchApartmentsApi= "$baseUrl/api/settings/getAllApartmentTypes";
+
 }

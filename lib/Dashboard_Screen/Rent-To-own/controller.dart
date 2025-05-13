@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/Models.dart';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Rent-To-own/models.dart';
@@ -24,6 +25,8 @@ class RentToOwnController extends GetxController {
   TextEditingController downPayment = TextEditingController();
   TextEditingController monthlyRepaymentController = TextEditingController();
   TextEditingController cityNameValue = TextEditingController();
+    TextEditingController apartmentName = TextEditingController();
+
   TextEditingController areaNameValue = TextEditingController();
   TextEditingController monthlyRendal = TextEditingController();
   TextEditingController loanAmount = TextEditingController();
@@ -33,7 +36,7 @@ class RentToOwnController extends GetxController {
   List allCity = [];
   List allArea = [];
   List allMsetting = [];
-  DateTime selectedDay = DateTime.now();
+  DateTime? selectedDay;
 //  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
   int? selectedApartmentType = 1;
   int? selectedCity;
@@ -109,7 +112,7 @@ class RentToOwnController extends GetxController {
     return int.tryParse(amountString) ?? 0;
   }
  Future<void> addRentoOwn(BuildContext context) async {
-  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay!);
 
   try {
     print('Preparing API request...');
@@ -174,7 +177,37 @@ class RentToOwnController extends GetxController {
     print('Error Occurred: $error');
   }
 }
+ Future<List<Apartment>> fetchApartments() async {
+    try {
+      var response = await http.get(
+        Uri.parse(Urls.fetchApartmentsApi),
+        headers: {
+          'Authorization': 'Bearer ${Params.userToken}',
+          'Content-Type': 'application/json',
+        },
+      );
 
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        if (data.isEmpty) {
+          Fluttertoast.showToast(
+            msg: "No areas found for the selected city",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey,
+            textColor: const Color.fromARGB(255, 56, 55, 55),
+            fontSize: 16.0,
+          );
+        }
+        print("datass1${data}");
+        return data.map((json) => Apartment.fromJson(json)).toList();
+      } else {
+        throw Exception("Failed to fetch areas");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
+    }
+  }
 
   Future<List<LoanModel>> getScreeningPeriodsApi() async {
     var response = await http.get(
@@ -263,7 +296,19 @@ class RentToOwnController extends GetxController {
 
     print('Updated City Name: $cityName');
   }
+ Future<void> findApartments() async {
+    List<Apartment> apartment = await fetchApartments();
 
+    var matchCity = apartment.firstWhere(
+      (item) => item.id == selectedApartmentType,
+      orElse: () => Apartment(id: -1, apartmentType: "Unknown", description: ''),
+    );
+
+    apartmentName.text = matchCity.apartmentType.toString();
+
+    print('Updated apartmentName Name: $apartmentName');
+  }
+  
   Future<void> findAndSetArea() async {
     List<SeletArea> allArea = await fetchAreasByCity();
 

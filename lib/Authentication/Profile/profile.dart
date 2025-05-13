@@ -80,7 +80,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
                       value: signupController.selectedGender,
-                      items: ['Male', 'Female']
+                      items: ['male', 'female']
                           .map((gender) => DropdownMenuItem<String>(
                                 value: gender,
                                 child: Text(gender),

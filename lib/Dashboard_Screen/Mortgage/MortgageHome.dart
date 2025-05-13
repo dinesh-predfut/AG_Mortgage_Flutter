@@ -2,11 +2,14 @@ import 'dart:math';
 
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Details_Page/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
+import 'package:ag_mortgage/Profile/profile_All_controller.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/const/commanFunction.dart';
@@ -46,7 +49,7 @@ class _MortgagePageHomeState extends State<MortgagePageHome> {
     const CalendarPageMortgage(),
     const MortgageTermSheetPage(),
     const ADD_CardDetailsPage(),
-    const PaymentMethodPage(),
+    const PaymentMethodPageMortage(),
     const Get_All_Cards(),
     const CardPaymentPage(),
     const MortgageTermSheetPage(),
@@ -115,12 +118,12 @@ class Landing_Mortgage extends StatelessWidget {
             children: [
               Image.asset(Images.mortgage),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'Mortgage',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: baseColor),
               ),
               const SizedBox(height: 10),
               const Text(
@@ -146,13 +149,7 @@ class Landing_Mortgage extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MortgagePageHome(
-                                startIndex: 10), // Start with MortgagePageHome
-                          ),
-                        );
+                        Navigator.pushNamed(context, "/termsheet");
                       },
                       //  onPressed: _goToPreviousStep,
                       style: ElevatedButton.styleFrom(
@@ -163,7 +160,7 @@ class Landing_Mortgage extends StatelessWidget {
                         minimumSize: const Size(200, 50),
                       ),
                       child: const Text(
-                        "Proceed",
+                        "Apply",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -193,12 +190,15 @@ class MortgageFormPage extends StatefulWidget {
 
 class _MortgageFormPageState extends State<MortgageFormPage> {
   final controller = Get.put(MortgagController());
+  final profileController = Get.put(Profile_Controller());
+
   MortgagController controllerFeild = MortgagController();
 
   @override
   void initState() {
     super.initState();
     calculateEMI();
+    controller.fetchApartments();
     final initialAmount = controller.monthlyRepaymentController.text;
     controller.initialDepositController.text = '0';
     if (widget.house != null) {
@@ -276,390 +276,441 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
     setState(() {});
   }
 
+  void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      // print("its working");
+      Navigator.pushNamed(context, "/termsheet");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mortgage'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-            key: _formKey,
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Center(
-                child: Text(
-                  'Let us know your preference',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ),
-              const SizedBox(height: 10),
-              if (widget.viewBtn == null)
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const MarketMain() // Start with MortgagePageHome
-                            ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: baseColor,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Text("View House",
-                        style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ),
-                ),
-              const SizedBox(height: 10),
-              // Apartment Type Dropdown
-              const Text('Apartment Type'),
-              DropdownButtonFormField<int>(
-                value: controller.selectedApartmentType,
-                items: const [
-                  DropdownMenuItem(value: 1, child: Text('Studio')),
-                  DropdownMenuItem(
-                      value: 2, child: Text('1 Bedroom Apartment')),
-                  DropdownMenuItem(
-                      value: 3, child: Text('2 Bedroom Apartment')),
-                  DropdownMenuItem(
-                      value: 4, child: Text('3 Bedroom Apartment')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    controller.selectedApartmentType = value;
-                  });
-                },
-                // validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return 'Please select an apartment type';
-                //   }
-                //   return null;
-                // },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // City Dropdown
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('City'),
-                  FutureBuilder<List<PostsModel>>(
-                    future: controller.getALLCityApi(),
-                    builder: (context, citySnapshot) {
-                      // Ensure data is not null
-                      List<PostsModel> cityData = citySnapshot.data ?? [];
-
-                      return DropdownButtonFormField<int>(
-                        value: controller.selectedCity,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                        isExpanded: true,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: cityData.isNotEmpty
-                            ? cityData.map((item) {
-                                return DropdownMenuItem<int>(
-                                  value: item.id,
-                                  child: Text(item.name ?? 'Unknown Name'),
-                                );
-                              }).toList()
-                            : [], // Prevents mapping on null
-
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              controller.selectedCity = value;
-                              controller.fetchAreasByCity();
-                              controller.selectedArea = null;
-                            });
-                            controller.findAndSetCity();
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please select a city';
-                          }
-                          return null;
-                        },
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  const Text('Area'),
-// Area Dropdown
-                  FutureBuilder<List<SeletArea>>(
-                    future: controller.selectedCity != null
-                        ? controller.fetchAreasByCity()
-                        : Future.value(
-                            []), // If selectedCity is null, return an empty list
-                    builder: (context, areaSnapshot) {
-                      List<SeletArea> areaData =
-                          areaSnapshot.data ?? []; // Prevent null errors
-
-                      return DropdownButtonFormField<int>(
-                        value: controller.selectedArea,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                        isExpanded: true,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: areaData.isNotEmpty
-                            ? areaData.map((item) {
-                                return DropdownMenuItem<int>(
-                                  value: item.id,
-                                  child: Text(item.name ?? 'Unknown Area'),
-                                );
-                              }).toList()
-                            : [], // Prevents mapping on null
-
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              controller.selectedArea = value;
-                            });
-                            // controller.findAndSetArea();
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please select an area';
-                          }
-                          return null;
-                        },
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Estimated Property Value
-                  const Text('Estimated Property Value'),
-                  TextFormField(
-                    controller: controller.propertyValueController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      prefix: const Padding(
-                        padding: EdgeInsets.only(
-                            right: 8), // Adds spacing between NGN and input
-                        child: Text(
-                          'NGN',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      calculateEMI();
-                    },
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter the estimated property value';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Initial Deposit
-                  const Text('Initial Deposit (Optional)'),
-                  TextFormField(
-                    controller: controller.initialDepositController,
-                    onChanged: (value) {
-                      calculateEMI();
-                    },
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      prefix: const Padding(
-                        padding: EdgeInsets.only(
-                            right: 8), // Adds spacing between NGN and input
-                        child: Text(
-                          'NGN',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Loan Repayment Period Slider
-                  const Text('Select Loan Repayment Period'),
-                  Slider(
-                    value: controller.sliderValue,
-                    min: 1,
-                    max: 20,
-                    divisions: 19,
-                    label: '${controller.sliderValue.toInt()} Years',
-                    onChanged: (value) {
-                      setState(() {
-                        controller.sliderValue = value; // Update slider value
-                        calculateEMI();
-                      });
-                    },
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return WillPopScope(
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Mortgage',
+              style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushNamed(context, "/termsheet");
+              },
+            ),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+                key: _formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '0',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                      const Center(
+                        child: Text(
+                          'Let us know your preference',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
                       ),
-                      Text(
-                        '10',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '20',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      if (widget.viewBtn == null)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MarketMain() // Start with MortgagePageHome
+                                    ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: baseColor,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 10.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text("+ House",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12)),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
 
-                  // Repayment Period
-                  const Text(
-                    'Repayment Period',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(252, 251, 255, 1),
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                      // City Dropdown
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Apartment Type'),
+                          FutureBuilder<List<Apartment>>(
+                            future: controller.fetchApartments(),
+                            builder: (context, snapshot) {
+                              // Ensure data is not null
+                              List<Apartment> apartment = snapshot.data ?? [];
+
+                              return DropdownButtonFormField<int>(
+                                value: controller.selectedCity,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                                isExpanded: true,
+                                hint: const Text('Select a Apartment Type'),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: apartment.isNotEmpty
+                                    ? apartment.map((item) {
+                                        return DropdownMenuItem<int>(
+                                          value: item.id,
+                                          child: Text(item.apartmentType ??
+                                              'Unknown Name'),
+                                        );
+                                      }).toList()
+                                    : [], // Prevents mapping on null
+
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      controller.selectedApartmentType = value;
+                                    });
+                                    // controller.findAndSetCity();
+                                  }
+                                },
+
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select a city';
+                                  }
+                                  return null;
+                                },
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Text('City'),
+                          FutureBuilder<List<PostsModel>>(
+                            future: controller.getALLCityApi(),
+                            builder: (context, citySnapshot) {
+                              // Ensure data is not null
+                              List<PostsModel> cityData =
+                                  citySnapshot.data ?? [];
+
+                              return DropdownButtonFormField<int>(
+                                value: controller.selectedCity,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                                isExpanded: true,
+                                hint: const Text('Select a city'),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: cityData.isNotEmpty
+                                    ? cityData.map((item) {
+                                        return DropdownMenuItem<int>(
+                                          value: item.id,
+                                          child:
+                                              Text(item.name ?? 'Unknown Name'),
+                                        );
+                                      }).toList()
+                                    : [], // Prevents mapping on null
+
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      controller.selectedCity = value;
+                                      controller.fetchAreasByCity();
+                                      controller.selectedArea = null;
+                                    });
+                                    controller.findAndSetCity();
+                                  }
+                                },
+
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select a city';
+                                  }
+                                  return null;
+                                },
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Text('Area'),
+// Area Dropdown
+                          FutureBuilder<List<SeletArea>>(
+                            future: controller.selectedCity != null
+                                ? controller.fetchAreasByCity()
+                                : Future.value(
+                                    []), // If selectedCity is null, return an empty list
+                            builder: (context, areaSnapshot) {
+                              List<SeletArea> areaData = areaSnapshot.data ??
+                                  []; // Prevent null errors
+
+                              return DropdownButtonFormField<int>(
+                                value: controller.selectedArea,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                                isExpanded: true,
+                                hint: const Text('Select a Area'),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: areaData.isNotEmpty
+                                    ? areaData.map((item) {
+                                        return DropdownMenuItem<int>(
+                                          value: item.id,
+                                          child:
+                                              Text(item.name ?? 'Unknown Area'),
+                                        );
+                                      }).toList()
+                                    : [], // Prevents mapping on null
+
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      controller.selectedArea = value;
+                                    });
+                                    // controller.findAndSetArea();
+                                  }
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select an area';
+                                  }
+                                  return null;
+                                },
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Estimated Property Value
+                          const Text('Estimated Property Value'),
+                          TextFormField(
+                            controller: controller.propertyValueController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              prefix: const Padding(
+                                padding: EdgeInsets.only(
+                                    right:
+                                        8), // Adds spacing between NGN and input
+                                child: Text(
+                                  'NGN',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              calculateEMI();
+                            },
+                            validator: (value) {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  value.trim() == '0') {
+                                return 'Please enter the estimated property value';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Initial Deposit
+                          const Text('Initial Deposit (Optional)'),
+                          TextFormField(
+                            controller: controller.initialDepositController,
+                            onChanged: (value) {
+                              calculateEMI();
+                            },
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              prefix: const Padding(
+                                padding: EdgeInsets.only(
+                                    right:
+                                        8), // Adds spacing between NGN and input
+                                child: Text(
+                                  'NGN',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Loan Repayment Period Slider
+                          const Text('Select Loan Repayment Period'),
+                          Slider(
+                            value: controller.sliderValue,
+                            min: 1,
+                            max: 20,
+                            divisions: 19,
+                            label: '${controller.sliderValue.toInt()} Years',
+                            onChanged: (value) {
+                              setState(() {
+                                controller.sliderValue =
+                                    value; // Update slider value
+                                calculateEMI();
+                              });
+                            },
+                          ),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '0',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '10',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '20',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Repayment Period
+                          const Text(
+                            'Repayment Period',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(252, 251, 255, 1),
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(100),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                '${controller.sliderValue.toInt()} Years', // Dynamically update the text
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Monthly Repayment
+                          const Text('Monthly Repayment'),
+                          TextFormField(
+                            controller: controller.monthlyRepaymentController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              prefix: const Padding(
+                                padding: EdgeInsets.only(
+                                    right:
+                                        8), // Adds spacing between NGN and input
+                                child: Text(
+                                  'NGN',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              // Add comma formatting
+                              TextInputFormatter.withFunction(
+                                  (oldValue, newValue) {
+                                final newText = newValue.text.replaceAll(
+                                    RegExp(r'\D'),
+                                    ''); // remove non-digit characters
+                                final formattedText =
+                                    controller.formatNumber(newText);
+                                return newValue.copyWith(text: formattedText);
+                              }),
+                            ],
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter the monthly repayment amount';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 30),
+
+                          // Proceed Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  // Form is valid, proceed with the submission
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MortgagePageHome(startIndex: 2),
+                                    ),
+                                  );
+                                  print("context$context");
+                                  Navigator.pushReplacementNamed(
+                                      context, '/mortgageCalendar');
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: "Please fill in all mandatory fields",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: baseColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: const Text(
+                                'Proceed',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      child: Text(
-                        '${controller.sliderValue.toInt()} Years', // Dynamically update the text
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Monthly Repayment
-                  const Text('Monthly Repayment'),
-                  TextFormField(
-                    controller: controller.monthlyRepaymentController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      prefix: const Padding(
-                        padding: EdgeInsets.only(
-                            right: 8), // Adds spacing between NGN and input
-                        child: Text(
-                          'NGN',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      // Add comma formatting
-                      TextInputFormatter.withFunction((oldValue, newValue) {
-                        final newText = newValue.text.replaceAll(
-                            RegExp(r'\D'), ''); // remove non-digit characters
-                        final formattedText = controller.formatNumber(newText);
-                        return newValue.copyWith(text: formattedText);
-                      }),
-                    ],
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter the monthly repayment amount';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Proceed Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // Form is valid, proceed with the submission
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const MortgagePageHome(startIndex: 2),
-                            ),
-                          );
-                          print("context$context");
-                          Navigator.pushReplacementNamed(
-                              context, '/mortgageCalendar');
-                        } else {
-                          Fluttertoast.showToast(
-                            msg: "Please fill in all mandatory fields",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: baseColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Proceed',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ])),
-      ),
-    );
+                    ])),
+          ),
+        ));
   }
 }
 
@@ -672,130 +723,214 @@ class CalendarPageMortgage extends StatefulWidget {
 
 class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
   final controller = Get.put(MortgagController());
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
+
+  DateTime _initialFocusedDay = DateTime.now();
+  void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      Navigator.pushReplacementNamed(
+        context,
+        '/mortgageForm',
+      );
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Anniversaryss'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Center(
-                child: Text(
-                  'Set your anniversary for payment..',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ),
-              const Center(
-                child: Text(
-                  '(An anniversary date is your last day to receive your payment every month)',
-                  style: TextStyle(fontSize: 8, color: Colors.grey),
-                ),
-              ),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Your next anniversary date is:",
-                  style: TextStyle(fontSize: 15, height: 5),
-                ),
-              ),
-              Text(
-                ' ${DateFormat('dd-MM-yyyy').format(controller.selectedDay)}',
-                style: const TextStyle(fontSize: 25, color: Colors.black),
-              ),
-              TableCalendar(
-                focusedDay: _focusedDay,
-                firstDay: DateTime(2000),
-                lastDay: DateTime(2100),
-                selectedDayPredicate: (day) {
-                  return isSameDay(controller.selectedDay, day);
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    controller.selectedDay = selectedDay;
-                    _focusedDay = focusedDay; // Update focusedDay
-                  });
-                },
-                calendarStyle: CalendarStyle(
-                  selectedDecoration: BoxDecoration(
-                    color: baseColor,
-                    shape: BoxShape.circle,
-                  ),
-                  todayDecoration: const BoxDecoration(
-                    color: Colors.orange,
-                    shape: BoxShape.circle,
-                  ),
-                  markerDecoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, '/mortgageTermsheet');
-
-                    controller.getData(Params.userId as String);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: baseColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    minimumSize: const Size(200, 50),
-                  ),
-                  child: const Text(
-                    "Proceed",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
+    return WillPopScope(
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Repayment',
+              style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/mortgageForm',
+                );
+              },
+            ),
           ),
-        ),
-      ),
-    );
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const Center(
+                    child: Text(
+                      'Set your repayment date',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      '(An anniversary date is your last day to receive your payment every month)',
+                      style: TextStyle(fontSize: 8, color: Colors.grey),
+                    ),
+                  ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Your next repayment date is:",
+                      style: TextStyle(fontSize: 15, height: 5),
+                    ),
+                  ),
+                  Text(
+                    controller.selectedDay != null
+                        ? DateFormat('dd-MM-yyyy')
+                            .format(controller.selectedDay!)
+                        : '',
+                    style: const TextStyle(fontSize: 25, color: Colors.black),
+                  ),
+                  TableCalendar(
+                    focusedDay: controller.selectedDay ?? _initialFocusedDay,
+                    firstDay: DateTime(2000),
+                    lastDay: DateTime(2100),
+                    selectedDayPredicate: (day) =>
+                        controller.selectedDay != null &&
+                        isSameDay(controller.selectedDay, day),
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        controller.selectedDay = selectedDay;
+                      });
+                    },
+                    calendarStyle: CalendarStyle(
+                      selectedDecoration: BoxDecoration(
+                        color: Colors.amber[800],
+                        shape: BoxShape.circle,
+                      ),
+                      todayDecoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      markerDecoration: const BoxDecoration(
+                        color: Colors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    headerStyle: const HeaderStyle(
+                      formatButtonVisible: false,
+                      titleCentered: true,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (controller.selectedDay == null) {
+                          Fluttertoast.showToast(
+                            msg: "Please select a repayment date",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        } else {
+                          Navigator.pushNamed(
+                              context, "/mortgageTermsheet");
+                          controller.getData(Params.userId as String);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: baseColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        minimumSize: const Size(200, 50),
+                      ),
+                      child: const Text(
+                        "Proceed",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }
 
-class PaymentMethodPage extends StatefulWidget {
-  const PaymentMethodPage({super.key});
+class PaymentMethodPageMortage extends StatefulWidget {
+  const PaymentMethodPageMortage({super.key});
 
   @override
-  _PaymentMethodPageState createState() => _PaymentMethodPageState();
+  _PaymentMethodPageMortageState createState() => _PaymentMethodPageMortageState();
 }
 
-class _PaymentMethodPageState extends State<PaymentMethodPage> {
+class _PaymentMethodPageMortageState extends State<PaymentMethodPageMortage> {
   String selectedPaymentMethod = "Card";
   final controller = Get.put(MortgagController());
+void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
 
+         Navigator.pushNamed(context, "/mortgageTermsheet");
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+     WillPopScope(
+      onWillPop: () async {
+        // Handle custom back navigation logic
+        _onBackPressed(context);
+        return false; // Prevent default back behavior
+      },
+    child: 
+     Scaffold(
       appBar: AppBar(
-        title: const Text("Payment"),
+        title:  Text("Payment",style: TextStyle(color: baseColor,fontWeight: FontWeight.bold),),
         centerTitle: true,
       ),
       body: Padding(
@@ -805,6 +940,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           children: [
             const Text(
               "How would you like to make your first deposit?",
+              textAlign:TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
@@ -823,7 +959,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ),
             ListTile(
               leading: const Icon(Icons.account_balance),
-              title: const Text("Bank Transfer"),
+              title:  Text("Bank Transfer",style: TextStyle(color: baseColor,fontWeight:FontWeight.bold),),
               trailing: Radio<String>(
                 value: "Bank Transfer",
                 groupValue: selectedPaymentMethod,
@@ -878,7 +1014,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -913,6 +1049,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
     _fetchCityName();
     _fetchAreaName();
     controller.fetchCitiesAndAreas();
+    _fetchApartment();
   }
 
   Future<void> _fetchCityName() async {
@@ -922,6 +1059,10 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
 
   Future<void> _fetchAreaName() async {
     var areaName = await controller.findAndSetArea();
+    setState(() {}); // Rebuild to display the city name
+  }
+   Future<void> _fetchApartment() async {
+    var apartmentName = await controller.fetchApartments();
     setState(() {}); // Rebuild to display the city name
   }
 
@@ -934,14 +1075,18 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
     print("44411${initialDeposit}");
     String todayDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
     String anniversary =
-        DateFormat('dd-MM-yyyy').format(controller.selectedDay);
+        DateFormat('dd-MM-yyyy').format(controller.selectedDay!);
     String anniversaryDate = controller.selectedDay?.toString() ?? '';
     String estimatedProfileDate =
         controller.calculateProfileDate(anniversaryDate, 16);
-
+    double repayment = calculateMonthlyRepayment(
+      loanAmount: initialDeposit * 0.7,
+      loanTermYears: controller.sliderValue.toInt(),
+      annualInterestRate: 25,
+    );
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Term Sheet'),
+          title:  Text('Term Sheet',style: TextStyle(color: baseColor,fontWeight: FontWeight.bold ),),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -964,7 +1109,10 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "login/propertyView",
+                        arguments: controller.apartmentOrMarketplace);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
                     padding: const EdgeInsets.symmetric(
@@ -973,7 +1121,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text("View House",
+                  child: const Text("+ House",
                       style: TextStyle(color: Colors.white, fontSize: 12)),
                 ),
               ),
@@ -982,7 +1130,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                 "House Details",
                 [
                   _buildRow("Apartment Type",
-                      controller.selectedApartmentType.toString()),
+                      controller.apartmentName.text.toString()),
                   // _buildRow("City", controller.findAndSetArea(controller.selectedArea)),
                   _buildRow("City", controller.cityNameValue.text),
 
@@ -998,13 +1146,42 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                 [
                   _buildRow("Initial Deposit",
                       "NGN ${controller.initialDepositController.text.toString()} "),
-                  _buildRow("Loan", "NGN ${(initialDeposit * 0.3)} "),
+                  _buildRow("Loan", "NGN ${formattedEMI(initialDeposit * 0.7)} "),
                   _buildRow("Repayment Period",
                       "${controller.sliderValue.toInt()} Years"),
-                  _buildRow("Monthly Repayment",
-                      controller.monthlyRepaymentController.text.toString()),
-                  _buildRow("Starting Date", todayDate),
-                  _buildRow("Next Anniversary Date", anniversary),
+                  _buildRow("Monthly Repayment", 'NGN ${formattedEMI(repayment)}'),
+                  // controller.monthlyRepaymentController.text.toString()),
+                   Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Starting Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(todayDate,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Next Anniversary Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(anniversary,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
+              
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1020,8 +1197,25 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       "NGN ${controller.monthlyRepaymentController.text}"),
                   _buildRow("Initial Deposit",
                       "NGN ${controller.initialDepositController.text}"),
-                  _buildRow("Minimum Total Expected Saving",
-                      "NGN ${(initialDeposit * 0.7)} "),
+                  
+                          Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Minimum Total Expected Saving",
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 44, 44, 44),
+                                fontWeight: FontWeight.bold)),
+                        Text(
+                            "NGN ${formattedEMI(initialDeposit * 0.3)} ",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1075,7 +1269,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                         ), // Start with MortgagePageHome
                       ),
                     );
-                    Navigator.pushNamed(context, "/rent-to-own/paymentPage");
+                    // Navigator.pushNamed(context, "/rent-to-own/paymentPage");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
@@ -1085,7 +1279,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text("Proceed to Pay",
+                  child: const Text("Proceed to Payment",
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -1291,9 +1485,15 @@ class _TermsHomePageState extends State<TermsHomePage> {
     return const Scaffold();
   }
 }
+class Sucess extends StatefulWidget {
+  const Sucess({super.key});
 
-class Success extends StatelessWidget {
-  const Success({super.key});
+  @override
+  State<Sucess> createState() => _SucessState();
+}
+
+class _SucessState extends State<Sucess> {
+  final controller = Get.put(Main_Dashboard_controller());
 
   @override
   Widget build(BuildContext context) {
@@ -1314,15 +1514,15 @@ class Success extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Deposite Successful",
+                  "Deposit Successful",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                const Text(
-                    "Congratulations Pelumi! You have made your first deposit",
-                    style: TextStyle(fontSize: 10)),
+                 Text(
+                    "Congratulations  ${controller.profileName} You have made your first deposit",
+                    style: const TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () { 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -1336,7 +1536,7 @@ class Success extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   child: const Text(
-                    "Processd",
+                    "Proceed to Home",
                     style: TextStyle(color: Colors.white, letterSpacing: 2),
                   ),
                 ),
@@ -1360,23 +1560,17 @@ class TermsAndConditionsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Terms and Conditions'),
+        title: Text(
+          'Terms and Conditions',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Text(
-                'Terms And Conditions',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
             const Text(
               'Effective Date: January 2025',
               style: TextStyle(

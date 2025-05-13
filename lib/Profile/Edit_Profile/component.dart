@@ -16,7 +16,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Profile"),
+        title: const Text("Edit Profiless"),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -67,12 +67,12 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                       },
                     ),
                     _buildMenuItem(
-                      text: 'Employments Details',
+                      text: 'Employments Detailsaaa',
                       onTap: () {
                             Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ProfilePagewidget(startIndex: 4),
+                          builder: (context) => const ProfilePagewidget(startIndex:6),
                         ));
                         // Handle navigation
                       },

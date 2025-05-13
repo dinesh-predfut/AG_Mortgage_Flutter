@@ -23,62 +23,58 @@ class StatementPage extends ChangeNotifier {
 //  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
 
   Future<bool> getAllTransactions(BuildContext context) async {
-  try {
-    var request = http.Request(
-        'GET', Uri.parse('${Urls.getAllTransactions}?page=0&size=10'));
+    try {
+      var request = http.Request(
+          'GET',
+          Uri.parse(
+              'http://3.253.82.115/api/customer/transaction?accountNumber=0000509644&startDate=2025-01-01&endDate=2025-05-01'));
 
-    request.headers.addAll({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${Params.userToken ?? ''}',
-    });
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken ?? ''}',
+      });
 
-    print('Sending request to: ${request.url}');
+      print('Sending request to: ${request.url}');
 
-    // Send request
-    http.StreamedResponse streamedResponse = await request.send();
-    var decodedResponse = await http.Response.fromStream(streamedResponse);
+      // Send request
+      http.StreamedResponse streamedResponse = await request.send();
+      var decodedResponse = await http.Response.fromStream(streamedResponse);
 
-    print('Response Code: ${decodedResponse.statusCode}');
-    print('Response Body: ${decodedResponse.body}');
+      print('Response Code: ${decodedResponse.statusCode}');
+      print('Response Body: ${decodedResponse.body}');
 
-    if (decodedResponse.statusCode == 200) {
-      final responseData = json.decode(decodedResponse.body);
+      if (decodedResponse.statusCode == 200) {
+        final responseData = json.decode(decodedResponse.body);
 
-      // Debugging: Check the structure of responseData
-      print('Decoded Response Data: $responseData');
-
-      if (responseData.containsKey('items')) {
-        if (responseData['items'] is List) {
-          if (responseData['items'].isNotEmpty) {
-            transactions.addAll(List<Map<String, dynamic>>.from(responseData['items']));
-            print('Updated Transactions List: $transactions');
-          } else {
-            print('Response "items" is an empty list.');
+        // Debugging: Check the structure of responseData
+        print('Decoded Response Data: $responseData');
+        for (var tx in responseData) {
+          final correctedTx = Map<String, dynamic>.from(tx);
+          if (correctedTx["balanceAfterTransaction"] == null &&
+              correctedTx["balanceAfterTranasction"] != null) {
+            correctedTx["balanceAfterTransaction"] =
+                correctedTx["balanceAfterTranasction"];
           }
-        } else {
-          print('Error: "items" is not a list. It is ${responseData['items'].runtimeType}');
+          transactions.add(correctedTx);
         }
-      } else {
-        print('Error: Response does not contain "items" key.');
-      }
+        print('Updated Transactions List: $transactions');
 
-      return true;
-    } else {
-      print('Error: ${decodedResponse.body}');
+        return true;
+      } else {
+        print('Error: ${decodedResponse.body}');
+        Fluttertoast.showToast(
+          msg: "Error: ${decodedResponse.body}",
+          toastLength: Toast.LENGTH_SHORT,
+        );
+        return false;
+      }
+    } catch (error) {
+      print('Error Occurred: $error');
       Fluttertoast.showToast(
-        msg: "Error: ${decodedResponse.body}",
+        msg: "An error occurred: $error",
         toastLength: Toast.LENGTH_SHORT,
       );
       return false;
     }
-  } catch (error) {
-    print('Error Occurred: $error');
-    Fluttertoast.showToast(
-      msg: "An error occurred: $error",
-      toastLength: Toast.LENGTH_SHORT,
-    );
-    return false;
   }
-}
-
 }

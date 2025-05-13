@@ -13,6 +13,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 void _openFile(String filePath) {
   OpenFilex.open(filePath);
@@ -150,7 +151,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
             TextFormField(
               controller: TextEditingController(
                 text: controller.dob != null
-                    ? DateFormat('yyyy-MM-dd').format(controller.dob!)
+                    ? DateFormat('dd-MM-yyyy').format(controller.dob!)
                     : '',
               ), // Display selected date
               readOnly: true, // Prevent manual text editing
@@ -191,77 +192,118 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
               },
             ),
             // _buildEditableField('NINs', value: controller.nin),
-            controller.isDocumentUploadedPd
-                ? _buildDocumentViewSection(
-                    'National ID', controller.nationalIdPath)
-                : _buildUploadBox(
-                    'Upload Picture of your National ID',
-                    onUpload: (filePath) {
-                      setState(() {
-                        controller.nationalIdPath = filePath;
-                        controller.isDocumentUploadedPd = true;
-                      });
-                    },
-                  ),
+            // controller.isDocumentUploadedPd
+            //     ? _buildDocumentViewSection(
+            //         'National ID', controller.nationalIdPath)
+            //     : _buildUploadBox(
+            //         'Upload Picture of your National ID',
+            //         onUpload: (filePath) {
+            //           setState(() {
+            //             controller.nationalIdPath = filePath;
+            //             controller.isDocumentUploadedPd = true;
+            //           });
+            //         },
+            //       ),
             const SizedBox(height: 16),
             const Text('Next of Kin Details',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             _buildEditableField('Full Name', value: controller.fullName),
             _buildEditableField('Relationship', value: controller.relationShip),
-            _buildEditableField('Phone Number', value: controller.phoneNumber),
-            _buildEditableField('Email (Optional)', value: controller.email),
+            IntlPhoneField(
+              controller: controller.phoneNumber,
+              keyboardType: TextInputType.phone,
+              validator: (phone) {
+                if (phone == null || phone.number.trim().isEmpty) {
+                  return 'Phone number is required';
+                }
+                if (phone.number.length < 10) {
+                  return 'Enter a valid phone number';
+                }
+                return null; // valid
+              },
+              decoration: InputDecoration(
+                labelText: "Phone Number",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: baseColor),
+                ),
+                counterText: "",
+              ),
+              initialCountryCode: 'NG',
+              disableLengthCheck: true,
+              onChanged: (phone) {
+                controller.countryCodeController.text = phone.countryCode;
+              },
+              onCountryChanged: (country) {
+                controller.countryCodeController.text = "+${country.dialCode}";
+              },
+            ),
+            // _buildEditableField('Phone Number', value: controller.phoneNumber),
+            _buildEditableField(
+              'Email (Optional)',
+              value: controller.email,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return null; // Optional field – no need to validate if empty
+                }
+                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                if (!emailRegex.hasMatch(value)) {
+                  return 'Enter a valid email address';
+                }
+                return null;
+              },
+            ),
             _buildEditableField('Address', value: controller.address),
-            controller.isDocumentUploadedPd
-                ? _buildDocumentViewSection(
-                    'Passport ID', controller.nationalIdPath)
-                : _buildUploadBox(
-                    'Upload Picture of your Passport ID',
-                    onUpload: (filePath) {
-                      setState(() {
-                        controller.passportIdPath = filePath;
-                        controller.isDocumentUploadedPd = true;
-                      });
-                    },
-                  ),
+            // controller.isDocumentUploadedPd
+            //     ? _buildDocumentViewSection(
+            //         'Passport ID', controller.nationalIdPath)
+            //     : _buildUploadBox(
+            //         'Upload Picture of your Passport ID',
+            //         onUpload: (filePath) {
+            //           setState(() {
+            //             controller.passportIdPath = filePath;
+            //             controller.isDocumentUploadedPd = true;
+            //           });
+            //         },
+            //       ),
             const SizedBox(height: 16),
             SizedBox(
-                    width: double.infinity,
-                    child:ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                alignment: Alignment.center,
-                backgroundColor: baseColor, // Transparent background
-                elevation: 0, // Remove shadow
-                foregroundColor:
-                    Colors.white, // Text and icon color// Text and icon color
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // Rounded corners
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  alignment: Alignment.center,
+                  backgroundColor: baseColor, // Transparent background
+                  elevation: 0, // Remove shadow
+                  foregroundColor:
+                      Colors.white, // Text and icon color// Text and icon color
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 109, vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                  ),
                 ),
-              ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  controller.kinDetails(context);
-                  Navigator.pushReplacementNamed(context, '/editProfile');
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    controller.kinDetails(context);
+                    Navigator.pushReplacementNamed(context, '/editProfile');
 
-                  setState(() {
-                    controller.isEdited = true;
-                  });
-                }
-                else {
-                          Fluttertoast.showToast(
-                            msg: "Please fill in all mandatory fields",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
-                        }
-              },
-              child: const Text('Save Changes'),
-            ),
-        )],
-          
+                    setState(() {
+                      controller.isEdited = true;
+                    });
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Please fill in all mandatory fields",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                    );
+                  }
+                },
+                child: const Text('Save Changes'),
+              ),
+            )
+          ],
         ));
   }
 

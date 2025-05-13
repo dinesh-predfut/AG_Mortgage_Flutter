@@ -77,13 +77,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
             centerTitle: true,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () =>   Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const MainLayout(
-                  showBottomNavBar: true,
-                  startIndex: 1,
-                  child: MarketMain()))),
+              onPressed: () =>  Navigator.pop(context)
             ),
           ),
           body: FutureBuilder<Houseview>(

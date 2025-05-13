@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:ag_mortgage/Dashboard_Screen/Investment/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
+import 'package:ag_mortgage/const/commanFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -17,7 +18,7 @@ class Investment_Forms extends StatefulWidget {
 }
 
 class _Investment_FormsState extends State<Investment_Forms> {
-  InvestmentModels? investmentData;
+  List<InvestmentItem> investmentData = [];
   bool isLoading = true;
 
   @override
@@ -28,63 +29,72 @@ class _Investment_FormsState extends State<Investment_Forms> {
 
   Future<void> loadInvestmentData() async {
     final controller = Get.put(Main_Dashboard_controller());
-    InvestmentModels? data = await controller.fetchInvestmentDetails();
+    try {
+      // 1️⃣ Fetch the list of items
+      List<InvestmentItem>? data = await controller.fetchInvestmentDetails();
 
-    setState(() {
-      investmentData = data;
-      isLoading = false;
-    });
+      // 2️⃣ Assign it to your state variable
+      setState(() {
+        investmentData = data ?? [];
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // handle error, e.g. show a toast
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Investments")),
-      body: isLoading
-    ? const Center(child: CircularProgressIndicator())
-    : investmentData == null || investmentData!.items.isEmpty
-        ? const Center(child: Text("No investments found"))
-        : Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: investmentData!.items.length,
-                  itemBuilder: (context, index) {
-                    InvestmentPlan investment = investmentData!.items[index];
-
-                    return InvestmentCard(investment: investment, index: index);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/investment");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24.0, vertical: 12.0),
-                      backgroundColor: baseColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+        appBar: AppBar(title: const Text("Investment Certificate")),
+        body: Column(children: [
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : (investmentData == null || investmentData!.isEmpty)
+                  ? const Center(child: Text("No investments found"))
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: investmentData.length,
+                        itemBuilder: (context, index) {
+                          InvestmentItem investment = investmentData![index];
+                          return InvestmentCard(
+                            investment: investment,
+                            index: index,
+                          );
+                        },
                       ),
                     ),
-                    child: const Text("Invest More",
-                        style: TextStyle(color: Colors.white)),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/investment");
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 12.0),
+                  backgroundColor: baseColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
+                child: const Text(
+                  "Invest More",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
-            ],
+            ),
           ),
- 
-    );
+        ]));
   }
 }
 
 class InvestmentCard extends StatelessWidget {
-  final InvestmentPlan investment;
+  final InvestmentItem investment;
   final int index;
 
   const InvestmentCard(
@@ -98,7 +108,7 @@ class InvestmentCard extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            "Investment $index",
+            "Investment ${index + 1}",
             style: const TextStyle(
                 color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -120,38 +130,39 @@ class InvestmentCard extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              buildRow("Amount Invested", "NGN ${investment.amountInvested}"),
-              buildRow("Duration", investment.duration),
-              buildRow("Start Date", investment.startDate),
+              buildRow("Amount", "NGN ${formattedEMI(investment.amountInvested) }"),
+              buildRow("Duration", '${investment.duration} Years'),
+              buildRow("Start Date", formatDateString(investment.startDate)),
               buildRow("Interest", "${investment.interestPercentage}%"),
-              buildRow("Maturity Date", investment.maturityDate),
-              buildRow("Maturity Amount", "NGN ${investment.maturityAmount}"),
+              buildRow("Maturity Date", formatDateString(investment.maturityDate)),
+              buildRow("Maturity Amount", "NGN ${formattedEMI(investment.maturityAmount)}"),
               buildRow("Status", investment.status),
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.yellow[800],
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text("Expected Yield"), Text("NGN 660,000")],
-          ),
-        ),
-    
-        const SizedBox(
-          height: 20,
-        ),
+        // Container(
+        //   padding: const EdgeInsets.all(16),
+        //   decoration: BoxDecoration(
+        //     color: Colors.yellow[800],
+        //     borderRadius: BorderRadius.circular(10),
+        //     boxShadow: [
+        //       BoxShadow(
+        //         color: Colors.black.withOpacity(0.1),
+        //         blurRadius: 10,
+        //         offset: const Offset(0, 5),
+        //       ),
+        //     ],
+        //   ),
+        //   child: const Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Text("Expected Yield"), Text("NGN 660,000")
+        //     ],
+        //   ),
+        // ),
+        // const SizedBox(
+        //   height: 20,
+        // ),
       ]),
     );
   }

@@ -23,14 +23,16 @@ class Main_Dashboard_controller extends ChangeNotifier {
   TextEditingController account = TextEditingController();
   TextEditingController amount = TextEditingController();
   final TextEditingController repaymentDate = TextEditingController();
+  Map<String, dynamic>? scoreData;
   var planOptions = <int>[].obs; // Observable list to store plan options
-  var isLoading = false.obs;
+  var isLoading = true.obs;
   var profileName = "";
+  var lastName = "";
   var phoneNumber = "";
   String? profileImageUrl;
-  Future<InvestmentModels?> fetchInvestmentDetails() async {
+  Future<List<InvestmentItem>?> fetchInvestmentDetails() async {
     try {
-      var url = Uri.parse(Urls.investment);
+      var url = Uri.parse('${Urls.investmentByid}${Params.userId}');
 
       var response = await http.get(
         url,
@@ -41,9 +43,10 @@ class Main_Dashboard_controller extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        return InvestmentModels.fromJson(data);
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList
+            .map((j) => InvestmentItem.fromJson(j as Map<String, dynamic>))
+            .toList();
       } else {
         print("Failed to fetch investment details: ${response.body}");
         return null;
@@ -54,7 +57,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
     }
   }
 
-  static Future<bool> updateInvestment(InvestmentModels investment) async {
+  static Future<bool> updateInvestment(InvestmentItem investment) async {
     try {
       var url = Uri.parse(Urls.investment);
 
@@ -96,6 +99,31 @@ class Main_Dashboard_controller extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchScore() async {
+    isLoading.value = true;
+    try {
+      var url = Uri.parse('${Urls.getScore}${Params.userId}');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${Params.userToken}',
+      };
+
+      var response = await http.get(url, headers: headers);
+
+      print('Response Code: ${response.statusCode}');
+      print('Score Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        isLoading.value = false;
+        var data = json.decode(response.body);
+        scoreData = data;
+        print('Response scoreData: $scoreData');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   String formatCurrency(dynamic value) {
     try {
       if (value == null || value.toString().isEmpty) return "";
@@ -127,7 +155,6 @@ class Main_Dashboard_controller extends ChangeNotifier {
   Future<void> fetchPlanOptions() async {
     try {
       print('Response Code: ${Params.userId}');
-      isLoading.value = true;
       var url = Uri.parse('${Urls.getEmployeeDetailsID}?id=${Params.userId}');
       var headers = {
         'Content-Type': 'application/json',
@@ -141,9 +168,13 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
+        // isLoading.value = false;
 
         if (data['firstName'] != null) {
           profileName = data['firstName'];
+        }
+        if (data['lastName'] != null) {
+          lastName = data['lastName'];
         }
         if (data['phoneNumber'] != null) {
           phoneNumber = data['phoneNumber'];
@@ -168,7 +199,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
     } catch (e) {
       print("API Call Error: $e");
     } finally {
-      isLoading.value = false;
+      // isLoading.value = false;
     }
   }
 
@@ -180,7 +211,9 @@ class Main_Dashboard_controller extends ChangeNotifier {
         "amount": amount.text.trim(),
         "accountNumber": accountNumber.text.trim(),
         "bvn": bvn.text.trim(),
-        "anniversary": repaymentDate.text.trim(),
+        "repaymentDate": repaymentDate.text.trim(),
+        "typeOfTransaction": "Monthly Contributions",
+        "status": 'OnTime'
       });
 
       request.headers.addAll({

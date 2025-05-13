@@ -29,6 +29,7 @@ class ProfileController extends GetxController {
   String countryCode = "";
   String countryName = "TZ";
   TextEditingController firstNameController = TextEditingController();
+  TextEditingController forgetPassword = TextEditingController();
   TextEditingController lasttNameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
   TextEditingController registerPhoneNumber = TextEditingController();
@@ -40,11 +41,12 @@ class ProfileController extends GetxController {
   TextEditingController promoCode = TextEditingController();
   TextEditingController dobController = TextEditingController();
   final TextEditingController countryCodeController = TextEditingController();
+
   TextEditingController nin = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   String? selectedGender;
   File? image;
-    final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
   RxInt secondsRemaining = 120.obs;
   Timer? timer;
   XFile path = XFile("null");
@@ -54,15 +56,15 @@ class ProfileController extends GetxController {
     // userProfile();
     super.onInit();
   }
-Future<void> pickImage() async {
+
+  Future<void> pickImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-     
-        image = File(pickedFile.path);
-  
+      image = File(pickedFile.path);
     }
   }
+
   nextFuncation(BuildContext context) {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
@@ -124,13 +126,18 @@ Future<void> pickImage() async {
       request.body = json.encode({
         "firstName": firstNameController.text,
         "lastName": lasttNameController.text,
-        "dateOfBirth": dobController.text,
+        "dateOfBirth": dobController.text.isNotEmpty
+            ? DateFormat('yyyy-MM-dd').format(
+                DateFormat('dd-MM-yyyy').parse(dobController.text),
+              )
+            : null,
         "phoneNumber":
             countryCodeController.text.trim() + registerPhoneNumber.text,
         "email": emailController.text,
         "gender": selectedGender,
         "password": newPasswordController.text,
-        "nin": nin.text
+        "nin": nin.text,
+        "bvn": nin.text
       });
       request.headers.addAll({'Content-Type': 'application/json'});
 
@@ -157,7 +164,6 @@ Future<void> pickImage() async {
               builder: (context) => const Authentication(),
             ));
       } else {
-     
         Fluttertoast.showToast(
           msg: message,
           toastLength: Toast.LENGTH_SHORT,
@@ -229,9 +235,62 @@ Future<void> pickImage() async {
       rethrow;
     }
   }
- static String formatDate(DateTime date) {
+
+  Future forgetPasswords(context) async {
+    try {
+      isLoading(true);
+
+      var request = http.Request('POST', Uri.parse(Urls.forgetPassword));
+      request.body = json.encode({
+        "email": forgetPassword.text.trim(),
+        "userType": "customer",
+      });
+      request.headers.addAll({'Content-Type': 'application/json'});
+
+      http.StreamedResponse response = await request.send();
+      var decodeData = await http.Response.fromStream(response);
+      // final result = jsonDecode(decodeData.body);
+      print("result ==> ${decodeData.body}");
+
+      if (response.statusCode == 200) {
+        // Get.to(() => Authentication(isReset: false), binding: InitialBinding());
+        // Show success toast
+        Fluttertoast.showToast(
+          msg: "OTP link send to you Email address",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Login(),
+                        ));
+        isLoading(false);
+      } else {
+        Fluttertoast.showToast(
+          msg: "Something went Wrong",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        // Fluttertoast.showToast(msg: result["message"]);
+        isLoading(false);
+      }
+    } catch (e) {
+      isLoading(false);
+      rethrow;
+    }
+  }
+
+  static String formatDate(DateTime date) {
     return DateFormat('dd-MM-yyyy').format(date);
   }
+
   Future signIn(BuildContext context) async {
     try {
       isLoading(true);

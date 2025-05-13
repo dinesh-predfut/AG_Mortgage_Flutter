@@ -26,8 +26,7 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
          leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
-          },
+Navigator.pushReplacementNamed(context, '/settings/getallCards');          },
         ),
       ),
       body: Padding(
@@ -109,13 +108,14 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
                   child: TextField(
                     // keyboardType: TextInputType.number,
                     controller: cardControllers.expDateController,
+                    
                     onChanged: (value) {
                       // Dynamically update state
                       setState(() {
                         cardControllers.expDateController.text = value;
                       });
                     },
-                    decoration: const InputDecoration(labelText: "Exp. Date"),
+                    decoration: const InputDecoration(labelText: "Exp. Date",hintText: "MM/YYYY"),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -142,6 +142,7 @@ class _ADD_CardDetailsPageState extends State<ADD_CardDetailsPage> {
               ],
             ),
             const Spacer(),
+            
             ElevatedButton(
               onPressed: () {
                 if (cardControllers.nameController.text.isEmpty) {

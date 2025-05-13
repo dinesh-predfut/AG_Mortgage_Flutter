@@ -7,6 +7,7 @@ import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/controller.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +33,10 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
   @override
   void initState() {
     super.initState();
+    String amount = controller.amountController.text.trim();
+    if (amount.isEmpty) {
+      controller.amountController.text = '0';
+    }
 
     // Ensure paymentcontroller is initialized before accessing its controllers
     if (paymentcontroller.initialDepositController.text.isNotEmpty &&
@@ -207,34 +212,40 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             const SizedBox(height: 20),
             TextFormField(
               controller: controller.amountController,
+              keyboardType: TextInputType.number,
+              onTap: () {
+                if (controller.amountController.text.trim() == '0') {
+                  controller.amountController.clear();
+                }
+              },
               decoration: InputDecoration(
                 prefixText: "NGN ",
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide:  BorderSide(color: baseColor),
+                  borderSide: BorderSide(color: baseColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide:
-                       BorderSide(color: baseColor, width: 2),
+                  borderSide: BorderSide(color: baseColor, width: 2),
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _amountButton(context, "#100,000", 100000),
-                _amountButton(context, "#200,000", 200000),
-                _amountButton(context, "#300,000", 300000),
-                _amountButton(context, "#400,000", 400000),
-                _amountButton(context, "#500,000", 500000),
-                _amountButton(context, "#600,000", 600000),
-              ],
-            ),
+            // Wrap(
+            //   spacing: 10,
+            //   runSpacing: 10,
+            //   children: [
+            //     _amountButton(context, "#100,000", 100000),
+            //     _amountButton(context, "#200,000", 200000),
+            //     _amountButton(context, "#300,000", 300000),
+            //     _amountButton(context, "#400,000", 400000),
+            //     _amountButton(context, "#500,000", 500000),
+            //     _amountButton(context, "#600,000", 600000),
+            //   ],
+            // ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
@@ -260,6 +271,13 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
                 } else if (monthlyRepayment == 0) {
                   controller.voluntoryPayment(amountPay, widget.selectedID!);
                   Navigator.pushNamed(context, "/dashBoardPage");
+                  Fluttertoast.showToast(
+                    msg: "Created Successfully",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    backgroundColor: Colors.grey,
+                    textColor: Color.fromARGB(255, 15, 15, 15),
+                  );
                 } else {
                   print("amountController");
                   controller.calculation(context, widget.selectedID!);

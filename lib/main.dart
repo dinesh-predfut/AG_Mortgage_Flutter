@@ -29,6 +29,7 @@ import 'package:ag_mortgage/Profile/Dashboard/How_We_Work/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/My_Cards/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/Terms_Condition/component.dart';
 import 'package:ag_mortgage/Profile/Dashboard/component.dart';
+import 'package:ag_mortgage/Profile/Edit_Profile/Employment_Details/component.dart';
 import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -132,9 +133,15 @@ class MyApp extends StatelessWidget {
                     showBottomNavBar: true, child: CalendarPageMortgage()));
           case '/mortgageTermsheet':
             return MaterialPageRoute(
-                builder: (context) =>  const MainLayout(
+                builder: (context) => const MainLayout(
                       showBottomNavBar: true,
                       child: MortgageTermSheetPage(),
+                    ));
+                     case '/mortgagePaymentmethod':
+            return MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                      showBottomNavBar: true,
+                      child: PaymentMethodPageMortage(),
                     ));
           case '/marketMain':
             return MaterialPageRoute(
@@ -216,12 +223,19 @@ class MyApp extends StatelessWidget {
                     startIndex: 3,
                     showBottomNavBar: true,
                     child: PersonalDetailsPage()));
+          case '/termsheet':
+            return MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                      startIndex: 0,
+                      showBottomNavBar: true,
+                      child: MortgagePageHome(startIndex: 10),
+                    ));
           case '/editProfile/employementDetails':
             return MaterialPageRoute(
                 builder: (context) => const MainLayout(
                     startIndex: 3,
                     showBottomNavBar: true,
-                    child: PersonalDetailsPage()));
+                    child: EmploymentDetails()));
           case '/editProfile/homeAddress':
             return MaterialPageRoute(
                 builder: (context) => const MainLayout(
@@ -395,24 +409,20 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   void _onItemTapped(int index) {
-    if (index < 0 || index >= 4) return; // Ensure index is within range
+    // if (index < 0 || index >= 4) return;
+    // if (_selectedIndex == index) {
+    //   if (index == 0) {
+    //     const DashboardPage();
+    //   } else if (index == 1) {
+    //     const MarketMain();
+    //   } else if (index == 2) {
+    //     NotificationsPage();
+    //   } else if (index == 3) {
+    //     const AccountPage();
+    //   }
+    //   return;
+    // }
 
-    if (_selectedIndex == index) {
-      // Handle click on the same tab (like refreshing or scrolling to top)
-      if (index == 0) {
-        // Example: Refreshing DashboardPage
-        const DashboardPage(); // Implement your refresh logic in the DashboardPage class
-      } else if (index == 1) {
-        const MarketMain();
-      } else if (index == 2) {
-        NotificationsPage();
-      } else if (index == 3) {
-        const AccountPage();
-      }
-      return; // Exit early to avoid unnecessary navigation
-    }
-
-    // Update selected index if it's a different tab
     setState(() {
       _selectedIndex = index;
     });
@@ -422,40 +432,61 @@ class _MainLayoutState extends State<MainLayout> {
     // Navigate to the selected page
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const DashboardPage())));
+       Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
+              showBottomNavBar: true,
+              startIndex: index,
+              child: const DashboardPage(),
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
         break;
       case 1:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const MarketMain())));
+       Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
+              showBottomNavBar: true,
+              startIndex: index,
+              child: const MarketMain(),
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
         break;
       case 2:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: NotificationsPage())));
+       Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
+              showBottomNavBar: true,
+              startIndex: index,
+              child: NotificationsPage(),
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
         break;
       case 3:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainLayout(
-                    showBottomNavBar: true,
-                    startIndex: index,
-                    child: const AccountPage())));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
+              showBottomNavBar: true,
+              startIndex: index,
+              child: const AccountPage(),
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+
         break;
       default:
         Navigator.pushReplacement(
@@ -473,41 +504,49 @@ class _MainLayoutState extends State<MainLayout> {
     return PopScope(
       canPop: _selectedIndex == 0, // Only allows popping when on Home tab
       onPopInvoked: (didPop) {
-        if (!didPop) {
-          if (_selectedIndex != 0) {
-            _onItemTapped(0);
-            setState(() {
-              _selectedIndex = 0; // Navigate to Home tab instead of exiting
-            });
-          }
+        if (!didPop && _selectedIndex != 0) {
+          _onItemTapped(0); // Navigate to Home tab instead of exiting
+          setState(() {
+            _selectedIndex = 0;
+          });
         }
       },
       child: Scaffold(
         body: widget.child,
-        bottomNavigationBar: widget.showBottomNavBar
+        bottomNavigationBar: (widget.showBottomNavBar)
             ? BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
-                items: [
+                backgroundColor: baseColor, // Or use a theme color
+                selectedItemColor: Colors.white, // Highlight color
+                unselectedItemColor: Colors.grey[500],
+                selectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                ),
+                elevation: 10, // Gives a subtle shadow
+                iconSize: 26,
+                items: const [
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.home),
+                    icon: Icon(Icons.home),
                     label: 'Home',
-                    backgroundColor: baseColor,
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.shopping_cart),
+                    icon: Icon(Icons.shopping_cart),
                     label: 'Marketplace',
-                    backgroundColor: baseColor,
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.notifications),
+                    icon: Icon(Icons.notifications),
                     label: 'Notifications',
-                    backgroundColor: baseColor,
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.person),
+                    icon: Icon(Icons.person),
                     label: 'Account',
-                    backgroundColor: baseColor,
                   ),
                 ],
               )

@@ -121,13 +121,13 @@ class InvestmentController extends ChangeNotifier {
       if (decodedResponse.statusCode == 200) {
         // clearFields();
         final result = jsonDecode(decodedResponse.body);
-        Fluttertoast.showToast(
-          msg: "Mortgage Created Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Color.fromARGB(255, 15, 15, 15),
-        );
+        // Fluttertoast.showToast(
+        //   msg: "Mortgage Created Successfully",
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.BOTTOM,
+        //   backgroundColor: Colors.grey,
+        //   textColor: Color.fromARGB(255, 15, 15, 15),
+        // );
         print('API Success Response: $result');
 
         // Navigate to MortgagePage

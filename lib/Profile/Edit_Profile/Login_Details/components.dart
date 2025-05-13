@@ -4,6 +4,7 @@ import 'package:ag_mortgage/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class EditLoginDetails extends StatefulWidget {
   const EditLoginDetails({super.key});
@@ -78,49 +79,52 @@ class _EditLoginDetailsState extends State<EditLoginDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextField(
-              controller: controller.phoneNumber,
-              readOnly:
-                  !isEditingUsername, // This determines if the field is editable
-
+          IntlPhoneField(
+              controller: controller.userPhonenumber,
+              keyboardType: TextInputType.phone,
+              validator: (phone) {
+                if (phone == null || phone.number.trim().isEmpty) {
+                  return 'Phone number is required';
+                }
+                if (phone.number.length < 10) {
+                  return 'Enter a valid phone number';
+                }
+                return null; // valid
+              },
               decoration: InputDecoration(
                 labelText: "Phone Number",
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isEditingUsername = true; // Enable editing mode
-                    });
-                  },
-                  child: Icon(
-                    isEditingUsername
-                        ? Icons.check
-                        : Icons.edit, // Change icon based on state
-                    color: isEditing ? Colors.green : Colors.grey,
-                  ),
-                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: baseColor),
                 ),
+                counterText: "",
               ),
+              initialCountryCode: 'NG',
+              disableLengthCheck: true,
+              onChanged: (phone) {
+                controller.countryCodeController.text = phone.countryCode;
+              },
+              onCountryChanged: (country) {
+                controller.countryCodeController.text = "+${country.dialCode}";
+              },
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: controller.email,
+              controller: controller.useremail,
               readOnly:
-                  !isEditingMail, // This determines if the field is editable
-
+                  !isEditingMail, 
               decoration: InputDecoration(
                 labelText: "Email",
                 suffixIcon: GestureDetector(
                   onTap: () {
                     setState(() {
-                      isEditingMail = true; // Enable editing mode
+                      isEditingMail = true;
                     });
                   },
                   child: Icon(
                     isEditingMail
                         ? Icons.check
-                        : Icons.edit, // Change icon based on state
+                        : Icons.edit,
                     color: isEditing ? Colors.green : Colors.grey,
                   ),
                 ),

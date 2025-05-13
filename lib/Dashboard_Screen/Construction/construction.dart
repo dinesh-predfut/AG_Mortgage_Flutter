@@ -6,9 +6,11 @@ import 'package:ag_mortgage/Dashboard_Screen/Construction/models.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Market_Place/main.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
+import 'package:ag_mortgage/Main_Dashboard/Mortgage/Withdraw/controller.dart';
 import 'package:ag_mortgage/Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'package:ag_mortgage/const/Image.dart';
 import 'package:ag_mortgage/const/colors.dart';
+import 'package:ag_mortgage/const/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -44,7 +46,7 @@ class _ConstructionPageState extends State<ConstructionPage> {
     const Construction_CalendarPage(),
     const TermSheetPage(),
     const PaymentMethodPage(),
-    const Success(),
+    const Sucesss(),
     const Construction_CalendarPage(),
     const TermSheetPage(),
     const BankTransferPage(),
@@ -145,7 +147,7 @@ class Construction_Landing extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                "Secure the financing you need to complete your housing project with AG Mortgage Bank.",
+                "Secure the financing you need to complete your housing project with AG Construction Bank.",
                 style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),
                 textAlign: TextAlign.center,
               ),
@@ -412,7 +414,10 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Construction Finance'),
+        title: Text(
+          'Construction Finance',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -820,7 +825,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   // Repayment Period
                   const Text(
                     'Repayment Period',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(
                     width: double.infinity,
@@ -936,108 +941,167 @@ class Construction_CalendarPage extends StatefulWidget {
 }
 
 class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
+  final controller = Get.put(ContructionController());
+
+  DateTime _initialFocusedDay = DateTime.now();
+  void _onBackPressed(BuildContext context) {
+    // Custom logic for back navigation
+    if (Navigator.of(context).canPop()) {
+      Navigator.pushReplacementNamed(
+        context,
+        '/mortgageForm',
+      );
+    } else {
+      // Show exit confirmation dialog if needed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Exit App"),
+          content: Text("Do you want to exit the app?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Anniversary'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Center(
-                child: Text(
-                  'Set your anniversary for payment..',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ),
-              const Center(
-                child: Text(
-                  '(An anniversary date is your last day to receive your payment every month)',
-                  style: TextStyle(fontSize: 8, color: Colors.grey),
-                ),
-              ),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Your next anniversary date is:",
-                  style: TextStyle(fontSize: 15, height: 5),
-                ),
-              ),
-              Text(
-                ' ${DateFormat('dd-MM-yyyy').format(_selectedDay)}',
-                style: const TextStyle(fontSize: 25, color: Colors.black),
-              ),
-              TableCalendar(
-                focusedDay: _focusedDay,
-                firstDay: DateTime(2000),
-                lastDay: DateTime(2100),
-                selectedDayPredicate: (day) {
-                  return isSameDay(_selectedDay, day);
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay; // Update focusedDay
-                  });
-                },
-                calendarStyle: CalendarStyle(
-                  selectedDecoration: BoxDecoration(
-                    color: baseColor,
-                    shape: BoxShape.circle,
-                  ),
-                  todayDecoration: const BoxDecoration(
-                    color: Colors.orange,
-                    shape: BoxShape.circle,
-                  ),
-                  markerDecoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const ConstructionPage(startIndex: 4),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: baseColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    minimumSize: const Size(200, 50),
-                  ),
-                  child: const Text(
-                    "Proceed",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
+    return WillPopScope(
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Repayment',
+              style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/mortgageForm',
+                );
+              },
+            ),
           ),
-        ),
-      ),
-    );
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const Center(
+                    child: Text(
+                      'Set your repayment date',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      '(An anniversary date is your last day to receive your payment every month)',
+                      style: TextStyle(fontSize: 8, color: Colors.grey),
+                    ),
+                  ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Your next repayment date is:",
+                      style: TextStyle(fontSize: 15, height: 5),
+                    ),
+                  ),
+                  Text(
+                    controller.selectedDay != null
+                        ? DateFormat('dd-MM-yyyy')
+                            .format(controller.selectedDay!)
+                        : '',
+                    style: const TextStyle(fontSize: 25, color: Colors.black),
+                  ),
+                  TableCalendar(
+                    focusedDay: controller.selectedDay ?? _initialFocusedDay,
+                    firstDay: DateTime(2000),
+                    lastDay: DateTime(2100),
+                    selectedDayPredicate: (day) =>
+                        controller.selectedDay != null &&
+                        isSameDay(controller.selectedDay, day),
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        controller.selectedDay = selectedDay;
+                      });
+                    },
+                    calendarStyle: CalendarStyle(
+                      selectedDecoration: BoxDecoration(
+                        color: Colors.amber[800],
+                        shape: BoxShape.circle,
+                      ),
+                      todayDecoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      markerDecoration: const BoxDecoration(
+                        color: Colors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    headerStyle: const HeaderStyle(
+                      formatButtonVisible: false,
+                      titleCentered: true,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (controller.selectedDay == null) {
+                          Fluttertoast.showToast(
+                            msg: "Please select a repayment date",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ConstructionPage(startIndex: 4),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: baseColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        minimumSize: const Size(200, 50),
+                      ),
+                      child: const Text(
+                        "Proceed",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }
 
@@ -1055,7 +1119,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Payment"),
+        title: Text(
+          "Payment",
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -1110,8 +1177,15 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   }
 }
 
-class Success extends StatelessWidget {
-  const Success({super.key});
+class Sucesss extends StatefulWidget {
+  const Sucesss({super.key});
+
+  @override
+  State<Sucesss> createState() => _SucesssState();
+}
+
+class _SucesssState extends State<Sucesss> {
+  final controller = Get.put(Main_Dashboard_controller());
 
   @override
   Widget build(BuildContext context) {
@@ -1132,19 +1206,19 @@ class Success extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Deposite Successful",
+                  "Deposit Successful",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                const Text(
-                    "Congratulations Pelumi! You have made your first deposit",
-                    style: TextStyle(fontSize: 10)),
+                Text(
+                    "Congratulations  ${controller.profileName} You have made your first deposit",
+                    style: const TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const DashboardPageS("Construction"),
+                        builder: (_) => const DashboardPageS("Mortgage"),
                       ),
                     );
                   },
@@ -1154,7 +1228,7 @@ class Success extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   child: const Text(
-                    "Processd",
+                    "Proceed to Home",
                     style: TextStyle(color: Colors.white, letterSpacing: 2),
                   ),
                 ),
@@ -1236,7 +1310,10 @@ class _TermSheetPageState extends State<TermSheetPage>
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Term Sheet'),
+          title: Text(
+            'Term Sheet',
+            style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -1280,8 +1357,36 @@ class _TermSheetPageState extends State<TermSheetPage>
                       "${controller.sliderValue.toInt()} Years"),
                   _buildRow("Monthly Repayment",
                       "NGN ${controller.formatNumber(controller.monthlyRepaymentController.text)}"),
-                  _buildRow("Starting Date", todayDate),
-                  _buildRow("Next Anniversary Date", anniversary),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Starting Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(todayDate,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Next Anniversary Date",
+                            style: TextStyle(color: Colors.grey)),
+                        Text(anniversary,
+                            style: TextStyle(
+                                color: baseColor,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1296,8 +1401,23 @@ class _TermSheetPageState extends State<TermSheetPage>
                   ),
                   _buildRow("Total Monthly Savings",
                       "NGN ${controller.formatNumber(emi.toString())}"),
-                  _buildRow("Minimum Total Expected Saving",
-                      "NGN ${controller.formatNumber(expectedSave.toString())} "),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Total Monthly Savings",
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 44, 44, 44),
+                                fontWeight: FontWeight.bold)),
+                        Text("NGN ${formattedEMI(expectedSave)} ",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1320,20 +1440,20 @@ class _TermSheetPageState extends State<TermSheetPage>
                       ],
                     ),
                     TextButton(
-                      onPressed: () {
-                        // controller.addMortgageForm(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ConstructionPage(
-                              startIndex: 5,
-                            ), // Start with MortgagePageHome
-                          ),
-                        );
-                      },
-                      child: Text(
-                          controller.formatNumber(expectedSave.toString())),
-                    ),
+                        onPressed: () {
+                          // controller.addMortgageForm(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ConstructionPage(
+                                startIndex: 5,
+                              ), // Start with MortgagePageHome
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'NGN ${formattedEMI(expectedSave)}',
+                        )),
                   ],
                 ),
               ),
@@ -1341,7 +1461,6 @@ class _TermSheetPageState extends State<TermSheetPage>
               Center(
                 child: ElevatedButton(
                   onPressed: () => {
-                    controller.constructionFinance(context),
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -1414,8 +1533,15 @@ class _TermSheetPageState extends State<TermSheetPage>
   }
 }
 
-class BankTransferPage extends StatelessWidget {
+class BankTransferPage extends StatefulWidget {
   const BankTransferPage({super.key});
+
+  @override
+  State<BankTransferPage> createState() => _BankTransferPageState();
+}
+
+class _BankTransferPageState extends State<BankTransferPage> {
+  final controller = Get.put(ContructionController());
 
   @override
   Widget build(BuildContext context) {
@@ -1488,6 +1614,8 @@ class BankTransferPage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
+                  controller.constructionFinance(context);
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -1550,7 +1678,10 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Construction Finance'),
+        title: Text(
+          'Construction Finance',
+          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -1888,7 +2019,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'KWIK by AGMB is a digital platform for the KWIK Mortgage program. This program helps users gradually save for a 30% down payment over 18 months, instilling a strong savings culture and enabling them to meet mortgage requirements to purchase verified properties.\n\nPlease note that the KWIK platform is not a regular savings or current account. It has specific terms and is for people on a mission to own a home. Applicants are encouraged to read these Terms carefully and fully understand them before signing up.',
+              'KWIK by AGMB is a digital platform for the KWIK Construction program. This program helps users gradually save for a 30% down payment over 18 months, instilling a strong savings culture and enabling them to meet Construction requirements to purchase verified properties.\n\nPlease note that the KWIK platform is not a regular savings or current account. It has specific terms and is for people on a mission to own a home. Applicants are encouraged to read these Terms carefully and fully understand them before signing up.',
               style: TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 20),
@@ -1934,7 +2065,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
             _buildSubBulletPoint(
                 'Are tracked separately from contractual savings.'),
             _buildSubBulletPoint(
-                'Enhance the user’s financial profile and improve their chances of mortgage approval.'),
+                'Enhance the user’s financial profile and improve their chances of Construction approval.'),
             const SizedBox(height: 20),
             const Text(
               '3.2 Monthly Deposits',
@@ -2167,7 +2298,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _buildBulletPoint(
-                'Use the platform to monitor your savings, build mortgage credibility, choose properties, and manage your mortgage application.'),
+                'Use the platform to monitor your savings, build Construction credibility, choose properties, and manage your Construction application.'),
             _buildBulletPoint(
                 'The platform will be updated regularly. Install updates to enjoy all features.'),
             _buildBulletPoint(

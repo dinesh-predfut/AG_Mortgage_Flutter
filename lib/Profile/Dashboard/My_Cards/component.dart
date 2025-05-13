@@ -170,7 +170,7 @@ CardController controller = CardController();
       create: (_) => CardController()..fetchCards(),
       child: Scaffold(
       appBar: AppBar(
-        title: const Text("My Cards"),
+          title:  Text("My Card",style: TextStyle(color: baseColor),),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -230,13 +230,13 @@ CardController controller = CardController();
                         final card = activeCards[index];
                         return GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CardPaymentPage(selectedID: card.id),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) =>
+                              //         CardPaymentPage(selectedID: card.id),
+                              //   ),
+                              // );
                             },
                             child: Container(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),

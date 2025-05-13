@@ -137,23 +137,23 @@ class _DocumentsPageState extends State<DocumentsPage> {
   void _onBackPressed(BuildContext context) {
     // Custom logic for back navigation
     if (Navigator.of(context).canPop()) {
-      print("its working");
-      Navigator.pushNamed(context, "/editProfile");
+      // print("its working");
+      Navigator.pop(context);
     } else {
       // Show exit confirmation dialog if needed
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Exit App"),
-          content: Text("Do you want to exit the app?"),
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         ),
@@ -182,63 +182,62 @@ class _DocumentsPageState extends State<DocumentsPage> {
             child: Column(
               children: [
                 // Fixed Percentage Circle
-              Obx(() => Padding(
-  padding: const EdgeInsets.all(16.0),
-  child: CircularPercentIndicator(
-    radius: 100.0,
-    animation: true,
-    lineWidth: 10.0,
-    percent: controller.finalData.isNotEmpty
-        ? controller.finalData.where((file) => file["status"] == true).length /
-            controller.finalData.length
-        : 0.0,
-    center: Text(
-      "${controller.finalData.where((file) => file["status"] == true).length}/${controller.finalData.length}",
-      style: const TextStyle(fontWeight: FontWeight.bold),
-    ),
-    progressColor: Colors.green,
-    backgroundColor: Colors.grey[300]!,
-    circularStrokeCap: CircularStrokeCap.round,
-  ),
-)),
+                Obx(() => Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: CircularPercentIndicator(
+                        radius: 100.0,
+                        animation: true,
+                        lineWidth: 10.0,
+                        percent: controller.finalData.isNotEmpty
+                            ? controller.finalData
+                                    .where((file) => file["status"] == false)
+                                    .length /
+                                controller.finalData.length
+                            : 0.0,
+                        center: Text(
+                          "${controller.finalData.where((file) => file["status"] == false).length}/${controller.finalData.length}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        progressColor: Colors.green,
+                        backgroundColor: Colors.grey[300]!,
+                        circularStrokeCap: CircularStrokeCap.round,
+                      ),
+                    )),
 
                 // Document Upload and View Sections
-               Obx(() =>  ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: controller.finalData.length,
-                        itemBuilder: (context, index) {
-                          final item = controller.finalData[index];
-                          final String documentType =
-                              item['documentName'] ?? '';
-                          final bool showUpload = item['status'];
-                          final matchedVerification =
-                              item['matchedVerification'];
-                          final String documentFile =
-                              matchedVerification != null
-                                  ? matchedVerification['documentFile'] ?? ''
-                                  : '';
-                          final int uploaddocumentFile =
-                              matchedVerification?['documentMasterId'] ?? 0;
+                Obx(() => ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: controller.finalData.length,
+                      itemBuilder: (context, index) {
+                        final item = controller.finalData[index];
+                        final String documentType = item['documentName'] ?? '';
+                        final bool showUpload = item['status'];
+                        final matchedVerification = item['matchedVerification'];
+                        final String documentFile = matchedVerification != null
+                            ? matchedVerification['documentFile'] ?? ''
+                            : '';
+                        final int uploaddocumentFile =
+                            matchedVerification?['documentMasterId'] ?? 0;
 
-                          print("showUpload111$documentFile");
-                          // For already uploaded file data
-                          final String? filePath =
-                              controller.uploadedFiles[documentType];
+                        print("showUpload111$item");
+                        // For already uploaded file data
+                        final String? filePath =
+                            controller.uploadedFiles[documentType];
 
-                          try {
-                            if (filePath != null) {
-                              Map<String, dynamic> fileData =
-                                  jsonDecode(filePath);
-                              controller.fileId = fileData['id'];
-                              controller.documentFileUrl =
-                                  fileData['documentName'];
-                            }
-                          } catch (e) {
-                            print("Error decoding file path JSON: $e");
+                        try {
+                          if (filePath != null) {
+                            Map<String, dynamic> fileData =
+                                jsonDecode(filePath);
+                            controller.fileId = fileData['id'];
+                            controller.documentFileUrl =
+                                fileData['documentName'];
                           }
+                        } catch (e) {
+                          print("Error decoding file path JSON: $e");
+                        }
 
-                          return Padding(
+                        return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: showUpload
                                 ? _buildUploadBox(
@@ -251,25 +250,27 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                       print(
                                           'Uploading for document: $documentType, documentMasterId: $uploaddocumentFile');
 
-                                      controller.pickAndUploadFile(
-                                        documentType,
-                                        matchedVerification, // use the already safely extracted int
-                                      );
+                                      controller.handleFileChange(
+                                          item['id'],
+                                          item['dueMonth'],
+                                          item['planType'],
+                                          item['dataNeeded'],
+                                          item['dataType'],
+                                          context);
 
                                       setState(() {
                                         controller.uploadedFiles[documentType] =
                                             path;
                                       });
                                     },
-                                  ):_buildDocumentViewSection(
+                                  )
+                                : _buildDocumentViewSection(
                                     documentType,
                                     documentFile,
                                     controller.documentFileUrl,
-                                  )
-                                
-                          );
-                        },
-               )),
+                                  ));
+                      },
+                    )),
               ],
             ),
           ),

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/Models.dart';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
+import 'package:ag_mortgage/Dashboard_Screen/Market_Place/Dashboard_Page/model.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgageHome.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/MortgagePage.dart';
 import 'package:ag_mortgage/Dashboard_Screen/Mortgage/models.dart';
@@ -24,18 +25,19 @@ class MortgagController extends ChangeNotifier {
   TextEditingController monthlyRepaymentController = TextEditingController();
   TextEditingController cityNameValue = TextEditingController();
   TextEditingController areaNameValue = TextEditingController();
+  TextEditingController apartmentName = TextEditingController();
   TextEditingController cvv = TextEditingController();
   Map<String, dynamic> data = {};
   List allApartments = [];
   List allCity = [];
   List allArea = [];
   List allMsetting = [];
-  DateTime selectedDay = DateTime.now();
-//  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+  DateTime? selectedDay;
+  // /  String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
   int? selectedApartmentType = 1;
   int? selectedCity;
   int? selectedArea;
-  double sliderValue = 10;
+  double sliderValue = 1;
   int? apartmentOrMarketplace;
   String cityName = "";
   String accountName = "Josh Doe";
@@ -47,6 +49,7 @@ class MortgagController extends ChangeNotifier {
     try {
       allArea = await fetchAreasByCity();
       allCity = await getALLCityApi();
+      List<Apartment> apartment = await fetchApartments();
 
       int? formDataArea = selectedArea;
       int? formDataCity = selectedCity;
@@ -55,6 +58,11 @@ class MortgagController extends ChangeNotifier {
       var defaultArea = allArea.firstWhere(
         (area) => area.id == formDataArea,
         orElse: () => SeletArea(id: -1, name: "Unknown Area"),
+      );
+      var matchCity = apartment.firstWhere(
+        (item) => item.id == selectedApartmentType,
+        orElse: () =>
+            Apartment(id: -1, apartmentType: "Unknown", description: ''),
       );
 
       var defaultCity = allCity.firstWhere(
@@ -70,10 +78,44 @@ class MortgagController extends ChangeNotifier {
       print("areaNameValue data: ${defaultArea.name}");
       areaNameValue.text = defaultArea.name;
       cityNameValue.text = defaultCity.name;
+      apartmentName.text = matchCity.apartmentType.toString();
+      print("apartmentName.text data: ${apartmentName.text}");
 
       // areaNameValue.text = defaultArea.name;
     } catch (error) {
       print("Error fetching data: $error");
+    }
+  }
+
+  Future<List<Apartment>> fetchApartments() async {
+    try {
+      var response = await http.get(
+        Uri.parse(Urls.fetchApartmentsApi),
+        headers: {
+          'Authorization': 'Bearer ${Params.userToken}',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        if (data.isEmpty) {
+          Fluttertoast.showToast(
+            msg: "No areas found for the selected city",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey,
+            textColor: const Color.fromARGB(255, 56, 55, 55),
+            fontSize: 16.0,
+          );
+        }
+        print("datass1${data}");
+        return data.map((json) => Apartment.fromJson(json)).toList();
+      } else {
+        throw Exception("Failed to fetch areas");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
     }
   }
 
@@ -135,7 +177,7 @@ class MortgagController extends ChangeNotifier {
   }
 
   Future<void> addMortgageForm(BuildContext context) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay!);
 
     try {
       print('addMortgageForm Preparing API request...');
@@ -178,13 +220,7 @@ class MortgagController extends ChangeNotifier {
       if (decodedResponse.statusCode == 200) {
         clearFields();
         final result = jsonDecode(decodedResponse.body);
-        Fluttertoast.showToast(
-          msg: "Mortgage Created Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Color.fromARGB(255, 15, 15, 15),
-        );
+
         print('API Success Response: $result');
 
         // Navigate to MortgagePage
@@ -200,7 +236,7 @@ class MortgagController extends ChangeNotifier {
   }
 
   Future<void> bankTransfer(BuildContext context) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay!);
 
     try {
       print('addMortgageForm Preparing API request...');
@@ -232,8 +268,8 @@ class MortgagController extends ChangeNotifier {
 
       if (decodedResponse.statusCode == 200) {
         final result = jsonDecode(decodedResponse.body);
-         // ignore: use_build_context_synchronously
-         Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const MortgagePageHome(
@@ -249,7 +285,7 @@ class MortgagController extends ChangeNotifier {
         );
         print('API Success Response: $result');
         // ignore: use_build_context_synchronously
-       
+
         // Navigate to MortgagePage
         // ignore: use_build_context_synchronously
       } else {
@@ -335,27 +371,27 @@ class MortgagController extends ChangeNotifier {
     print('Updated City Name: $cityName');
   }
 
-String formatCurrency(dynamic value) {
-  try {
-    if (value == null || value.toString().isEmpty) return "";
-    double numericValue;
+  String formatCurrency(dynamic value) {
+    try {
+      if (value == null || value.toString().isEmpty) return "";
+      double numericValue;
 
-    if (value is String) {
-      value = value.replaceAll(',', ''); // Remove commas from string
-      numericValue = double.tryParse(value) ?? 0.0; // Convert to double
-    } else if (value is num) {
-      numericValue = value.toDouble();
-    } else {
+      if (value is String) {
+        value = value.replaceAll(',', ''); // Remove commas from string
+        numericValue = double.tryParse(value) ?? 0.0; // Convert to double
+      } else if (value is num) {
+        numericValue = value.toDouble();
+      } else {
+        return "";
+      }
+
+      final formatter = NumberFormat("#,##0.##", "en_US");
+      return formatter.format(numericValue);
+    } catch (error) {
+      print("Error formatting currency: $error");
       return "";
     }
-
-    final formatter = NumberFormat("#,##0.##", "en_US");
-    return formatter.format(numericValue); 
-  } catch (error) {
-    print("Error formatting currency: $error");
-    return "";
   }
-}
 
   Future<void> findAndSetArea() async {
     List<SeletArea> allArea = await fetchAreasByCity();
@@ -393,6 +429,6 @@ String formatCurrency(dynamic value) {
 
   String formatProfileDateName(String profileDate) {
     DateTime dateTime = DateTime.parse(profileDate);
-    return DateFormat('MMM dd').format(dateTime).toUpperCase();
+    return DateFormat('MMMM y').format(dateTime).toUpperCase();
   }
 }

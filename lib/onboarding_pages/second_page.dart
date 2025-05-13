@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/image.dart'; // Import Images class.
 import 'package:ag_mortgage/onboarding_pages/termsandcondition.dart';
 
-
-
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
 
@@ -19,15 +17,15 @@ class _LandingScreenState extends State<LandingScreen> {
 
   final List<Widget> _pages = [
     const OnboardingPage(
-      title: "Mortgages",
+      title: "Mortgage",
       description:
-          "Make your consistent saving habits a part of your collateral! Save consistently over 18 months and build your own payment to qualify for an instant mortgage. Start your homeownership journey today!",
+          "Make your consistent saving habits a part of your collateral! Save consistently over 18 months and build your down payment to qualify for an instant mortgage. Start your homeownership journey today!",
       imagePath: Images.keyIcon,
     ),
     const OnboardingPage(
       title: "Rent to Own",
       description:
-          "With a minimum of 40% down payment in an interest-bearing account, move into your dream property within 30 days and convert to a mortgage in 12 months. T&Cs apply.",
+          "With a minimum of 40% down payment in an interest bearing account, move into your dream property within 30 days and convert to a mortgage in 12 months. T&Cs apply.",
       imagePath: Images.rendtoHome,
     ),
     const OnboardingPage(
@@ -39,7 +37,7 @@ class _LandingScreenState extends State<LandingScreen> {
     const OnboardingPage(
       title: "Investment",
       description:
-          "Invest in high-growth real estate opportunities starting from just ₦500,000. Build your wealth with secure, property-backed returns. T&Cs apply.",
+          "Invest in high growth real estate opportunities starting from just N500,000. Build your wealth with secure, property-backed returns. T&Cs apply.",
       imagePath: Images.investment,
     ),
   ];
@@ -51,10 +49,8 @@ class _LandingScreenState extends State<LandingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const RegisterScreen())
-      ); 
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const LunchTermsAndConditionsDialog()));
     }
   }
 
@@ -82,29 +78,32 @@ class _LandingScreenState extends State<LandingScreen> {
                 OutlinedButton(
                   onPressed: () {
                     _pageController.jumpToPage(_pages.length - 1);
+                    if (_currentPage == _pages.length - 1) {
+                      Navigator.pushNamed(context, "/login");
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterScreen()));
+                    }
                   },
                   style: OutlinedButton.styleFrom(
-                    side:  BorderSide(width: 1.0, color: baseColor),
+                    side: BorderSide(width: 1.0, color: baseColor),
                   ),
-                  child:  Text(
-                    "Skip",
+                  child: Text(
+                    _currentPage == _pages.length - 1 ? "Login" : "Skip",
                     style: TextStyle(color: baseColor),
                   ),
                 ),
                 ElevatedButton(
-                
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
-                  
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
-                      
-                      
                     ),
                     minimumSize: const Size(200, 50),
                   ),
-                  
                   child: Text(
                     _currentPage == _pages.length - 1 ? "Get Started" : "Next",
                     style: const TextStyle(color: Colors.white),
@@ -142,7 +141,7 @@ class OnboardingPage extends StatelessWidget {
           const SizedBox(height: 30),
           Text(
             title,
-            style:  TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: baseColor,

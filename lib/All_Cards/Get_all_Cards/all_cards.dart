@@ -50,7 +50,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
       create: (_) => CardController()..fetchCards(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("My Cards"),
+          title:  Text("My Card",style: TextStyle(color: baseColor),),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),

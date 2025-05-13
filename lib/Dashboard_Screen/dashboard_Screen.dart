@@ -30,6 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
+  var lastName="";
   var profileImage = "";
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
         setState(() {
           profileName = data['firstName'];
+          lastName = data['lastName'];
           profileImage = data['profileImage'];
         });
 
@@ -96,7 +98,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    'Hello, ${controller.profileName} 👋',
+                    'Hello, ${controller.profileName} ${controller.lastName} 👋',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -112,7 +114,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: ListView(
                   children: [
                     MenuButton(
-                      title: 'Mortgage',
+                      title: ' KWIK Mortgage',
                       icon: Image.asset(
                         Images.keyIcon,
                         width: 24,
@@ -140,7 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 16),
                     MenuButton(
-                      title: 'Rent to Own',
+                      title: 'KWIK Rent-to-Own',
                       icon: Image.asset(
                         Images.rendtoHome,
                         width: 24,
@@ -168,7 +170,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 16),
                     MenuButton(
-                        title: 'Construction Finance',
+                        title: 'KWIK Complete My Home',
                         icon: Image.asset(
                           Images.constraction,
                           width: 24,
@@ -194,7 +196,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         }),
                     const SizedBox(height: 16),
                     MenuButton(
-                      title: 'Investment',
+                      title: 'KWIK Real Estate Investment',
                       icon: Image.asset(
                         Images.investment,
                         width: 24,

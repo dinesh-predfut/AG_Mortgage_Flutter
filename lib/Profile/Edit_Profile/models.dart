@@ -169,3 +169,25 @@ class NextOfKinDetailsModel {
     );
   }
 }
+class Apartment {
+  int? id;
+  String? apartmentType;
+  String? description;
+
+  Apartment({this.id, this.apartmentType, this.description});
+
+  Apartment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    apartmentType = json['apartmentType'];
+    description = json['description'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['apartmentType'] = apartmentType;
+    data['description'] = description;
+    return data;
+  }
+}
+

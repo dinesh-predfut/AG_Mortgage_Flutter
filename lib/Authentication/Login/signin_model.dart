@@ -6,7 +6,7 @@ class SignInModel {
   String? refreshToken;
   String? refreshTokenExpiry;
   List<String>? roles;
-
+  
   SignInModel(
       {this.token,
       this.type,

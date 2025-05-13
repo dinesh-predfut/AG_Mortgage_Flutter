@@ -108,7 +108,10 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
+                        
                         children: [
+                        
+// if(widget.plans == "Rent-to-Own")
                           Container(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,7 +144,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                       ),
                                     ),
                                     Text(
-                                      "NGN 38,700,000",
+                                      "NGN 13164",
                                       textAlign: TextAlign.end,
                                       style: TextStyle(
                                           color: Colors.green,
@@ -196,6 +199,31 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                                         fontSize: 14, color: Colors.white),
                                   ),
                                 ),
+                                 if (widget.plans == "Rent-to-Own")
+                                ElevatedButton(
+                                  onPressed: () => {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Get_All_Cards(),
+                                      ),
+                                    ),
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: baseColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: const EdgeInsets.only(
+                                        left: 15, right: 15, top: 5, bottom: 5),
+                                  ),
+                                  child: const Text(
+                                    "Pay Rent",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ),
                             ],
                           ),
                         ],
@@ -215,7 +243,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
 
                   // Parse and format the date
                   DateTime transactionDate =
-                      DateTime.parse(transaction["date"]);
+                      DateTime.parse(transaction["transactionDate"]);
                   String formattedDate =
                       DateFormat('dd-MM-yyyy').format(transactionDate);
 
@@ -227,7 +255,7 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                   // Show date only if it's the first occurrence of that date
                   bool showDateHeader = index == 0 ||
                       DateFormat('dd-MM-yyyy').format(DateTime.parse(
-                              Controllers.transactions[index - 1]["date"])) !=
+                              Controllers.transactions[index - 1]["transactionDate"])) !=
                           formattedDate;
 
                   return Column(
@@ -262,7 +290,11 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                             ),
                           ),
                           title: Text(
-                            "NGN ${transaction["typeOfTransaction"].toString()}",
+                            "NGN ${transaction["transactionAmount"].toString()}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            transaction["transactionType"]=="DR" ?"Into${ transaction["narration"]}":"From ${ transaction["narration"]}",
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           trailing: Column(
@@ -274,8 +306,8 @@ class _StatementOfAccountState extends State<StatementOfAccount> {
                               // ),
                               const SizedBox(height: 4),
                               Text(
-                                DateFormat('hh:mm a')
-                                    .format(transactionDate), // Show time only
+                               // Show time only
+                               transaction["transactionType"]=="DR" ? "Withdraw":"Deposit",
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey),
                               ),
