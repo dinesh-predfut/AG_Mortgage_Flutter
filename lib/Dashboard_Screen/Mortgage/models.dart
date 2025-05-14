@@ -46,3 +46,40 @@ class PostsModel {
       return data;
     }
   }
+  class LoanModel {
+  final int id;
+  final String typeName;
+  final int profilingPeriod;
+  final int minPaymentPeriod;
+  final int maxPaymentPeriod;
+  final String constructionType;
+  final String constructionLocation;
+  final double depositInterest;
+  final double mortgageInterest;
+
+  LoanModel({
+    required this.id,
+    required this.typeName,
+    required this.profilingPeriod,
+    required this.minPaymentPeriod,
+    required this.maxPaymentPeriod,
+    required this.constructionType,
+    required this.constructionLocation,
+    required this.depositInterest,
+    required this.mortgageInterest,
+  });
+
+  factory LoanModel.fromJson(Map<String, dynamic> json) {
+    return LoanModel(
+      id: json['id'] ?? 0, // Ensure ID is never null
+      typeName: json['typeName'] ?? "Unknown Loan",
+      profilingPeriod: json['profilingPeriod'] ?? 0,
+      minPaymentPeriod: json['minPaymentPeriod'] ?? 0,
+      maxPaymentPeriod: json['maxPaymentPeriod'] ?? 0,
+      constructionType: json['constructionType'] ?? "Unknown Type",
+      constructionLocation: json['constructionLocation'] ?? "Unknown Location",
+      depositInterest: (json['depositInterest'] ?? 0.0).toDouble(),
+      mortgageInterest: (json['mortgageInterest'] ?? 0.0).toDouble(),
+    );
+  }
+}

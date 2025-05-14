@@ -87,6 +87,7 @@ class MortgagController extends ChangeNotifier {
     }
   }
 
+
   Future<List<Apartment>> fetchApartments() async {
     try {
       var response = await http.get(
