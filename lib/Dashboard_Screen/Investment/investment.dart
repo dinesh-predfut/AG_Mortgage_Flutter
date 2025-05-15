@@ -40,7 +40,7 @@ class __InvestmenStateState extends State<Investment> {
     const ADD_CardDetailsPage(),
     const CardPaymentPage(),
     const Success(),
-    const CalendarPage(),
+    // const CalendarPage(),
     const TermSheetPage(),
     const BankTransferPage()
   ];
@@ -98,14 +98,17 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
             children: [
               const Center(
                 child: Text(
-                  'Let us know your preference',
+                  'Begin to earn big in real estate investment',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
               const SizedBox(height: 10),
               const Text('Amount (<NGN 500,000)'),
               TextFormField(
-                controller: controller.amount,
+                controller: controller.amount
+                  ..text = controller.amount.text.isEmpty
+                      ? '0'
+                      : controller.amount.text,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -162,6 +165,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                     }).toList(),
                     onChanged: (value) {
                       if (value != null) {
+                        controller.calculateYield();
                         controller.selectedLoan.value = value;
                         controller.interestRate.value = TextEditingValue(
                             text: value.interestRate.toString());
@@ -188,6 +192,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
+                  suffixText: 'year',
                 ),
               ),
               const Text('Start Date'),
@@ -256,32 +261,32 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                     );
 
                     if (pickedDate != null) {
-                      setState(() {
+                     
                         controller.selectedStartDateMaturityDate.value =
                             pickedDate;
-                      });
+                      
                     }
                   },
                 ),
                 const SizedBox(height: 10),
-                const Text('yieldValue'),
+                const Text('yield'),
                 TextFormField(
                   controller: controller.yieldValue,
                   readOnly: true,
                   keyboardType: TextInputType.number,
-                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(
-                        right: 8), // Adds spacing between NGN and input
-                    child: Text(
-                      'NGN',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(
+                          right: 8), // Adds spacing between NGN and input
+                      child: Text(
+                        'NGN',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                ),
                 ),
               ],
               // Add other form fields here
@@ -290,14 +295,15 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      controller.addInvestment(context);
-                      Navigator.pushReplacementNamed(context, '/investment/card');
+                     
+                      Navigator.pushReplacementNamed(
+                          context, '/investment/card');
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: baseColor,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 20),
+                        vertical: 16, horizontal: 120),
                   ),
                   child: const Text(
                     'Proceed',
@@ -681,11 +687,13 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   );
                 } else if (selectedPaymentMethod == "Card") {
                   // Navigate to a page for Card payment
-                  Navigator.pushReplacementNamed(context, '/investment/cardPayment');
+                  Navigator.pushReplacementNamed(
+                      context, '/investment/cardPayment');
                 } else {
                   // Default case: navigate to MortgagePageHome with startIndex as 3 (fallback case)
-                 
-                  Navigator.pushReplacementNamed(context, '/investment/bankPayment');
+
+                  Navigator.pushReplacementNamed(
+                      context, '/investment/bankPayment');
                 }
               },
               //

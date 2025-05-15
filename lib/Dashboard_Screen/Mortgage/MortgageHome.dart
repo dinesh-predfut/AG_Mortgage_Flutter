@@ -522,9 +522,9 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                               calculateEMI();
                             },
                             validator: (value) {
-                              if (value == null ||
-                                  value.trim().isEmpty ||
-                                  value.trim() == '0') {
+                                if (value == null ||
+                                    value.trim().isEmpty ||
+                                    value.trim() == '0') {
                                 return 'Please enter the estimated property value';
                               }
                               return null;

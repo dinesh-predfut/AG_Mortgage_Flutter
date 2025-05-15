@@ -49,8 +49,21 @@ class _Investment_FormsState extends State<Investment_Forms> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Investment Certificate")),
+        appBar: AppBar(
+          title: Text(
+            "Investment Certificate",
+            style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+        ),
         body: Column(children: [
+          const Center(
+            child: Text(
+              'Est pellentesque fermentum cursus curabitur pharetra, vene',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ),
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : (investmentData == null || investmentData!.isEmpty)
@@ -130,12 +143,15 @@ class InvestmentCard extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              buildRow("Amount", "NGN ${formattedEMI(investment.amountInvested) }"),
+              buildRow(
+                  "Amount", "NGN ${formattedEMI(investment.amountInvested)}"),
               buildRow("Duration", '${investment.duration} Years'),
               buildRow("Start Date", formatDateString(investment.startDate)),
               buildRow("Interest", "${investment.interestPercentage}%"),
-              buildRow("Maturity Date", formatDateString(investment.maturityDate)),
-              buildRow("Maturity Amount", "NGN ${formattedEMI(investment.maturityAmount)}"),
+              buildRow(
+                  "Maturity Date", formatDateString(investment.maturityDate)),
+              buildRow("Maturity Amount",
+                  "NGN ${formattedEMI(investment.maturityAmount)}"),
               buildRow("Status", investment.status),
             ],
           ),

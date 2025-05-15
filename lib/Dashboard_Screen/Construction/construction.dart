@@ -434,7 +434,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Center(
                 child: Text(
-                  'Let us know your preference',
+                  'Let us know about your Housing Project',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
@@ -461,7 +461,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                           ),
                         ),
                         isExpanded: true,
-                        hint: const Text("Select a City"),
+                        hint: const Text("Select  City"),
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: cityData.isNotEmpty
                             ? cityData.map((item) {
@@ -484,7 +484,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Please select a city';
+                            return 'Please select  city';
                           }
                           return null;
                         },
@@ -512,7 +512,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                           ),
                         ),
                         isExpanded: true,
-                        hint: const Text("Select a Area"),
+                        hint: const Text("Select  Area"),
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: areaData.map((item) {
                           return DropdownMenuItem<int>(
@@ -529,7 +529,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                           }
                         },
                         validator: (value) =>
-                            value == null ? 'Please select an area' : null,
+                            value == null ? 'Please Select area' : null,
                       );
                     },
                   ),
@@ -609,7 +609,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         ),
                         isExpanded: true,
                         hint: const Text(
-                            "Select a Plan"), // Display hint when no value is selected
+                            "Select  Plan"), // Display hint when no value is selected
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: loanData.map((LoanModel loan) {
                           return DropdownMenuItem<LoanModel>(
@@ -626,7 +626,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Please select a Construction ';
+                            return 'Please Select  Construction ';
                           }
                           return null;
                         },
@@ -672,7 +672,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                   //       },
                   //       validator: (value) {
                   //         if (value == null) {
-                  //           return 'Please select a screening period';
+                  //           return 'Please Select  screening period';
                   //         }
                   //         return null;
                   //       },
@@ -690,7 +690,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                             50), // Rounded-full equivalent
                       ),
                     ),
-                    hint: const Text("Select a Stage"),
+                    hint: const Text("Select  Stage"),
                     isExpanded: true,
                     items: const [
                       DropdownMenuItem<int>(
@@ -722,7 +722,7 @@ class _ConstuctionFormPageState extends State<ConstuctionFormPage> {
                       }
                     },
                     validator: (value) =>
-                        value == null ? "Please select a stage" : null,
+                        value == null ? "Please Select  stage" : null,
                   ),
 
                   const SizedBox(height: 10),
@@ -1068,7 +1068,7 @@ class _Construction_CalendarPageState extends State<Construction_CalendarPage> {
                       onPressed: () {
                         if (controller.selectedDay == null) {
                           Fluttertoast.showToast(
-                            msg: "Please select a repayment date",
+                            msg: "Please Select repayment date",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             backgroundColor: Colors.red,
@@ -1672,182 +1672,189 @@ class _ConstructionFinancePageState extends State<ConstructionFinancePage> {
     controller.voluntaryAmount.text = '0'; // Set default value on page load
   }
 
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Construction Finance',
-          style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+        appBar: AppBar(
+          title: Text(
+            'Construction Finance',
+            style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, "/construction");
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "Let's know about your housing project",
-                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
-                )),
-            const SizedBox(height: 20.0),
-            _buildSwitchTile(
-                'Have you started Construction?', controller.hasRegisteredDeed,
-                (value) {
-              setState(() {
-                controller.hasRegisteredDeed = value;
-              });
-            }),
-            _buildSwitchTile('Do you have title deed on the plot?',
-                controller.hasLandTitleCertificate, (value) {
-              setState(() {
-                controller.hasLandTitleCertificate = value;
-              });
-            }),
-            _buildSwitchTile(
-                'Do you have current valuation report of the asset?',
-                controller.hasValuationReport, (value) {
-              setState(() {
-                controller.hasValuationReport = value;
-              });
-            }),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: controller.voluntaryAmount,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Let's know about your housing project",
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.w400),
+                    )),
+                const SizedBox(height: 20.0),
+                _buildSwitchTile('Have you started Construction?',
+                    controller.hasRegisteredDeed, (value) {
+                  setState(() {
+                    controller.hasRegisteredDeed = value;
+                  });
+                }),
+                _buildSwitchTile('Do you have title deed on the plot?',
+                    controller.hasLandTitleCertificate, (value) {
+                  setState(() {
+                    controller.hasLandTitleCertificate = value;
+                  });
+                }),
+                _buildSwitchTile(
+                    'Do you have current valuation report of the asset?',
+                    controller.hasValuationReport, (value) {
+                  setState(() {
+                    controller.hasValuationReport = value;
+                  });
+                }),
+                const SizedBox(height: 16.0),
+                const Text('Valuation Amount'),
+                TextFormField(
+                  controller: controller.voluntaryAmount,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(
+                          right: 8), // Adds spacing between NGN and input
+                      child: Text(
+                        'NGN',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      final newText = newValue.text.replaceAll(
+                          RegExp(r'\D'), ''); // Remove non-digit characters
+                      final formattedText = controller
+                          .formatNumber(newText.isEmpty ? '0' : newText);
+                      return newValue.copyWith(text: formattedText);
+                    }),
+                  ],
+                  validator: (value) {
+                    if (value == null ||
+                        value.trim().isEmpty ||
+                        value.trim() == '0') {
+                      return 'Please enter a valuation amount';
+                    }
+                    final int enteredAmount =
+                        int.tryParse(value.replaceAll(',', '')) ?? 0;
+                    final int estimatedAmount =
+                        controller.estimatedAmount as int;
+
+                    if (enteredAmount < estimatedAmount) {
+                      return 'Valuation amount must be greater than or equal to estimated completion amount.';
+                    }
+                    return null; // No error message when valid
+                  },
+                  onChanged: (value) {
+                    // Set default value to '0' if empty
+                    if (value.isEmpty) {
+                      controller.voluntaryAmount.text = '0';
+                      controller.voluntaryAmount.selection =
+                          TextSelection.fromPosition(
+                        TextPosition(
+                            offset: controller.voluntaryAmount.text.length),
+                      );
+                    }
+
+                    // Hide validation message dynamically
+                    controller.formKey.currentState?.validate();
+                  },
                 ),
-                prefix: const Padding(
-                  padding: EdgeInsets.only(
-                      right: 8), // Adds spacing between NGN and input
-                  child: Text(
-                    'NGN',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                _buildSwitchTile(
+                    'Do you have approved architectural & structural drawing?',
+                    controller.hasArchitecturalDrawing, (value) {
+                  setState(() {
+                    controller.hasArchitecturalDrawing = value;
+                  });
+                }),
+                _buildSwitchTile(
+                    'Do you have approved electrical and mechanical drawing?',
+                    controller.hasElectricalAndMechanicalDrawings, (value) {
+                  setState(() {
+                    controller.hasElectricalAndMechanicalDrawings = value;
+                  });
+                }),
+                _buildSwitchTile(
+                    'Do you have current bill of Qualities and material by certified quantity surveyor?',
+                    controller.hasBillOfQuantities, (value) {
+                  setState(() {
+                    controller.hasBillOfQuantities = value;
+                  });
+                }),
+                const SizedBox(height: 20.0),
+                const Text(
+                  'Details of Project Professionals',
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16.0),
+                _buildProfessionalDetails('Architect', controller.architechName,
+                    controller.architechNumner),
+                engineer('Engineer', controller.engineerName,
+                    controller.engineerNumner),
+                quantity('Quantity Surveyor', controller.surveyorName,
+                    controller.surveyorNumner),
+                const SizedBox(height: 16.0),
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 214, 160, 32),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: const Text(
+                    'Note: No worries if you don’t have the required documents. AG Mortgage can help you obtain them as we move forward.',
+                    style: TextStyle(fontSize: 14.0, color: Colors.white),
                   ),
                 ),
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                TextInputFormatter.withFunction((oldValue, newValue) {
-                  final newText = newValue.text.replaceAll(
-                      RegExp(r'\D'), ''); // Remove non-digit characters
-                  final formattedText =
-                      controller.formatNumber(newText.isEmpty ? '0' : newText);
-                  return newValue.copyWith(text: formattedText);
-                }),
-              ],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a valuation amount';
-                }
-                final int enteredAmount =
-                    int.tryParse(value.replaceAll(',', '')) ?? 0;
-                final int estimatedAmount = controller.estimatedAmount as int;
-
-                if (enteredAmount < estimatedAmount) {
-                  return 'Valuation amount must be greater than or equal to estimated completion amount.';
-                }
-                return null; // No error message when valid
-              },
-              onChanged: (value) {
-                // Set default value to '0' if empty
-                if (value.isEmpty) {
-                  controller.voluntaryAmount.text = '0';
-                  controller.voluntaryAmount.selection =
-                      TextSelection.fromPosition(
-                    TextPosition(
-                        offset: controller.voluntaryAmount.text.length),
-                  );
-                }
-
-                // Hide validation message dynamically
-                controller.formKey.currentState?.validate();
-              },
-            ),
-            _buildSwitchTile(
-                'Do you have approved architectural & structural drawing?',
-                controller.hasArchitecturalDrawing, (value) {
-              setState(() {
-                controller.hasArchitecturalDrawing = value;
-              });
-            }),
-            _buildSwitchTile(
-                'Do you have approved electrical and mechanical drawing?',
-                controller.hasElectricalAndMechanicalDrawings, (value) {
-              setState(() {
-                controller.hasElectricalAndMechanicalDrawings = value;
-              });
-            }),
-            _buildSwitchTile(
-                'Do you have current bill of quantities and material by certified quantity surveyor?',
-                controller.hasBillOfQuantities, (value) {
-              setState(() {
-                controller.hasBillOfQuantities = value;
-              });
-            }),
-            const SizedBox(height: 20.0),
-            const Text(
-              'Details of Project Professionals',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16.0),
-            _buildProfessionalDetails('Architect', controller.architechName,
-                controller.architechNumner),
-            engineer(
-                'Engineer', controller.engineerName, controller.engineerNumner),
-            quantity('Quantity Surveyor', controller.surveyorName,
-                controller.surveyorNumner),
-            const SizedBox(height: 16.0),
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 214, 160, 32),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: const Text(
-                'Note: No worries if you don’t have the required documents. AG Mortgage can help you obtain them as we move forward.',
-                style: TextStyle(fontSize: 14.0, color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ConstructionPage(
-                          startIndex: 3), // Start with MortgagePage
+                const SizedBox(height: 20.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ConstructionPage(
+                                startIndex: 3), // Start with MortgagePage
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        backgroundColor: baseColor),
+                    child: const Text(
+                      'Proceed to Open Account',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w600),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    backgroundColor: baseColor),
-                child: const Text(
-                  'Proceed to Open Account',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
@@ -1967,15 +1974,6 @@ class TermsAndConditionsDialog extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Text(
-                'Terms And Conditions',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
             const Text(
               'Effective Date: January 2025',

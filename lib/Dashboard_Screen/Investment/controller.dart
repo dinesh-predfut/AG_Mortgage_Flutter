@@ -23,12 +23,12 @@ class InvestmentController extends ChangeNotifier {
 
   String? _selectedApartmentType;
   var selectedStartDate = DateTime.now().obs;
-  var selectedStartDateMaturityDate = DateTime.now().obs;
+    var selectedStartDateMaturityDate = DateTime.now().obs;
 
   var selectedLoan = Rxn<LoanTypeInvestment>();
 
   String formattedEMI(double amount) {
-    // Format the number with international commas (thousands separators)
+    // Format the number with international commas (thousan ds separators)
     final numberFormatter = NumberFormat(
         '#,###.##', 'en_US'); // en_US for international comma formatting
     return numberFormatter.format(amount);
