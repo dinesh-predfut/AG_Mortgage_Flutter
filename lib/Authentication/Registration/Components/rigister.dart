@@ -20,6 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   ProfileController signupController = Get.find<ProfileController>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -37,6 +38,8 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
+            child: Form(
+      key: _formKey,
       child: Stack(
         children: [
           // Background image
@@ -82,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   ),
                   const SizedBox(height: 30),
                   // Phone Number Field
-                  TextField(
+                  TextFormField(
                     controller: signupController.firstNameController,
                     decoration: InputDecoration(
                       labelText: "First Name",
@@ -91,10 +94,17 @@ class _RegisterScreenState extends State<RegisterScreen>
                         borderSide: BorderSide(color: baseColor),
                       ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your first name';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
-                  // Phone Number Field
-                  TextField(
+
+                  // Last Name Field
+                  TextFormField(
                     controller: signupController.lasttNameController,
                     decoration: InputDecoration(
                       labelText: "Last Name",
@@ -103,6 +113,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                         borderSide: BorderSide(color: baseColor),
                       ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your last name';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
 
@@ -127,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   //         .completeNumber); // Prints full number with country code
                   //   },
                   // ),
-                    IntlPhoneField(
+                  IntlPhoneField(
                     controller: signupController.registerPhoneNumber,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
@@ -138,24 +154,31 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       counterText: "",
                     ),
-                    initialCountryCode: 'NG', 
+                    initialCountryCode: 'NG',
                     disableLengthCheck: true,
                     onChanged: (phone) {
                       signupController.countryCodeController.text =
                           phone.countryCode;
-            
                     },
                     onCountryChanged: (country) {
                       signupController.countryCodeController.text =
                           "+${country.dialCode}";
-                    
+                    },
+                    validator: (phone) {
+                      if (phone == null || phone.number.trim().isEmpty) {
+                        return 'Please enter a valid phone number';
+                      }
+                      if (phone.number.length < 10) {
+                        return 'Phone number length should more the 10';
+                      }
+                      return null;
                     },
                   ),
 
                   const SizedBox(height: 20),
 
                   // Phone Number Field
-                  TextField(
+                  TextFormField(
                     controller: signupController.emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
@@ -165,6 +188,23 @@ class _RegisterScreenState extends State<RegisterScreen>
                         borderSide: BorderSide(color: baseColor),
                       ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your email';
+                      }
+
+                      // Simple email pattern check
+                      bool isValidEmail =
+                          RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+                                  r"[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value.trim());
+
+                      if (!isValidEmail) {
+                        return 'Enter a valid email address';
+                      }
+
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
                   // Promo Code Field
@@ -182,7 +222,14 @@ class _RegisterScreenState extends State<RegisterScreen>
                   // Register Button
                   ElevatedButton(
                     onPressed: () {
-                      signupController.nextFuncation(context);
+                      if (_formKey.currentState!.validate()) {
+                        // Valid input → Proceed with login
+
+                        signupController.nextFuncation(context);
+                      } else {
+                        // Invalid input → Errors will show
+                        print("Phone is invalid");
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: baseColor,
@@ -229,6 +276,6 @@ class _RegisterScreenState extends State<RegisterScreen>
           ),
         ],
       ),
-    ));
+    )));
   }
 }

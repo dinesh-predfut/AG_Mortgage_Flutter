@@ -69,6 +69,16 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
   final controller = Get.put(InvestmentController());
   final _formKey = GlobalKey<FormState>();
   // ignore: non_constant_identifier_names
+  @override
+  void initState() {
+    super.initState();
+    String startDate = DateFormat('yyyy-MM-dd').format(
+        controller.selectedStartDateMaturityDate.value ?? DateTime(1900));
+
+    String maturityDate = DateFormat('yyyy-MM-dd').format(
+        controller.selectedStartDateMaturityDate.value ?? DateTime(1900));
+        controller.selectedStartDate.value =null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +146,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               ),
               const SizedBox(height: 10),
               const Text('Type of Investment'),
-              FutureBuilder<List<LoanTypeInvestment>>(
+          FutureBuilder<List<LoanTypeInvestment>>(
                 future: controller.getScreeningPeriodsApi(),
                 builder: (context, snapshot) {
                   List<LoanTypeInvestment> loanData = snapshot.data ?? [];
@@ -166,6 +176,8 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                     onChanged: (value) {
                       if (value != null) {
                         controller.calculateYield();
+                        controller.changeStartDate(
+                            controller.selectedStartDate.value);
                         controller.selectedLoan.value = value;
                         controller.interestRate.value = TextEditingValue(
                             text: value.interestRate.toString());
@@ -196,33 +208,32 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 ),
               ),
               const Text('Start Date'),
-              TextFormField(
-                controller: TextEditingController(
-                  text: DateFormat('dd-MM-yyyy')
-                      .format(controller.selectedStartDate.value),
-                ), // Display selected date
-                readOnly: true, // Prevent manual text editing
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(Icons.calendar_today), // Calendar icon
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: controller.selectedStartDate.value,
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-
-                  if (pickedDate != null) {
-                    setState(() {
-                      controller.selectedStartDate.value = pickedDate;
-                    });
-                  }
-                },
-              ),
+              Obx(() => TextFormField(
+                    controller: TextEditingController(
+                      text: controller.selectedStartDate.value != null
+                          ? DateFormat('dd-MM-yyyy')
+                              .format(controller.selectedStartDate.value!)
+                          : '',
+                    ),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      suffixIcon: const Icon(Icons.calendar_today),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: controller.selectedStartDate.value,
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null) {
+                        controller.changeStartDate(pickedDate);
+                      }
+                    },
+                  )),
 
               const SizedBox(height: 10),
               if (controller.selectedStartDate != null) ...[
@@ -238,36 +249,36 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text('Maturity Date'),
-                TextFormField(
-                  controller: TextEditingController(
-                    text: DateFormat('dd-MM-yyyy')
-                        .format(controller.selectedStartDateMaturityDate.value),
-                  ), // Display selected date
-                  readOnly: true, // Prevent manual text editing
-                  decoration: InputDecoration(
-                    suffixIcon:
-                        const Icon(Icons.calendar_today), // Calendar icon
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate:
-                          controller.selectedStartDateMaturityDate.value,
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    );
+                Obx(() => TextFormField(
+                      controller: TextEditingController(
+  text: controller.selectedStartDateMaturityDate.value != null
+      ? DateFormat('dd-MM-yyyy').format(controller.selectedStartDateMaturityDate.value!)
+      : '',
+),
+//  selected date
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        suffixIcon:
+                            const Icon(Icons.calendar_today), // Calendar icon
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate:
+                              controller.selectedStartDateMaturityDate.value,
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
 
-                    if (pickedDate != null) {
-                     
-                        controller.selectedStartDateMaturityDate.value =
-                            pickedDate;
-                      
-                    }
-                  },
-                ),
+                        if (pickedDate != null) {
+                          controller.selectedStartDateMaturityDate.value =
+                              pickedDate;
+                        }
+                      },
+                    )),
                 const SizedBox(height: 10),
                 const Text('yield'),
                 TextFormField(
@@ -280,7 +291,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                     ),
                     prefix: const Padding(
                       padding: EdgeInsets.only(
-                          right: 8), // Adds spacing between NGN and input
+                          right: 8), 
                       child: Text(
                         'NGN',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -295,7 +306,6 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                     
                       Navigator.pushReplacementNamed(
                           context, '/investment/card');
                     }

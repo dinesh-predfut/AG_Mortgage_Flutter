@@ -44,16 +44,16 @@ class _DashboardPageSState extends State<DashboardPageS> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Exit App"),
-          content: Text("Do you want to exit the app?"),
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         ),
@@ -84,14 +84,26 @@ class _DashboardPageSState extends State<DashboardPageS> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage: controller.profileImageUrl != null
-                                ? NetworkImage(controller
-                                    .profileImageUrl!) // Use the URL from the response
-                                : const AssetImage('')
-                                    as ImageProvider, // Default image if no URL
-                          ),
+                          Obx(() => Container(
+                                padding: const EdgeInsets.all(
+                                    2), // Optional spacing between image and border
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.grey, // Border color
+                                    width: 1.0, // Border width (1px)
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: controller
+                                          .profileImageUrl.value.isNotEmpty
+                                      ? NetworkImage(
+                                          controller.profileImageUrl.value)
+                                      : const AssetImage('assets/image.png')
+                                          as ImageProvider,
+                                ),
+                              )),
                           const SizedBox(width: 10),
                           Text(
                             "Hello, ${"${controller.profileName} ${controller.lastName}"}👋",
@@ -695,13 +707,13 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
-                                  Text(
-                                    controller.profileName,
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800),
-                                  )
+                                  Obx(() => Text(
+                                        'Hello, ${controller.profileName.value} ${controller.lastName.value}',
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      )),
                                 ],
                               ),
                               Row(
@@ -1240,4 +1252,3 @@ class InvestmentItem {
     };
   }
 }
-

@@ -19,6 +19,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../Main_Dashboard/Mortgage/Withdraw/controller.dart';
+
 class ProfileController extends GetxController {
   RxBool showMsg = false.obs;
   RxBool isLoading = false.obs;
@@ -28,6 +30,7 @@ class ProfileController extends GetxController {
   RxString gender = 'Female'.obs;
   String countryCode = "";
   String countryName = "TZ";
+  final controller = Get.put(Main_Dashboard_controller());
   TextEditingController firstNameController = TextEditingController();
   TextEditingController forgetPassword = TextEditingController();
   TextEditingController lasttNameController = TextEditingController();
@@ -263,11 +266,11 @@ class ProfileController extends GetxController {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Login(),
-                        ));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Login(),
+            ));
         isLoading(false);
       } else {
         Fluttertoast.showToast(
@@ -309,7 +312,7 @@ class ProfileController extends GetxController {
       if (response.statusCode == 200) {
         signInModel.value = SignInModel.fromJson(decodeData);
         print("login response ==> ${signInModel.value.refreshToken}");
-
+        controller.fetchPlanOptions();
         SetSharedPref().setData(
             token: signInModel.value.token ?? "null",
             phoneNumber: signInModel.value.username ?? "null",

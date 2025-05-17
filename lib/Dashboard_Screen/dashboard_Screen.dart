@@ -30,7 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
   var planOptions = <String>[].obs; // Observable list to store plan options
   var isLoading = false.obs;
   var profileName = "";
-  var lastName="";
+  var lastName = "";
   var profileImage = "";
   @override
   void initState() {
@@ -88,20 +88,33 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundImage: controller.profileImageUrl != null
-                        ? NetworkImage(controller
-                            .profileImageUrl!) // Use the URL from the response
-                        : const AssetImage('')
-                            as ImageProvider, // Default image if no URL
-                  ),
+                  Obx(() => Container(
+                        padding: const EdgeInsets.all(
+                            2), // Optional spacing between image and border
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.grey, // Border color
+                            width: 1.0, // Border width (1px)
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: controller
+                                  .profileImageUrl.value.isNotEmpty
+                              ? NetworkImage(controller.profileImageUrl.value)
+                              : const AssetImage('assets/image.png')
+                                  as ImageProvider,
+                        ),
+                      )),
                   const SizedBox(width: 16),
-                  Text(
-                    'Hello, ${controller.profileName} ${controller.lastName} 👋',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
+                  Obx(() => Text(
+                        'Hello, ${controller.profileName.value} ${controller.lastName.value} 👋',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
                 ],
               ),
               const SizedBox(height: 8),
@@ -126,12 +139,10 @@ class _DashboardPageState extends State<DashboardPage> {
                         if (controller.planOptions.contains(25)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Mortgage");
-                        } else if (controller.planOptions
-                            .contains(26)) {
+                        } else if (controller.planOptions.contains(26)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Rent-to-Own");
-                        } else if (controller.planOptions
-                            .contains(27)) {
+                        } else if (controller.planOptions.contains(27)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Construction Finance");
                         } else {
@@ -151,19 +162,18 @@ class _DashboardPageState extends State<DashboardPage> {
                         colorBlendMode: BlendMode.srcIn,
                       ),
                       onTap: () {
-                        print("controller.planOptions${controller.planOptions}");
-                         if (controller.planOptions.contains(25)) {
+                        print(
+                            "controller.planOptions${controller.planOptions}");
+                        if (controller.planOptions.contains(25)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Mortgage");
-                        } else if (controller.planOptions
-                            .contains(26)) {
+                        } else if (controller.planOptions.contains(26)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Rent-to-Own");
-                        } else if (controller.planOptions
-                            .contains(27)) {
+                        } else if (controller.planOptions.contains(27)) {
                           Navigator.pushNamed(context, "/mainDashboard",
                               arguments: "Construction Finance");
-                        }  else {
+                        } else {
                           Navigator.pushNamed(context, "/rent-to-own");
                         }
                       },
@@ -179,18 +189,16 @@ class _DashboardPageState extends State<DashboardPage> {
                           colorBlendMode: BlendMode.srcIn,
                         ),
                         onTap: () {
-                           if (controller.planOptions.contains(25)) {
-                          Navigator.pushNamed(context, "/mainDashboard",
-                              arguments: "Mortgage");
-                        } else if (controller.planOptions
-                            .contains(26)) {
-                          Navigator.pushNamed(context, "/mainDashboard",
-                              arguments: "Rent-to-Own");
-                        } else if (controller.planOptions
-                            .contains(27)) {
-                          Navigator.pushNamed(context, "/mainDashboard",
-                              arguments: "Construction Finance");
-                        } else {
+                          if (controller.planOptions.contains(25)) {
+                            Navigator.pushNamed(context, "/mainDashboard",
+                                arguments: "Mortgage");
+                          } else if (controller.planOptions.contains(26)) {
+                            Navigator.pushNamed(context, "/mainDashboard",
+                                arguments: "Rent-to-Own");
+                          } else if (controller.planOptions.contains(27)) {
+                            Navigator.pushNamed(context, "/mainDashboard",
+                                arguments: "Construction Finance");
+                          } else {
                             Navigator.pushNamed(context, "/construction");
                           }
                         }),

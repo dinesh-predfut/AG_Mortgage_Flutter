@@ -1977,7 +1977,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                  Navigator.pushNamed(context, "/dashBoardPage");
                   },
                   child: const Text(
                     'Decline',

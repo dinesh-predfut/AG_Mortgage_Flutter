@@ -46,7 +46,7 @@ class _Rest_PasswordState extends State<Rest_Password> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                    Text(
-                    "Forget Password",
+                    "Forgot Password",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -69,7 +69,7 @@ class _Rest_PasswordState extends State<Rest_Password> {
                     controller: signupController.forgetPassword,
                       keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: "Email",
+                      labelText: "Phone Number",
                       
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

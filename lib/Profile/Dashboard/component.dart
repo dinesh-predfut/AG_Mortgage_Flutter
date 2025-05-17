@@ -37,9 +37,7 @@ class _AccountPageState extends State<AccountPage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => {
-           Navigator.pop(context)
-          },
+          onPressed: () => {Navigator.pop(context)},
         ),
       ),
       body: SingleChildScrollView(
@@ -49,30 +47,41 @@ class _AccountPageState extends State<AccountPage> {
             // Profile Section
             Column(
               children: [
-                CircleAvatar(
-                  radius: 45,
-                  backgroundImage: controller.profileImageUrl != null
-                      ? NetworkImage(controller
-                          .profileImageUrl!) // Use the URL from the response
-                      : const AssetImage('')
-                          as ImageProvider, // Default image if no URL
-                ),
+                Obx(() => Container(
+                        padding: const EdgeInsets.all(
+                            2), // Optional spacing between image and border
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.grey, // Border color
+                            width: 1.0, // Border width (1px)
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: controller
+                                  .profileImageUrl.value.isNotEmpty
+                              ? NetworkImage(controller.profileImageUrl.value)
+                              : const AssetImage('assets/image.png')
+                                  as ImageProvider,
+                        ),
+                      )),
                 const SizedBox(height: 10),
+                Obx(() => Text(
+                      'Hello, ${controller.profileName.value} ${controller.lastName.value}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
                 Text(
-                  controller.profileName,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                 Text(
-                 controller.phoneNumber,
+                  controller.phoneNumber,
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/editProfile');
+                    Navigator.pushReplacementNamed(context, '/editProfile');
                   },
                   icon: const Icon(
                     Icons.edit,
@@ -114,8 +123,8 @@ class _AccountPageState extends State<AccountPage> {
                         icon: Icons.credit_card,
                         text: 'My Cards',
                         onTap: () {
-                         
-                           Navigator.pushReplacementNamed(context, '/settings/getallCards');
+                          Navigator.pushReplacementNamed(
+                              context, '/settings/getallCards');
                         },
                       ),
                       _buildMenuItem(
@@ -124,17 +133,15 @@ class _AccountPageState extends State<AccountPage> {
                         onTap: () {
                           // Handle navigation
 
-                             Navigator.pushReplacementNamed(context, '/howwearework');
-                          
+                          Navigator.pushReplacementNamed(
+                              context, '/howwearework');
                         },
                       ),
                       _buildMenuItem(
                         icon: Icons.help,
                         text: 'Help Desk',
                         onTap: () {
-                        
-                  
-                           Navigator.pushReplacementNamed(context, '/helpDisk');
+                          Navigator.pushReplacementNamed(context, '/helpDisk');
                         },
                       ),
                       _buildMenuItem(
@@ -147,15 +154,16 @@ class _AccountPageState extends State<AccountPage> {
                               builder: (context) => const FAQPage(),
                             ),
                           );
-                           Navigator.pushReplacementNamed(context, '/settings/faq');
+                          Navigator.pushReplacementNamed(
+                              context, '/settings/faq');
                         },
                       ),
                       _buildMenuItem(
                         icon: Icons.description,
                         text: 'Terms of Service',
                         onTap: () {
-                         
-                           Navigator.pushReplacementNamed(context, '/settings/termofservice');
+                          Navigator.pushReplacementNamed(
+                              context, '/settings/termofservice');
                           // Handle navigation
                         },
                       ),
@@ -171,7 +179,8 @@ class _AccountPageState extends State<AccountPage> {
                             style: TextStyle(color: Colors.red),
                           ),
                           onTap: () {
-                           controller.onLogout(context);
+                            // Get.deleteAll(force: true);
+                            controller.onLogout(context);
                           },
                         ),
                       )

@@ -16,7 +16,8 @@ import 'package:intl/intl.dart';
 
 import '../../dashboard/Dashboard/component.dart';
 
-class Main_Dashboard_controller extends ChangeNotifier {
+// ignore: camel_case_types
+class Main_Dashboard_controller extends GetxController  {
   TextEditingController accountNumber = TextEditingController();
   TextEditingController bvn = TextEditingController();
   TextEditingController bankName = TextEditingController();
@@ -26,10 +27,10 @@ class Main_Dashboard_controller extends ChangeNotifier {
   Map<String, dynamic>? scoreData;
   var planOptions = <int>[].obs; // Observable list to store plan options
   var isLoading = true.obs;
-  var profileName = "";
-  var lastName = "";
+  var profileName = "".obs;
+  var lastName = "".obs;
   var phoneNumber = "";
-  String? profileImageUrl;
+var profileImageUrl = ''.obs;
   Future<List<InvestmentItem>?> fetchInvestmentDetails() async {
     try {
       var url = Uri.parse('${Urls.investmentByid}${Params.userId}');
@@ -148,7 +149,6 @@ class Main_Dashboard_controller extends ChangeNotifier {
 
   Future<void> onLogout(BuildContext context) async {
     await SetSharedPref().clearData();
-    // ignore: use_build_context_synchronously
     Navigator.of(context, rootNavigator: true).pushNamed("/login");
   }
 
@@ -171,10 +171,10 @@ class Main_Dashboard_controller extends ChangeNotifier {
         // isLoading.value = false;
 
         if (data['firstName'] != null) {
-          profileName = data['firstName'];
+          profileName.value  = data['firstName'];
         }
         if (data['lastName'] != null) {
-          lastName = data['lastName'];
+          lastName.value = data['lastName'];
         }
         if (data['phoneNumber'] != null) {
           phoneNumber = data['phoneNumber'];
@@ -192,7 +192,7 @@ class Main_Dashboard_controller extends ChangeNotifier {
         }
         print("WWWWWWWW$planOptions");
         // Assuming you want to store the image URL for use in your UI
-        profileImageUrl = profileImage; // Store the image URL
+        profileImageUrl.value = profileImage; // Store the image URL
       } else {
         print("Error: ${response.body}");
       }

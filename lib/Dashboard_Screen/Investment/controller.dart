@@ -22,15 +22,15 @@ class InvestmentController extends ChangeNotifier {
   late final TextEditingController amount = TextEditingController();
 
   String? _selectedApartmentType;
-  var selectedStartDate = DateTime.now().obs;
-    var selectedStartDateMaturityDate = DateTime.now().obs;
+ var selectedStartDate = Rxn<DateTime>();
+var selectedStartDateMaturityDate = Rxn<DateTime>();
+
 
   var selectedLoan = Rxn<LoanTypeInvestment>();
 
   String formattedEMI(double amount) {
-    // Format the number with international commas (thousan ds separators)
     final numberFormatter = NumberFormat(
-        '#,###.##', 'en_US'); // en_US for international comma formatting
+        '#,###.##', 'en_US'); 
     return numberFormatter.format(amount);
   }
 
@@ -82,14 +82,57 @@ class InvestmentController extends ChangeNotifier {
     }
   }
 
+  String newFormatDate(DateTime date) {
+    // e.g. return DateFormat("yyyy-MM-ddTHH:mm:ss").format(date);
+    return date.toUtc().toIso8601String();
+  }
+
+  void calculateMaturityDate(DateTime startDate, String duration) {
+    final years = int.tryParse(duration) ?? 0;
+    final monthsToAdd = years * 12;
+
+    final maturityDate = DateTime(
+      startDate.year,
+      startDate.month + monthsToAdd,
+      startDate.day,
+      startDate.hour,
+      startDate.minute,
+      startDate.second,
+    );
+
+    selectedStartDateMaturityDate.value = maturityDate;
+    final formatted = newFormatDate(maturityDate);
+    final dateOnly = formatted.split('T').first;
+    // selectedStartDate.value=dateOnly;
+
+    print(
+        '$dateOnly, $maturityDate — maturityDate');
+  }
+
+  void changeStartDate(picked) async {
+      if (picked == null) return;
+
+      // 1. Format & split off the date part
+      final formatted = newFormatDate(picked);
+      final dateOnly = formatted.split('T').first;
+      print(dateOnly);
+      selectedStartDate.value = picked;
+      calculateMaturityDate(picked, tenure.text);
+
+      print('$picked${tenure.text} investmentDuration');
+    }
+
   Future<void> addInvestment(BuildContext context) async {
-    String formattedDate =
-        DateFormat('yyyy-MM-dd').format(selectedStartDateMaturityDate.value);
-    String date = DateFormat('yyyy-MM-dd').format(selectedStartDate.value);
+    String date = selectedStartDate.value != null
+    ? DateFormat('yyyy-MM-dd').format(selectedStartDate.value!)
+    : '';
+
+String formattedDate = selectedStartDateMaturityDate.value != null
+    ? DateFormat('yyyy-MM-dd').format(selectedStartDateMaturityDate.value!)
+    : '';
+
 
     try {
-     
-
       // Prepare the request
       var request = http.Request('POST', Uri.parse(Urls.investment));
       request.body = json.encode({

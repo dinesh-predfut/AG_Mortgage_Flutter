@@ -143,16 +143,16 @@ class _Edit_ProfileState extends State<Edit_Profile> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Exit App"),
-          content: Text("Do you want to exit the app?"),
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         ),
@@ -175,7 +175,18 @@ class _Edit_ProfileState extends State<Edit_Profile> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+             Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const MainLayout(
+              showBottomNavBar: true,
+              startIndex: 3,
+              child: AccountPage(),
+            ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
           },
         ),
       ),

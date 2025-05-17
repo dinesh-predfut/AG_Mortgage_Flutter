@@ -18,34 +18,34 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   ProfileController signupController = Get.find<ProfileController>();
  static String formatDate(DateTime date) {
     return DateFormat('dd-MM-yyyy').format(date);
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              Images.house1, // Replace with your image path
-              fit: BoxFit.cover,
-            ),
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Stack(
+      children: [
+        // Background image
+        Positioned.fill(
+          child: Image.asset(
+            Images.house1,
+            fit: BoxFit.cover,
           ),
-          // Registration form
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(30),
-                ),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -62,9 +62,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           : null,
                     ),
                     const SizedBox(height: 20),
-                    TextField(
+
+                    // DOB Field
+                    TextFormField(
                       controller: signupController.dobController,
-                      readOnly: true, // Prevent manual input
+                      readOnly: true,
                       decoration: InputDecoration(
                         labelText: 'Date of Birth',
                         hintText: 'DD/MM/YYYY',
@@ -74,10 +76,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: () => signupController.selectDate(context),
                         ),
                       ),
-                      onTap: () => signupController
-                          .selectDate(context), // Open date picker on tap
+                      onTap: () => signupController.selectDate(context),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select your date of birth';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 20),
+
+                    // Gender Dropdown
                     DropdownButtonFormField<String>(
                       value: signupController.selectedGender,
                       items: ['male', 'female']
@@ -93,39 +102,64 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         labelText: 'Sex',
                         border: OutlineInputBorder(),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select your gender';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 20),
-                    TextField(
+
+                    // NIN Field
+                    TextFormField(
                       controller: signupController.nin,
                       decoration: const InputDecoration(
                         labelText: 'NIN',
                         hintText: 'Input NIN',
                         border: OutlineInputBorder(),
                       ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter your NIN';
+                        } else if (value.length != 11) {
+                          return 'NIN must be 11 digits';
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 30),
+
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: baseColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 65
-                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 65),
                       ),
                       onPressed: () {
-                        signupController.checkUser(context);
+                        if (_formKey.currentState!.validate()) {
+                          signupController.checkUser(context);
+                        }
                       },
-                      child: const Text('Register',
-                          style: TextStyle(fontSize: 16, color: Colors.white)),
+                      child: const Text(
+                        'Register',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }
+
+  }
+
