@@ -61,6 +61,8 @@ dependencies:
   latlong2: ^0.9.1
   webview_flutter: ^4.8.0
   dio: ^5.8.0+1
+  flutter_libphonenumber: ^1.0.3+1
+  libphonenumber_plugin: ^0.3.3
  
 
 dev_dependencies:

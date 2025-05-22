@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../const/mapPage.dart';
 import '../../Mortgage/MortgageHome.dart';
@@ -62,7 +63,12 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
       );
     }
   }
-
+  String formattedEMI(double amount) {
+    // Format the number with international commas (thousands separators)
+    final numberFormatter = NumberFormat(
+        '#,###.##', 'en_US'); // en_US for international comma formatting
+    return numberFormatter.format(amount);
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -134,7 +140,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'NGN ${house.price}',
+                                'NGN ${formattedEMI(house.price)}',
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,

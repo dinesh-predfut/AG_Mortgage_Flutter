@@ -17,7 +17,8 @@ import '../../Dashboard_Screen/Investment/investment.dart';
 // ignore: camel_case_types
 class CardPaymentPage extends StatefulWidget {
   final int? selectedID;
-  const CardPaymentPage({super.key, this.selectedID});
+  final String? planType;
+  const CardPaymentPage({super.key, this.selectedID, this.planType});
 
   @override
   _CardPaymentPageState createState() => _CardPaymentPageState();
@@ -28,7 +29,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
 
   late Future<CardModel?> cardDetails;
   final controller = Get.put(CardControllerSelectAmount());
-  final paymentcontroller = Get.put(MortgagController());
+  final mortgagecontroller = Get.put(MortgagController());
 
   @override
   void initState() {
@@ -38,16 +39,16 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
       controller.amountController.text = '0';
     }
 
-    // Ensure paymentcontroller is initialized before accessing its controllers
-    if (paymentcontroller.initialDepositController.text.isNotEmpty &&
-        paymentcontroller.monthlyRepaymentController.text.isNotEmpty) {
+    // Ensure mortgagecontroller is initialized before accessing its controllers
+    if (mortgagecontroller.initialDepositController.text.isNotEmpty &&
+        mortgagecontroller.monthlyRepaymentController.text.isNotEmpty) {
       double initialDeposit = double.tryParse(
-            paymentcontroller.initialDepositController.text.replaceAll(',', ''),
+            mortgagecontroller.initialDepositController.text.replaceAll(',', ''),
           ) ??
           0;
 
       double monthlyRepayment = double.tryParse(
-            paymentcontroller.monthlyRepaymentController.text
+            mortgagecontroller.monthlyRepaymentController.text
                 .replaceAll(',', ''),
           ) ??
           0;
@@ -250,12 +251,12 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
             ElevatedButton(
               onPressed: () {
                 double monthlyRepayment = double.tryParse(
-                      paymentcontroller.monthlyRepaymentController.text
+                      mortgagecontroller.monthlyRepaymentController.text
                           .replaceAll(',', ''),
                     ) ??
                     0;
                 double initialDeposit = double.tryParse(
-                      paymentcontroller.initialDepositController.text
+                      mortgagecontroller.initialDepositController.text
                           .replaceAll(',', ''),
                     ) ??
                     0;
@@ -264,13 +265,16 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
                     ) ??
                     0;
                 if (monthlyRepayment != 0) {
+                  if(widget.planType == "Mortgage"){
+                    mortgagecontroller.addMortgageForm(context);
+                  
                   controller.monthlyContribution(
                       context, monthlyRepayment, widget.selectedID!);
                   controller.voluntoryPayment(
                       initialDeposit, widget.selectedID!);
                 } else if (monthlyRepayment == 0) {
                   controller.voluntoryPayment(amountPay, widget.selectedID!);
-                  Navigator.pushNamed(context, "/dashBoardPage");
+
                   Fluttertoast.showToast(
                     msg: "Created Successfully",
                     toastLength: Toast.LENGTH_SHORT,
@@ -282,6 +286,7 @@ class _CardPaymentPageState extends State<CardPaymentPage> {
                   print("amountController");
                   controller.calculation(context, widget.selectedID!);
                 }
+              }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: baseColor,

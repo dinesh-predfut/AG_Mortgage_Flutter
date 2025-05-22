@@ -35,7 +35,7 @@ Future<String> getURLbasedPlanType(String? planType) async {
     case 'Mortgage':
       url = 'mortgage/getAllMortgageDetailsByCustomer?id=';
       break;
-    case 'Rent to Own':
+    case 'Rent-to-own':
       url = 'rentToOwn/getAllRentToOwnDetailsByCustomer?id=';
       break;
     case 'Construction Finance':

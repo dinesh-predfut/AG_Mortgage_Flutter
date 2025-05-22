@@ -87,7 +87,6 @@ class MortgagController extends ChangeNotifier {
     }
   }
 
-
   Future<List<Apartment>> fetchApartments() async {
     try {
       var response = await http.get(
@@ -178,10 +177,12 @@ class MortgagController extends ChangeNotifier {
   }
 
   Future<void> addMortgageForm(BuildContext context) async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay!);
+      String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay!);
+    String anniversaryDate = selectedDay?.toString() ?? '';
+    String estimatedProfileDate = calculateProfileDate(anniversaryDate, 18);
 
     try {
-      print('addMortgageForm Preparing API request...');
+      print('addMortgageForm Preparing API request...$estimatedProfileDate');
 
       // Prepare the request
       var request = http.Request('POST', Uri.parse(Urls.mortagaform));
@@ -196,11 +197,15 @@ class MortgagController extends ChangeNotifier {
         "initialDeposit": double.tryParse(
                 initialDepositController.text.replaceAll(',', '').trim()) ??
             0.0,
+        "id": "",
+        "profilingPeriod": "18",
+        "estimatedProfileDate": estimatedProfileDate,
         "loanRepaymentPeriod": sliderValue,
         "monthlyRepaymentAmount": double.tryParse(
                 monthlyRepaymentController.text.replaceAll(',', '').trim()) ??
             0.0,
         "anniversary": formattedDate, // Ensure DateTime is properly formatted
+        "monthlyRentalAmount": ""
       });
       request.headers.addAll({
         'Content-Type': 'application/json ',
@@ -220,6 +225,10 @@ class MortgagController extends ChangeNotifier {
 
       if (decodedResponse.statusCode == 200) {
         clearFields();
+        
+        // ignore: use_build_context_synchronously
+        Navigator.pushNamed(context, "/mainDashboard", arguments: "Mortgage");
+
         final result = jsonDecode(decodedResponse.body);
 
         print('API Success Response: $result');
@@ -404,28 +413,43 @@ class MortgagController extends ChangeNotifier {
     areaNameValue.text = matchArea.name.toString();
   }
 
-  String calculateProfileDate(String anniversaryDate, int remainingMonths) {
-    DateTime startDate = DateTime.parse(anniversaryDate);
-
-    if (startDate == null) {
-      throw Exception('Invalid date');
-    }
-
-    DateTime newDate = DateTime(
-      startDate.year,
-      startDate.month + remainingMonths,
-      startDate.day,
-    );
-
-    return '${newDate.year}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}';
-  }
-
   String formatProfileDate(String profileDate) {
     DateTime dateTime = DateTime.parse(profileDate);
 
     String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
 
     return formattedDate;
+  }
+
+  String calculateProfileDate(String anniversaryDate, int remainingMonths) {
+    print("remainingMonths$remainingMonths");
+    // Validate inputs
+    if (anniversaryDate.isEmpty) {
+      throw ArgumentError('Invalid input: anniversaryDate is missing');
+    }
+    if (remainingMonths.isNaN) {
+      throw ArgumentError('Invalid input: remainingMonths is not a number');
+    }
+
+    // Parse the input date
+    late DateTime startDate;
+    try {
+      startDate = DateTime.parse(anniversaryDate);
+    } catch (e) {
+      throw FormatException(
+          'Invalid date format for anniversaryDate: $anniversaryDate');
+    }
+
+    // Compute the new date by adding months
+    // Dart’s DateTime constructor will handle month overflow automatically.
+    final newDate = DateTime(
+      startDate.year,
+      startDate.month + remainingMonths,
+      startDate.day,
+    );
+
+    // Return as "YYYY-MM-DD"
+    return newDate.toIso8601String().split('T').first;
   }
 
   String formatProfileDateName(String profileDate) {

@@ -50,7 +50,7 @@ class _MortgagePageHomeState extends State<MortgagePageHome> {
     const MortgageTermSheetPage(),
     const ADD_CardDetailsPage(),
     const PaymentMethodPageMortage(),
-    const Get_All_Cards(),
+    const Get_All_Cards(""),
     const CardPaymentPage(),
     const MortgageTermSheetPage(),
     const BankTransferPage(),
@@ -361,7 +361,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                               List<Apartment> apartment = snapshot.data ?? [];
 
                               return DropdownButtonFormField<int>(
-                                value: controller.selectedCity,
+                                value: controller.selectedApartmentType,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(100),
@@ -391,7 +391,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
 
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Please select a city';
+                                    return 'Please select a Apartment Type';
                                   }
                                   return null;
                                 },
@@ -522,9 +522,9 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                               calculateEMI();
                             },
                             validator: (value) {
-                                if (value == null ||
-                                    value.trim().isEmpty ||
-                                    value.trim() == '0') {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  value.trim() == '0') {
                                 return 'Please enter the estimated property value';
                               }
                               return null;
@@ -578,7 +578,7 @@ class _MortgageFormPageState extends State<MortgageFormPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '0',
+                                '1',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
@@ -737,16 +737,16 @@ class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Exit App"),
-          content: Text("Do you want to exit the app?"),
+          title: const Text("Exit App"),
+          content: const Text("Do you want to exit the app?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         ),
@@ -818,9 +818,17 @@ class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
                         controller.selectedDay != null &&
                         isSameDay(controller.selectedDay, day),
                     onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        controller.selectedDay = selectedDay;
-                      });
+                      if (!selectedDay.isBefore(DateTime.now())) {
+                        setState(() {
+                          controller.selectedDay = selectedDay;
+                        });
+                      }
+                    },
+                    enabledDayPredicate: (day) {
+                      // Disable past dates
+                      final now = DateTime.now();
+                      return !day
+                          .isBefore(DateTime(now.year, now.month, now.day));
                     },
                     calendarStyle: CalendarStyle(
                       selectedDecoration: BoxDecoration(
@@ -835,6 +843,8 @@ class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
                         color: Colors.orange,
                         shape: BoxShape.circle,
                       ),
+                      disabledTextStyle:
+                          const TextStyle(color: Colors.grey), // Optional
                     ),
                     headerStyle: const HeaderStyle(
                       formatButtonVisible: false,
@@ -856,8 +866,7 @@ class _CalendarPageMortgageState extends State<CalendarPageMortgage> {
                             textColor: Colors.white,
                           );
                         } else {
-                          Navigator.pushNamed(
-                              context, "/mortgageTermsheet");
+                          Navigator.pushNamed(context, "/mortgageTermsheet");
                           controller.getData(Params.userId as String);
                         }
                       },
@@ -886,17 +895,17 @@ class PaymentMethodPageMortage extends StatefulWidget {
   const PaymentMethodPageMortage({super.key});
 
   @override
-  _PaymentMethodPageMortageState createState() => _PaymentMethodPageMortageState();
+  _PaymentMethodPageMortageState createState() =>
+      _PaymentMethodPageMortageState();
 }
 
 class _PaymentMethodPageMortageState extends State<PaymentMethodPageMortage> {
   String selectedPaymentMethod = "Card";
   final controller = Get.put(MortgagController());
-void _onBackPressed(BuildContext context) {
+  void _onBackPressed(BuildContext context) {
     // Custom logic for back navigation
     if (Navigator.of(context).canPop()) {
-
-         Navigator.pushNamed(context, "/mortgageTermsheet");
+      Navigator.pushNamed(context, "/mortgageTermsheet");
     } else {
       // Show exit confirmation dialog if needed
       showDialog(
@@ -907,114 +916,118 @@ void _onBackPressed(BuildContext context) {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         ),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return
-     WillPopScope(
-      onWillPop: () async {
-        // Handle custom back navigation logic
-        _onBackPressed(context);
-        return false; // Prevent default back behavior
-      },
-    child: 
-     Scaffold(
-      appBar: AppBar(
-        title:  Text("Payment",style: TextStyle(color: baseColor,fontWeight: FontWeight.bold),),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "How would you like to make your first deposit?",
-              textAlign:TextAlign.center,
-              style: TextStyle(fontSize: 16),
+    return WillPopScope(
+        onWillPop: () async {
+          // Handle custom back navigation logic
+          _onBackPressed(context);
+          return false; // Prevent default back behavior
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Payment",
+              style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.credit_card),
-              title: const Text("Card"),
-              trailing: Radio<String>(
-                value: "Card",
-                groupValue: selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
+            centerTitle: true,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "How would you like to make your first deposit?",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16),
+                      )
+                    ]),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: const Icon(Icons.credit_card),
+                  title: const Text(
+                    "Card",
+                  ),
+                  trailing: Radio<String>(
+                    value: "Card",
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedPaymentMethod = value!;
+                      });
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.account_balance),
+                  title: const Text(
+                    "Bank Transfer",
+                  ),
+                  trailing: Radio<String>(
+                    value: "Bank Transfer",
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedPaymentMethod = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {
+                    // controller.addMortgageForm(context);
+                    if (selectedPaymentMethod == "Bank Transfer") {
+                      // Navigate to a page for Bank Transfer
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MortgagePageHome(
+                              startIndex: 9), // Example for Bank Transfer
+                        ),
+                      );
+                    } else if (selectedPaymentMethod == "Card") {
+                      // Navigate to a page for Card payment
+                      Navigator.pushNamed(context, "/getAllcards",arguments: "Mortgage");
+                    } else {
+                      // Default case: navigate to MortgagePageHome with startIndex as 3 (fallback case)
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MortgagePageHome(
+                              startIndex: 9), // Default case
+                        ),
+                      );
+                    }
+                  },
+                  //
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: baseColor,
+                  ),
+                  child: const Text("Make Payment",
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.account_balance),
-              title:  Text("Bank Transfer",style: TextStyle(color: baseColor,fontWeight:FontWeight.bold),),
-              trailing: Radio<String>(
-                value: "Bank Transfer",
-                groupValue: selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                controller.addMortgageForm(context);
-                if (selectedPaymentMethod == "Bank Transfer") {
-                  // Navigate to a page for Bank Transfer
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MortgagePageHome(
-                          startIndex: 9), // Example for Bank Transfer
-                    ),
-                  );
-                } else if (selectedPaymentMethod == "Card") {
-                  // Navigate to a page for Card payment
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MortgagePageHome(
-                          startIndex: 6), // Example for Card payment
-                    ),
-                  );
-                } else {
-                  // Default case: navigate to MortgagePageHome with startIndex as 3 (fallback case)
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const MortgagePageHome(startIndex: 9), // Default case
-                    ),
-                  );
-                }
-              },
-              //
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: baseColor,
-              ),
-              child: const Text("Make Payment",
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 }
 
@@ -1061,7 +1074,8 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
     var areaName = await controller.findAndSetArea();
     setState(() {}); // Rebuild to display the city name
   }
-   Future<void> _fetchApartment() async {
+
+  Future<void> _fetchApartment() async {
     var apartmentName = await controller.fetchApartments();
     setState(() {}); // Rebuild to display the city name
   }
@@ -1078,7 +1092,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
         DateFormat('dd-MM-yyyy').format(controller.selectedDay!);
     String anniversaryDate = controller.selectedDay?.toString() ?? '';
     String estimatedProfileDate =
-        controller.calculateProfileDate(anniversaryDate, 16);
+        controller.calculateProfileDate(anniversaryDate, 18);
     double repayment = calculateMonthlyRepayment(
       loanAmount: initialDeposit * 0.7,
       loanTermYears: controller.sliderValue.toInt(),
@@ -1086,7 +1100,10 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
     );
     return Scaffold(
         appBar: AppBar(
-          title:  Text('Term Sheet',style: TextStyle(color: baseColor,fontWeight: FontWeight.bold ),),
+          title: Text(
+            'Term Sheet',
+            style: TextStyle(color: baseColor, fontWeight: FontWeight.bold),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -1098,10 +1115,13 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Est pellentesque fermentum cursus curabitur pharetra, vene",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 13),
+              const Align(
+                alignment: Alignment.center,
+                child: Text(
+                  "Est pellentesque fermentum cursus curabitur pharetra, vene",
+                  // textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                ),
               ),
               const SizedBox(
                 height: 5,
@@ -1121,7 +1141,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text("+ House",
+                  child: const Text("+ View House",
                       style: TextStyle(color: Colors.white, fontSize: 12)),
                 ),
               ),
@@ -1146,12 +1166,14 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                 [
                   _buildRow("Initial Deposit",
                       "NGN ${controller.initialDepositController.text.toString()} "),
-                  _buildRow("Loan", "NGN ${formattedEMI(initialDeposit * 0.7)} "),
+                  _buildRow(
+                      "Loan", "NGN ${formattedEMI(initialDeposit * 0.7)} "),
                   _buildRow("Repayment Period",
                       "${controller.sliderValue.toInt()} Years"),
-                  _buildRow("Monthly Repayment", 'NGN ${formattedEMI(repayment)}'),
+                  _buildRow(
+                      "Monthly Repayment", 'NGN ${formattedEMI(repayment)}'),
                   // controller.monthlyRepaymentController.text.toString()),
-                   Padding(
+                  Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1171,7 +1193,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Next Anniversary Date",
+                        const Text("Next Repayment Date",
                             style: TextStyle(color: Colors.grey)),
                         Text(anniversary,
                             style: TextStyle(
@@ -1181,7 +1203,6 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       ],
                     ),
                   ),
-              
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -1197,8 +1218,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                       "NGN ${controller.monthlyRepaymentController.text}"),
                   _buildRow("Initial Deposit",
                       "NGN ${controller.initialDepositController.text}"),
-                  
-                          Padding(
+                  Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1207,8 +1227,7 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
                             style: TextStyle(
                                 color: Color.fromARGB(255, 44, 44, 44),
                                 fontWeight: FontWeight.bold)),
-                        Text(
-                            "NGN ${formattedEMI(initialDeposit * 0.3)} ",
+                        Text("NGN ${formattedEMI(initialDeposit * 0.3)} ",
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -1222,40 +1241,51 @@ class _MortgageTermSheetPageState extends State<MortgageTermSheetPage>
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.amber[100],
+                  color: Colors.amber[600],
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Estimated Mortgage Month",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
                         Text(
-                          controller
-                              .formatProfileDateName(estimatedProfileDate),
-                        )
+                          "Estimated Mortgage Month",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
                       ],
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MortgagePageHome(
-                              startIndex: 1,
-                            ), // Start with MortgagePageHome
-                          ),
-                        );
-                      },
-                      child: const Text("Recalculate"),
-                    ),
+                    Text(
+                      controller.formatProfileDateName(estimatedProfileDate),
+                      style: const TextStyle(color: Colors.white),
+                    )
                   ],
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Over/Under Estimated ?"),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MortgagePageHome(
+                            startIndex: 1,
+                          ), // Start with MortgagePageHome
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Recalculate",
+                      style: TextStyle(
+                          color: baseColor, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24.0),
               Center(
@@ -1485,6 +1515,7 @@ class _TermsHomePageState extends State<TermsHomePage> {
     return const Scaffold();
   }
 }
+
 class Sucess extends StatefulWidget {
   const Sucess({super.key});
 
@@ -1517,12 +1548,12 @@ class _SucessState extends State<Sucess> {
                   "Deposit Successful",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                 Text(
+                Text(
                     "Congratulations  ${controller.profileName} You have made your first deposit",
                     style: const TextStyle(fontSize: 10)),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () { 
+                  onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -1977,7 +2008,7 @@ class TermsAndConditionsDialog extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                  Navigator.pushNamed(context, "/dashBoardPage");
+                    Navigator.pushNamed(context, "/dashBoardPage");
                   },
                   child: const Text(
                     'Decline',

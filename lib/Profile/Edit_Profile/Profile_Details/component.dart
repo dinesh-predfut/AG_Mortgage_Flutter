@@ -185,7 +185,7 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> {
                 if (val == null || val.isEmpty) {
                   return 'This field cannot be empty';
                 }
-                if (val.length <= 11) {
+                if (val.length < 11) {
                   return 'Value must be more than 11 characters';
                 }
                 return null;

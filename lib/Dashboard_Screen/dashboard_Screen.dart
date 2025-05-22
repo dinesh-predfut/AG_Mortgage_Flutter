@@ -108,13 +108,18 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       )),
                   const SizedBox(width: 16),
-                  Obx(() => Text(
-                        'Hello, ${controller.profileName.value} ${controller.lastName.value} 👋',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                  Obx(() => SizedBox(
+                        width: 250,
+                        child: Text(
+                           'Hello, ${controller.profileName.value ?? ''} ${controller.lastName.value ?? ''} 👋',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
                         ),
-                      )),
+                      ))
                 ],
               ),
               const SizedBox(height: 8),

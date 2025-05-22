@@ -678,13 +678,13 @@ class Profile_Controller extends ChangeNotifier {
         HelpDiskEmail = responseJson['email'] ?? '';
         HelpDiskPhone = responseJson['phoneNumber'] ?? '';
         HelpDiskWhatapp = responseJson['whatsApp'] ?? '';
-        Fluttertoast.showToast(
-          msg: "LoginDetails Updated Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-        );
+        // Fluttertoast.showToast(
+        //   msg: "LoginDetails Updated Successfully",
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.BOTTOM,
+        //   backgroundColor: Colors.grey,
+        //   textColor: Colors.white,
+        // );
         return true;
       } else {
         print('Error: ${decodedResponse.body}');

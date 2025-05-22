@@ -35,7 +35,7 @@ class __InvestmenStateState extends State<Investment> {
   final List<Widget> _steps = [
     const InvestmentFormPage(),
     const PaymentMethodPage(),
-    const Get_All_Cards(),
+    const Get_All_Cards(""),
     const CardPaymentPage(),
     const ADD_CardDetailsPage(),
     const CardPaymentPage(),
@@ -77,7 +77,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
 
     String maturityDate = DateFormat('yyyy-MM-dd').format(
         controller.selectedStartDateMaturityDate.value ?? DateTime(1900));
-        controller.selectedStartDate.value =null;
+    controller.selectedStartDate.value = null;
   }
 
   @override
@@ -146,7 +146,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
               ),
               const SizedBox(height: 10),
               const Text('Type of Investment'),
-          FutureBuilder<List<LoanTypeInvestment>>(
+              FutureBuilder<List<LoanTypeInvestment>>(
                 future: controller.getScreeningPeriodsApi(),
                 builder: (context, snapshot) {
                   List<LoanTypeInvestment> loanData = snapshot.data ?? [];
@@ -251,10 +251,12 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                 const Text('Maturity Date'),
                 Obx(() => TextFormField(
                       controller: TextEditingController(
-  text: controller.selectedStartDateMaturityDate.value != null
-      ? DateFormat('dd-MM-yyyy').format(controller.selectedStartDateMaturityDate.value!)
-      : '',
-),
+                        text: controller.selectedStartDateMaturityDate.value !=
+                                null
+                            ? DateFormat('dd-MM-yyyy').format(
+                                controller.selectedStartDateMaturityDate.value!)
+                            : '',
+                      ),
 //  selected date
                       readOnly: true,
                       decoration: InputDecoration(
@@ -290,8 +292,7 @@ class InvestmentFormPageState extends State<InvestmentFormPage> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                     prefix: const Padding(
-                      padding: EdgeInsets.only(
-                          right: 8), 
+                      padding: EdgeInsets.only(right: 8),
                       child: Text(
                         'NGN',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -388,6 +389,11 @@ class _CalendarPageState extends State<CalendarPage> {
                     _focusedDay = focusedDay; // Update focusedDay
                   });
                 },
+                enabledDayPredicate: (day) {
+                  // Disable past dates
+                  final now = DateTime.now();
+                  return !day.isBefore(DateTime(now.year, now.month, now.day));
+                },
                 calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
                     color: baseColor,
@@ -401,6 +407,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
+                  disabledTextStyle:
+                      const TextStyle(color: Colors.grey), // Optional
                 ),
                 headerStyle: const HeaderStyle(
                   formatButtonVisible: false,

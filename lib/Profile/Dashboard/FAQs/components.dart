@@ -14,7 +14,7 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<String> _tabs = [
     'Mortgage',
-    'Rent to Own',
+    'Rent-to-own',
     'Construction Finance',
     'Investment',
   ];
@@ -44,9 +44,9 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
             'It is a legal agreement by which a bank or building society lends money at interest and gives them the right to take your property if you don’t repay the money you’ve borrowed.'
       },
       {
-        'question': 'What is Rent to Own?',
+        'question': 'What is Rent-to-own?',
         'answer':
-            'Rent to Own is a system where tenants rent a property with the option to purchase later.'
+            'Rent-to-own is a system where tenants rent a property with the option to purchase later.'
       },
       {
         'question': 'What is Mortgage?',
@@ -54,9 +54,9 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
             'It is a legal agreement by which a bank or building society lends money at interest and gives them the right to take your property if you don’t repay the money you’ve borrowed.'
       },
       {
-        'question': 'What is Rent to Own?',
+        'question': 'What is Rent-to-own?',
         'answer':
-            'Rent to Own is a system where tenants rent a property with the option to purchase later.'
+            'Rent-to-own is a system where tenants rent a property with the option to purchase later.'
       },
       {
         'question': 'What is Mortgage?',
@@ -64,18 +64,18 @@ class _FAQPageState extends State<FAQPage> with SingleTickerProviderStateMixin {
             'It is a legal agreement by which a bank or building society lends money at interest and gives them the right to take your property if you don’t repay the money you’ve borrowed.'
       },
       {
-        'question': 'What is Rent to Own?',
+        'question': 'What is Rent-to-own?',
         'answer':
-            'Rent to Own is a system where tenants rent a property with the option to purchase later.'
+            'Rent-to-own is a system where tenants rent a property with the option to purchase later.'
       },{
         'question': 'What is Mortgage?',
         'answer':
             'It is a legal agreement by which a bank or building society lends money at interest and gives them the right to take your property if you don’t repay the money you’ve borrowed.'
       },
       {
-        'question': 'What is Rent to Own?',
+        'question': 'What is Rent-to-own?',
         'answer':
-            'Rent to Own is a system where tenants rent a property with the option to purchase later.'
+            'Rent-to-own is a system where tenants rent a property with the option to purchase later.'
       }
     ];
     _isExpanded = List<bool>.filled(_faqs.length, false);

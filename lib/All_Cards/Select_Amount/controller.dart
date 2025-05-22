@@ -90,6 +90,7 @@ class CardControllerSelectAmount {
       request.body = json.encode({
         "cardId": id,
         "amount": monthlyRepayment,
+        "status":"OnTime",
         "typeOfTransaction": "Monthly Contributions"
       });
       request.headers.addAll({
@@ -147,6 +148,7 @@ class CardControllerSelectAmount {
       request.body = json.encode({
         "cardId": id,
         "amount": monthlyRepayment,
+         "status":"OnTime",
         "typeOfTransaction": "Voluntary Contributions"
       });
       request.headers.addAll({

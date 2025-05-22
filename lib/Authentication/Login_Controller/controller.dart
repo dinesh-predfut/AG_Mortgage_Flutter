@@ -13,7 +13,9 @@ import 'package:ag_mortgage/const/constant.dart';
 import 'package:ag_mortgage/const/url.dart';
 import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:libphonenumber_plugin/libphonenumber_plugin.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -58,6 +60,18 @@ class ProfileController extends GetxController {
   void onInit() {
     // userProfile();
     super.onInit();
+  }
+
+  Future<bool> isPhoneNumberValid(String phone, String isoCode) async {
+    try {
+      final isValid = await PhoneNumberUtil.isValidPhoneNumber(phone, isoCode);
+      print('Validation error: $isValid');
+      return isValid ?? true;
+      
+    } catch (e) {
+      print('Validation error: $e');
+      return false;
+    }
   }
 
   Future<void> pickImage() async {

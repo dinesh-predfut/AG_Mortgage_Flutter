@@ -13,6 +13,7 @@ import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/const/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class DashboardPageS extends StatefulWidget {
@@ -28,9 +29,13 @@ class _DashboardPageSState extends State<DashboardPageS> {
   @override
   void initState() {
     super.initState();
+    // ignore: unrelated_type_equality_checks
+    controller.amount.text = '0';
 
-    controller.fetchScore();
     controller.fetchPlanOptions();
+    if (controller.scoreData == null) {
+      controller.fetchScore();
+    }
     print("controller.scoreData: ${controller.scoreData}");
   }
 
@@ -202,11 +207,11 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   ),
                                 ]),
                             const SizedBox(height: 20),
-                            const Row(
+                            Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
+                                  const Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -229,7 +234,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Total Savings",
                                         style: TextStyle(
                                             fontSize: 14, color: Colors.grey),
@@ -238,7 +243,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                         "NGN 100,000,000",
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.deepPurple,
+                                          color: baseColor,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -257,21 +262,26 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                         showSuccessPopup(context);
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.deepPurple,
+                                        foregroundColor: Colors
+                                            .deepPurple, // text color if needed
+                                        backgroundColor: Colors
+                                            .transparent, // remove background color
+                                        shadowColor: Colors
+                                            .transparent, // remove shadow if needed
+                                        side: BorderSide(
+                                            color: baseColor,
+                                            width: 2), // border
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
-                                        padding: const EdgeInsets.only(
-                                            left: 15,
-                                            right: 15,
-                                            top: 5,
-                                            bottom: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15, vertical: 8),
                                       ),
-                                      child: const Text(
-                                        "withdraw",
+                                      child: Text(
+                                        "Withdraw",
                                         style: TextStyle(
-                                            fontSize: 14, color: Colors.white),
+                                            fontSize: 14, color: baseColor),
                                       ),
                                     ),
                                   if (widget.plans == "Rent-To-Own")
@@ -288,7 +298,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                               ));
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.deepPurple,
+                                          backgroundColor: baseColor,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(20),
@@ -311,16 +321,10 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                       widget.plans == "Construction Finance")
                                     ElevatedButton(
                                       onPressed: () {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Get_All_Cards(),
-                                          ),
-                                        );
+                                          Navigator.pushNamed(context, "/getAllcards");
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.deepPurple,
+                                        backgroundColor: baseColor,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20),
@@ -464,6 +468,30 @@ class _DashboardPageSState extends State<DashboardPageS> {
 
   void showSuccessPopup(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
+    final List<String> bankList = [
+      'Access Bank',
+      'Citibank',
+      'Ecobank Nigeria',
+      'Fidelity Bank',
+      'First Bank of Nigeria',
+      'First City Monument Bank (FCMB)',
+      'Guaranty Trust Bank (GTBank)',
+      'Heritage Bank',
+      'Jaiz Bank',
+      'Keystone Bank',
+      'Polaris Bank',
+      'Providus Bank',
+      'Stanbic IBTC Bank',
+      'Standard Chartered Bank',
+      'Sterling Bank',
+      'Suntrust Bank',
+      'Union Bank of Nigeria',
+      'United Bank for Africa (UBA)',
+      'Unity Bank',
+      'Wema Bank',
+      'Zenith Bank',
+    ];
+    final NumberFormat _formatter = NumberFormat('#,##0', 'en_US');
 
     showModalBottomSheet(
         context: context,
@@ -472,7 +500,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
         ),
         isScrollControlled: true,
         builder: (context) => FractionallySizedBox(
-            heightFactor: 0.8,
+            heightFactor: 0.85,
+            widthFactor: 0.98,
             child: SingleChildScrollView(
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -499,14 +528,19 @@ class _DashboardPageSState extends State<DashboardPageS> {
                           TextFormField(
                             controller: controller.accountNumber,
                             keyboardType: TextInputType.number,
+                            maxLength: 10,
                             decoration: InputDecoration(
+                              hintText: "Input Account Number",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
                               ),
+                              counterText: '', // hides the character counter
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter account number';
+                              } else if (value.length != 10) {
+                                return 'Account number must be exactly 10 digits';
                               }
                               return null;
                             },
@@ -518,14 +552,20 @@ class _DashboardPageSState extends State<DashboardPageS> {
                           TextFormField(
                             controller: controller.bvn,
                             keyboardType: TextInputType.number,
+                            maxLength: 11,
                             decoration: InputDecoration(
+                              hintText: "Input BVN",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
                               ),
+                              counterText:
+                                  '', // hides the default character counter
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter BVN';
+                              } else if (value.length != 11) {
+                                return 'BVN must be exactly 11 digits';
                               }
                               return null;
                             },
@@ -534,19 +574,33 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             height: 10,
                           ),
                           const Text('Bank'),
-                          TextFormField(
-                            controller: controller.bankName,
-                            // keyboardType: TextInputType.datetime,
+                          DropdownButtonFormField<String>(
+                            value: controller.bankName.text.isNotEmpty
+                                ? controller.bankName.text
+                                : null,
                             decoration: InputDecoration(
+                              // labelText: "Select Bank",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
                               ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 20),
                             ),
+                            isExpanded: true,
+                            hint: const Text("Select Bank"),
+                            items: bankList.map((String bank) {
+                              return DropdownMenuItem<String>(
+                                value: bank,
+                                child: Text(bank),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              controller.bankName.text = value ?? '';
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter a Bank Name';
+                                return 'Please select a Bank Name';
                               }
-                              // Add further date validation logic if needed
                               return null;
                             },
                           ),
@@ -558,15 +612,41 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             controller: controller.amount,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
+                              hintText: "Input Amount",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(100),
                               ),
+                              prefix: const Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: Text(
+                                  'NGN',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
+                            onChanged: (value) {
+                              String cleaned = value.replaceAll(',', '');
+                              if (cleaned.isEmpty) {
+                                controller.amount.text = '0';
+                              } else {
+                                final number = int.tryParse(cleaned);
+                                if (number != null) {
+                                  final newText = _formatter.format(number);
+                                  controller.amount.value = TextEditingValue(
+                                    text: newText,
+                                    selection: TextSelection.collapsed(
+                                        offset: newText.length),
+                                  );
+                                }
+                              }
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter an amount';
                               }
-                              if (double.tryParse(value) == null) {
+                              final number =
+                                  int.tryParse(value.replaceAll(',', ''));
+                              if (number == null) {
                                 return 'Please enter a valid number';
                               }
                               return null;
@@ -579,25 +659,30 @@ class _DashboardPageSState extends State<DashboardPageS> {
                           TextFormField(
                             controller: controller.repaymentDate,
                             readOnly: true, // Prevent manual text input
+                            decoration: InputDecoration(
+                              // labelText: 'NIN',
+                              hintText: 'Select Date',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
                             onTap: () async {
+                              DateTime today = DateTime.now();
                               DateTime? pickedDate = await showDatePicker(
                                 context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000), // Minimum date
-                                lastDate: DateTime(2100), // Maximum date
+                                initialDate: today,
+                                firstDate: DateTime(today.year, today.month,
+                                    today.day), // disables past dates
+                                lastDate: DateTime(2100),
                               );
 
                               if (pickedDate != null) {
                                 // Convert DateTime to String and assign to TextEditingController
                                 controller.repaymentDate.text =
-                                    "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                                    "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
                               }
                             },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                            ),
+
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please select a repayment date';
@@ -610,36 +695,14 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Processing request...')),
-                                  );
-                                  controller
-                                      .withdraw(context)
-                                      .then((isSuccess) {
-                                    if (isSuccess) {
-                                      showWithdrawDetailsPopup(context);
-
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Form Submitted!')),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'Failed to process request.')),
-                                      );
-                                    }
-                                  });
+                                  showWithdrawDetailsPopup(context);
+                                  // Navigator.pop(context);
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
+                                backgroundColor: baseColor,
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 150),
+                                    vertical: 16, horizontal: 140),
                               ),
                               child: const Text(
                                 'Proceed',
@@ -708,9 +771,9 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Obx(() => Text(
-                                        'Hello, ${controller.profileName.value} ${controller.lastName.value}',
+                                        ' ${controller.profileName.value} ${controller.lastName.value}',
                                         style: const TextStyle(
-                                          fontSize: 24,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       )),
@@ -820,47 +883,47 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                   )
                                 ],
                               ),
-                              const Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Disbursment Date",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "9 Sept, 2024",
-                                    style: TextStyle(
+                                    controller.repaymentDate.text,
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
                                   )
                                 ],
                               ),
-                              const Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Repayment Date",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   ),
                                   Text(
-                                    "30 Sept, 2024",
-                                    style: TextStyle(
+                                    controller.repaymentDate.text,
+                                    style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w800),
                                   ),
                                 ],
                               ),
-                              const Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Disbursed Amount",
                                     style: TextStyle(
                                         color: Colors.black,
@@ -868,8 +931,8 @@ class _DashboardPageSState extends State<DashboardPageS> {
                                         fontWeight: FontWeight.w900),
                                   ),
                                   Text(
-                                    "NGN 70,000",
-                                    style: TextStyle(
+                                    'NGN ${controller.amount.text}',
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w900,
@@ -882,9 +945,20 @@ class _DashboardPageSState extends State<DashboardPageS> {
                         ),
                         const SizedBox(height: 25),
                         ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            showwithdrawSuccessPopup(context);
+                          onPressed: () async {
+                            // Navigator.pop(context);
+                            final success = await controller.withdraw(context);
+                            if (success) {
+                              // ignore: use_build_context_synchronously
+                              showwithdrawSuccessPopup(context);
+                            } else {
+                              // Optionally show error
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Withdrawal failed")),
+                              );
+                            }
                           },
                           //
                           style: ElevatedButton.styleFrom(
@@ -892,7 +966,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             minimumSize: const Size.fromHeight(50),
                           ),
                           child: const Text(
-                            "Processd",
+                            "Proceed",
                             style: TextStyle(
                                 color: Colors.white, letterSpacing: 2),
                           ),
@@ -924,23 +998,16 @@ class _DashboardPageSState extends State<DashboardPageS> {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          "Deposite Successful",
+                          "Withdrawal Successful",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w600),
                         ),
-                        Text(
-                            "Congratulations ${controller.profileName} You have made your first deposit",
-                            style: const TextStyle(fontSize: 10)),
+                        
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DashboardPageS(
-                                    widget.plans), // Start with MortgagePage
-                              ),
-                            );
+                            Navigator.pushNamed(context, "/mainDashboard",
+                                arguments: widget.plans);
                           },
                           //
                           style: ElevatedButton.styleFrom(
@@ -948,7 +1015,7 @@ class _DashboardPageSState extends State<DashboardPageS> {
                             minimumSize: const Size.fromHeight(50),
                           ),
                           child: const Text(
-                            "Processd",
+                            "Proceed",
                             style: TextStyle(
                                 color: Colors.white, letterSpacing: 2),
                           ),
@@ -993,7 +1060,7 @@ class FeatureCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 30, color: Colors.deepPurple),
+            Icon(icon, size: 30, color: baseColor),
             const SizedBox(height: 10),
             Text(
               label,
@@ -1028,7 +1095,7 @@ class GaugeChartWidget extends StatelessWidget {
       width: 400,
       height: 250,
       decoration: BoxDecoration(
-        color: Colors.deepPurple,
+        color: baseColor,
         borderRadius: BorderRadius.circular(1),
       ),
       child: Column(
@@ -1050,7 +1117,7 @@ class GaugeChartWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    plans,
+                    "KWIK $plans",
                     textAlign: TextAlign.left,
                     style: const TextStyle(
                       fontSize: 18,
@@ -1060,14 +1127,24 @@ class GaugeChartWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(
-                "${data["currentPlanDuration"] ?? ''}",
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.timer, // Timer icon
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 4), // Spacing between icon and text
+                  Text(
+                    "${data["currentPlanDuration"] ?? ''}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
           const SizedBox(height: 20),
@@ -1112,21 +1189,24 @@ class GaugeChartWidget extends StatelessWidget {
                   annotations: <GaugeAnnotation>[
                     GaugeAnnotation(
                       widget: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          data["creditScore"] ?? '',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue[900],
-                            fontWeight: FontWeight.w900,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                        ),
-                      ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            child: Text(
+                              data["creditScore"] ?? '',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.blue[900],
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          )),
                       angle: 90,
                       positionFactor: 0.8,
                     ),

@@ -23,7 +23,7 @@ class _LandingScreenState extends State<LandingScreen> {
       imagePath: Images.keyIcon,
     ),
     const OnboardingPage(
-      title: "Rent to Own",
+      title: "Rent-to-own",
       description:
           "With a minimum of 40% down payment in an interest bearing account, move into your dream property within 30 days and convert to a mortgage in 12 months. T&Cs apply.",
       imagePath: Images.rendtoHome,
@@ -79,7 +79,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   onPressed: () {
                     _pageController.jumpToPage(_pages.length - 1);
                     if (_currentPage == _pages.length - 1) {
-                      Navigator.pushNamed(context, "/login");
+                      Navigator.pushNamed(context, "/register");
                     } else {
                       Navigator.push(
                           context,
@@ -91,7 +91,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     side: BorderSide(width: 1.0, color: baseColor),
                   ),
                   child: Text(
-                    _currentPage == _pages.length - 1 ? "Login" : "Skip",
+                    _currentPage == _pages.length - 1 ? "Register" : "Skip",
                     style: TextStyle(color: baseColor),
                   ),
                 ),

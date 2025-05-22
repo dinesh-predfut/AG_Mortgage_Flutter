@@ -17,7 +17,7 @@ import 'package:intl/intl.dart';
 import '../../dashboard/Dashboard/component.dart';
 
 // ignore: camel_case_types
-class Main_Dashboard_controller extends GetxController  {
+class Main_Dashboard_controller extends GetxController {
   TextEditingController accountNumber = TextEditingController();
   TextEditingController bvn = TextEditingController();
   TextEditingController bankName = TextEditingController();
@@ -30,7 +30,8 @@ class Main_Dashboard_controller extends GetxController  {
   var profileName = "".obs;
   var lastName = "".obs;
   var phoneNumber = "";
-var profileImageUrl = ''.obs;
+  var profileImageUrl = ''.obs;
+
   Future<List<InvestmentItem>?> fetchInvestmentDetails() async {
     try {
       var url = Uri.parse('${Urls.investmentByid}${Params.userId}');
@@ -121,6 +122,9 @@ var profileImageUrl = ''.obs;
         print('Response scoreData: $scoreData');
       }
     } catch (e) {
+      print('error scoreData: $e');
+
+      isLoading.value = false;
       print(e);
     }
   }
@@ -149,6 +153,7 @@ var profileImageUrl = ''.obs;
 
   Future<void> onLogout(BuildContext context) async {
     await SetSharedPref().clearData();
+    // ignore: use_build_context_synchronously
     Navigator.of(context, rootNavigator: true).pushNamed("/login");
   }
 
@@ -171,7 +176,7 @@ var profileImageUrl = ''.obs;
         // isLoading.value = false;
 
         if (data['firstName'] != null) {
-          profileName.value  = data['firstName'];
+          profileName.value = data['firstName'];
         }
         if (data['lastName'] != null) {
           lastName.value = data['lastName'];
@@ -204,14 +209,19 @@ var profileImageUrl = ''.obs;
   }
 
   Future<bool> withdraw(BuildContext context) async {
+    final rawDate = repaymentDate.text.trim();
+    final parsedDate = DateFormat('dd-MM-yyyy').parse(rawDate);
+    final formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+    print("Date$formattedDate");
     try {
       var request = http.Request('POST', Uri.parse(Urls.withdraw));
       request.body = json.encode({
         "bankName": bankName.text.trim(),
-        "amount": amount.text.trim(),
-        "accountNumber": accountNumber.text.trim(),
+        "amount":
+            double.tryParse(amount.text.replaceAll(',', '').trim()) ?? 0.0,
+        "accountNumber": accountNumber.text,
         "bvn": bvn.text.trim(),
-        "repaymentDate": repaymentDate.text.trim(),
+        "repaymentDate": formattedDate,
         "typeOfTransaction": "Monthly Contributions",
         "status": 'OnTime'
       });
@@ -232,14 +242,12 @@ var profileImageUrl = ''.obs;
 
       if (decodedResponse.statusCode == 200) {
         // ignore: use_build_context_synchronously
-
-        Fluttertoast.showToast(
-          msg: "Withdrawal Successful",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-        );
+        bankName.clear();
+        amount.clear();
+        accountNumber.clear();
+        bvn.clear();
+        repaymentDate.clear();
+     
         return true;
       } else {
         print('Error: ${decodedResponse.body}');

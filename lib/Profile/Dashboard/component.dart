@@ -35,10 +35,7 @@ class _AccountPageState extends State<AccountPage> {
       appBar: AppBar(
         title: const Text('Account'),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => {Navigator.pop(context)},
-        ),
+       
       ),
       body: SingleChildScrollView(
         child: Column(

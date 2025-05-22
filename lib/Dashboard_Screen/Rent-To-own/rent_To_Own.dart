@@ -127,7 +127,7 @@ class RentToOwnLanding extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                "Rent to Own",
+                "Rent-to-own",
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
@@ -1020,9 +1020,16 @@ class _CalendarPageState extends State<CalendarPage> {
                     controller.selectedDay != null &&
                     isSameDay(controller.selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    controller.selectedDay = selectedDay;
-                  });
+                  if (!selectedDay.isBefore(DateTime.now())) {
+                    setState(() {
+                      controller.selectedDay = selectedDay;
+                    });
+                  }
+                },
+                enabledDayPredicate: (day) {
+                  // Disable past dates
+                  final now = DateTime.now();
+                  return !day.isBefore(DateTime(now.year, now.month, now.day));
                 },
                 calendarStyle: CalendarStyle(
                   selectedDecoration: BoxDecoration(
@@ -1037,6 +1044,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     color: Colors.orange,
                     shape: BoxShape.circle,
                   ),
+                  disabledTextStyle: TextStyle(color: Colors.grey), // Optional
                 ),
                 headerStyle: const HeaderStyle(
                   formatButtonVisible: false,
@@ -2073,8 +2081,7 @@ class TermsAndConditionsDialogRentown extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 18),
                   ),
                   onPressed: () {
-                                    Navigator.pushNamed(context, "/dashBoardPage");
-
+                    Navigator.pushNamed(context, "/dashBoardPage");
                   },
                   child: const Text(
                     'Decline',

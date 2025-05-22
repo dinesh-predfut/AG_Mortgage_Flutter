@@ -10,7 +10,8 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class Get_All_Cards extends StatefulWidget {
-  const Get_All_Cards({super.key});
+  final String? selectedLoan;
+  const Get_All_Cards(this.selectedLoan, {super.key});
 
   @override
   State<Get_All_Cards> createState() => _Get_All_CardsState();
@@ -50,7 +51,10 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
       create: (_) => CardController()..fetchCards(),
       child: Scaffold(
         appBar: AppBar(
-          title:  Text("My Card",style: TextStyle(color: baseColor),),
+          title: Text(
+            "My Card",
+            style: TextStyle(color: baseColor),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -96,7 +100,15 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                                       CardPaymentPage(selectedID: card.id),
                                 ),
                               );
-                                Navigator.pushReplacementNamed(context, '/selectedCard',arguments: card.id);
+                              Navigator.pushReplacementNamed(
+                                context,
+                                '/selectedCard',
+                                arguments: {
+                                  'cardId': card.id,
+                                  'LoanType': widget
+                                      .selectedLoan, // or any other second value
+                                },
+                              );
                             },
                             child: Container(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -227,14 +239,7 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // handleAddCard(context);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const ADD_CardDetailsPage(), // Start with MortgagePageHome
-                        ),
-                      );
+                      Navigator.pushNamed(context, "/addCard");
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Add New Card"),
@@ -410,12 +415,11 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                         horizontal: 15, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:  BorderSide(color: baseColor),
+                      borderSide: BorderSide(color: baseColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                           BorderSide(color: baseColor, width: 2),
+                      borderSide: BorderSide(color: baseColor, width: 2),
                     ),
                   ),
                 ),
@@ -433,12 +437,11 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                         horizontal: 15, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:  BorderSide(color: baseColor),
+                      borderSide: BorderSide(color: baseColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                           BorderSide(color: baseColor, width: 2),
+                      borderSide: BorderSide(color: baseColor, width: 2),
                     ),
                   ),
                 ),
@@ -456,12 +459,11 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                         horizontal: 15, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:  BorderSide(color: baseColor),
+                      borderSide: BorderSide(color: baseColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                           BorderSide(color: baseColor, width: 2),
+                      borderSide: BorderSide(color: baseColor, width: 2),
                     ),
                   ),
                 ),
@@ -479,12 +481,11 @@ class _Get_All_CardsState extends State<Get_All_Cards> {
                         horizontal: 15, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:  BorderSide(color: baseColor),
+                      borderSide: BorderSide(color: baseColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                           BorderSide(color: baseColor, width: 2),
+                      borderSide: BorderSide(color: baseColor, width: 2),
                     ),
                   ),
                 ),

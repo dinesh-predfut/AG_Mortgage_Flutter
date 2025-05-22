@@ -113,7 +113,7 @@ class CardController extends ChangeNotifier {
           Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Get_All_Cards(), // Start with MortgagePage
+                    builder: (context) => const Get_All_Cards(""), // Start with MortgagePage
                   ),
                 );
 
@@ -166,7 +166,7 @@ class CardController extends ChangeNotifier {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Get_All_Cards(), // Start with MortgagePage
+                    builder: (context) => const Get_All_Cards(""), // Start with MortgagePage
                   ),
                 );
               

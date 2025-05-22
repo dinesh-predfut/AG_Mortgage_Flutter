@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:ag_mortgage/All_Cards/Add_New_Cards/add_cards.dart';
+import 'package:ag_mortgage/All_Cards/Get_all_Cards/all_cards.dart';
 import 'package:ag_mortgage/All_Cards/Get_all_Cards/controller.dart';
 import 'package:ag_mortgage/All_Cards/Select_Amount/select_Amount.dart';
 import 'package:ag_mortgage/Authentication/Login/login.dart';
@@ -33,7 +35,6 @@ import 'package:ag_mortgage/Profile/Edit_Profile/Employment_Details/component.da
 import 'package:ag_mortgage/Profile/profile.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/const/colors.dart';
 import 'package:ag_mortgage/const/constant.dart';
@@ -45,7 +46,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
 import 'Authentication/Login_Controller/controller.dart';
 import 'Main_Dashboard/dashboard/Dashboard/component.dart';
 import 'Profile/Edit_Profile/Profile_Details/component.dart';
@@ -54,6 +55,7 @@ import 'Profile/Edit_Profile/Profile_Details/component.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Get.lazyPut(() => ProfileController());
+  await FlutterLibphonenumber().init();
   await SetSharedPref().getData(); // Retrieve saved data from SharedPreferences
 
   if (Params.refreshToken != "null") {
@@ -137,11 +139,24 @@ class MyApp extends StatelessWidget {
                       showBottomNavBar: true,
                       child: MortgageTermSheetPage(),
                     ));
-                     case '/mortgagePaymentmethod':
+          case '/mortgagePaymentmethod':
             return MaterialPageRoute(
                 builder: (context) => const MainLayout(
                       showBottomNavBar: true,
                       child: PaymentMethodPageMortage(),
+                    ));
+          case '/getAllcards':
+            final argument = settings.arguments;
+            return MaterialPageRoute(
+                builder: (context) => MainLayout(
+                      showBottomNavBar: false,
+                      child: Get_All_Cards(argument.toString()),
+                    ));
+          case '/addCard':
+            return MaterialPageRoute(
+                builder: (context) => const MainLayout(
+                      showBottomNavBar: false,
+                      child: ADD_CardDetailsPage(),
                     ));
           case '/marketMain':
             return MaterialPageRoute(
@@ -370,12 +385,21 @@ class MyApp extends StatelessWidget {
                 builder: (context) => const MainLayout(
                     showBottomNavBar: true, child: Investment_Forms()));
           case '/selectedCard':
-            final argument = settings.arguments as int?;
+            final args = settings.arguments as Map<String, dynamic>;
+            final selectedID = args['cardId'] as int?;
+            final cardType = args['LoanType'] as String?; // Optional if needed
+
             return MaterialPageRoute(
-                builder: (context) => MainLayout(
-                      showBottomNavBar: true,
-                      child: CardPaymentPage(selectedID: argument),
-                    ));
+              builder: (context) => MainLayout(
+                showBottomNavBar: false,
+                child: CardPaymentPage(
+                  selectedID: selectedID,
+                  planType:
+                      cardType, // Pass this only if your widget supports it
+                ),
+              ),
+            );
+
           default:
             return MaterialPageRoute(
                 builder: (context) =>
@@ -432,7 +456,7 @@ class _MainLayoutState extends State<MainLayout> {
     // Navigate to the selected page
     switch (index) {
       case 0:
-       Navigator.pushReplacement(
+        Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
@@ -446,7 +470,7 @@ class _MainLayoutState extends State<MainLayout> {
         );
         break;
       case 1:
-       Navigator.pushReplacement(
+        Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => MainLayout(
@@ -460,7 +484,7 @@ class _MainLayoutState extends State<MainLayout> {
         );
         break;
       case 2:
-       Navigator.pushReplacement(
+        Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => MainLayout(

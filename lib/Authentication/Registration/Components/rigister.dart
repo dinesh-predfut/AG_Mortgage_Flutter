@@ -3,6 +3,7 @@ import 'package:ag_mortgage/Authentication/Login_Controller/controller.dart';
 import 'package:ag_mortgage/Authentication/OTP/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -143,9 +144,11 @@ class _RegisterScreenState extends State<RegisterScreen>
                   //         .completeNumber); // Prints full number with country code
                   //   },
                   // ),
+
                   IntlPhoneField(
                     controller: signupController.registerPhoneNumber,
                     keyboardType: TextInputType.phone,
+                    invalidNumberMessage: "Please select a valid number",
                     decoration: InputDecoration(
                       labelText: "Phone Number",
                       border: OutlineInputBorder(
@@ -164,13 +167,27 @@ class _RegisterScreenState extends State<RegisterScreen>
                       signupController.countryCodeController.text =
                           "+${country.dialCode}";
                     },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
                     validator: (phone) {
                       if (phone == null || phone.number.trim().isEmpty) {
-                        return 'Please enter a valid phone number';
+                        return 'Please enter a phone number';
                       }
-                      if (phone.number.length < 10) {
-                        return 'Phone number length should more the 10';
+
+                      String phoneNumber = phone.number.trim();
+
+                      // Simple rules (Nigeria as example: 10 digits)
+                      if (phoneNumber.length != 10) {
+                        return 'Phone number must be 10 digits';
                       }
+
+                      // Optional: more basic rule - ensure all characters are digits
+                      if (!RegExp(r'^\d{10}$').hasMatch(phoneNumber)) {
+                        return 'Only digits are allowed';
+                      }
+
                       return null;
                     },
                   ),

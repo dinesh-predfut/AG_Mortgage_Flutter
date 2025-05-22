@@ -6,8 +6,10 @@ import 'package:ag_mortgage/Dashboard_Screen/dashboard_Screen.dart';
 import 'package:ag_mortgage/main.dart';
 import 'package:flutter/material.dart';
 import 'package:ag_mortgage/const/Image.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart'; // Update this with the correct path to your image.dart file.
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
 
 import '../../const/colors.dart';
 
@@ -92,7 +94,7 @@ class _LoginState extends State<Login> {
                           counterText: "",
                         ),
                         initialCountryCode: 'NG',
-                        disableLengthCheck: true,
+                        disableLengthCheck: true, // we’ll do our own check
                         onChanged: (phone) {
                           signupController.countryCodeController.text =
                               phone.countryCode;
@@ -101,17 +103,30 @@ class _LoginState extends State<Login> {
                           signupController.countryCodeController.text =
                               "+${country.dialCode}";
                         },
-                        validator: (phone) {
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        validator: (phone) async {
                           if (phone == null || phone.number.trim().isEmpty) {
-                            return 'Please enter a valid phone number';
+                            return 'Please enter a phone number';
                           }
-                          if (phone.number.length < 10) {
-                            return 'Phone number length should more the 10';
-                          }
+                      if (phone.number.length != 10) {
+                        return 'Phone number must be 10 digits';
+                      }
+                          // bool isValid =
+                          //     await signupController.isPhoneNumberValid(
+                          //   phone.completeNumber,
+                          //   phone.countryISOCode ?? 'NG',
+                          // );
+
+                          // if (!isValid) {
+                          //   return 'Invalid phone number for selected country';
+                          // }
+
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 20),
                       // Promo Code Field
                       TextField(
